@@ -5,9 +5,9 @@
             "defines": ["${default}", "ENV_UNIT_TESTS", "PLATFORM_HOSTED", "RUN_WITH_PROFILING"],
             "includePath": [
                 "${default}",
-                "template-project/taproot/sim-modm/hosted-linux/modm/src",
-                "template-project/taproot/test",
-                "template-project/test"
+                "qkrt-mcb-project/taproot/sim-modm/hosted-linux/modm/src",
+                "qkrt-mcb-project/taproot/test",
+                "qkrt-mcb-project/test"
             ],
             "compilerPath": "g++",
             "intelliSenseMode": "gcc-x64",
@@ -18,7 +18,7 @@
             "defines": ["${default}", "PLATFORM_HOSTED", "RUN_WITH_PROFILING"],
             "includePath": [
                 "${default}",
-                "template-project/taproot/sim-modm/hosted-linux/modm/src"
+                "qkrt-mcb-project/taproot/sim-modm/hosted-linux/modm/src"
             ],
             "compilerPath": "g++",
             "intelliSenseMode": "gcc-x64",
@@ -28,10 +28,10 @@
             "name": "Hardware",
             "includePath": [
                 "${default}",
-                "template-project/taproot/modm/src",
-                "template-project/taproot/modm/ext/cmsis/core",
-                "template-project/taproot/modm/ext/cmsis/device",
-                "template-project/taproot/modm/ext/cmsis/dsp"        
+                "qkrt-mcb-project/taproot/modm/src",
+                "qkrt-mcb-project/taproot/modm/ext/cmsis/core",
+                "qkrt-mcb-project/taproot/modm/ext/cmsis/device",
+                "qkrt-mcb-project/taproot/modm/ext/cmsis/dsp"        
             ],
             "compilerPath": "arm-none-eabi-g++",
             "intelliSenseMode": "gcc-arm",
