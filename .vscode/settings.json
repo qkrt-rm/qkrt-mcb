@@ -1,6 +1,7 @@
 {
   "editor.tabSize": 4,
   "files.associations": {
+    "*.pro": "prolog",
     "array": "cpp",
     "string": "cpp",
     "string_view": "cpp",
@@ -69,7 +70,13 @@
     "valarray": "cpp",
     "variant": "cpp",
     "SConstruct": "python",
-    "SConscript": "python"
+    "SConscript": "python",
+    "bit": "cpp",
+    "compare": "cpp",
+    "concepts": "cpp",
+    "numbers": "cpp",
+    "ranges": "cpp",
+    "span": "cpp"
   },
   "C_Cpp.errorSquiggles": "Enabled",
   "C_Cpp.default.includePath": [
