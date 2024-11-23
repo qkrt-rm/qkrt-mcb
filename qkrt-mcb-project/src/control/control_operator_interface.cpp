@@ -10,14 +10,19 @@ ControlOperatorInterface::ControlOperatorInterface(tap::communication::serial::R
 {
 }
 
-float ControlOperatorInterface::getChassisLeftVerticalInput() const
+float ControlOperatorInterface::getChassisXInput() const
 {
     return _M_remote.getChannel(Remote::Channel::LEFT_HORIZONTAL);
 }
 
-float ControlOperatorInterface::getChassisLeftHorizontalInput() const
+float ControlOperatorInterface::getChassisZInput() const
 {
     return _M_remote.getChannel(Remote::Channel::LEFT_VERTICAL);
+}
+
+float ControlOperatorInterface::getChassisRInput() const
+{
+    return _M_remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL);
 }
 
 }  // control
