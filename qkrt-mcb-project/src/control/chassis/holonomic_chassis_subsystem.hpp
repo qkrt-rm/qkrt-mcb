@@ -53,23 +53,16 @@ private:
 public:
     HolonomicChassisSubsystem(Drivers& drivers, const ChassisConfig& config);
 
-    ///
-    /// @brief Initializes the drive motors.
-    ///
     void initialize() override;
 
     ///
-    /// @brief Control the chassis using omni drive. Sets the wheel velocity of the four drive
-    /// motors individually based on on the input left/right desired velocity.
+    /// @brief Sets the wheel velocity of the four drive motors individually based on 
+    /// the input desired velocities.
     ///
-    /// @param leftFront Desired speed in m/s of the left-front wheel of the chassis. Positive speed is
-    /// forward, negative is backwards.
-    /// @param leftBack Desired speed in m/s of the left-back wheel of the chassis. Positive speed is
-    /// forward, negative is backwards.
-    /// @param rightFront Desired chassis speed in m/s of the right-front of the chassis. Positive speed is
-    /// forward, negative is backwards.
-    /// @param rightBack Desired speed in m/s of the right-back wheel of the chassis. Positive speed is
-    /// forward, negative is backwards.
+    /// @param leftFront Desired speed in m/s of the left-front wheel of the chassis.
+    /// @param leftBack Desired speed in m/s of the left-back wheel of the chassis.
+    /// @param rightFront Desired chassis speed in m/s of the right-front of the chassis.
+    /// @param rightBack Desired speed in m/s of the right-back wheel of the chassis.
     ///
     void setWheelVelocities(float leftFront, float leftBack, float rightFront, float rightBack);
     
