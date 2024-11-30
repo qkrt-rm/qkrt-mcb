@@ -21,16 +21,17 @@ void HolonomicChassisCommand::execute()
     float z = _M_operatorInterface.getChassisZInput();
     float r = _M_operatorInterface.getChassisRInput();
 
-    double denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
-    double leftFront  = (z + x + r) / denominator;
-    double leftBack   = (z - x + r) / denominator;
-    double rightFront = (z - x - r) / denominator;
-    double rightBack  = (z + x - r) / denominator;
+    float xx = (float) x * 1.1; // Counteract imperfect strafing
+    float yy = (float) -z; // Y stick is reversed!
+    float rr = (float) r;
 
-    _M_chassis.setWheelVelocities(leftFront,
-                                  leftBack,
-                                  rightFront,
-                                  rightBack);
+    float denominator = std::max(std::abs(yy) + std::abs(xx) + std::abs(rr), 1.0f);
+    float leftFront = (yy + xx + rr) / denominator;
+    float leftBack = (yy - xx + rr) / denominator;
+    float rightFront = (yy - xx - rr) / denominator;
+    float rightBack = (yy + xx - rr) / denominator;
+
+    _M_chassis.setWheelVelocities(leftFront, leftBack, rightFront, rightBack);
 }
 
 void HolonomicChassisCommand::end(bool /* interrupted */)
