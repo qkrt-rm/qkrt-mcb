@@ -19,7 +19,7 @@ void HolonomicChassisCommand::execute()
 {
     float x = _M_operatorInterface.getChassisXInput();
     float z = _M_operatorInterface.getChassisZInput();
-    float r = _M_operatorInterface.getChassisRInput();
+    float r = 0.0f;
 
     double denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
     double leftFront  = (z + x + r) / denominator;

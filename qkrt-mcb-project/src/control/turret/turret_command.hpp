@@ -11,9 +11,12 @@ namespace control::turret
 class TurretCommand : public tap::control::Command
 {
 private:
+    using Uart = tap::communication::serial::Uart;
 
 public:
-    TurretCommand(TurretSubsystem& chassis, ControlOperatorInterface& operatorInterface);
+    TurretCommand(TurretSubsystem& chassis,
+                  ControlOperatorInterface& operatorInterface,
+                  Uart& uart);
 
     void initialize() override;
 
@@ -28,7 +31,7 @@ public:
 private:
     TurretSubsystem& _M_turret;
     ControlOperatorInterface& _M_operatorInterface;
-
+    Uart& _M_uart;
 };
 
 }  // namespace control::turret

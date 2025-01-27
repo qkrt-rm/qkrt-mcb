@@ -1,13 +1,19 @@
 #include "turret_subsystem.hpp"
 
+namespace control::turret
+{
+
 TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
-    : tap::control::Subsystem(&drivers)
+    : tap::control::Subsystem(&drivers),
       _M_desiredOutput(),
       _M_pidControllers(),
       _M_motors({
           Motor(&drivers, config.pitchId,  config.canBus, false, "PITCH"),
           Motor(&drivers, config.yawId,    config.canBus, false, "YAW")
-      })
+      }),
+      _M_elevation(0.0f), _M_azimuth(0.0f),
+      _M_sensitivity(0.1f),
+      _M_yawForwardOffset(0.0f)
 {
     for (auto& controller : _M_pidControllers)
     {
@@ -15,7 +21,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
     }
 }
 
-void TurretSubsystem::initialize() override
+void TurretSubsystem::initialize()
 {
     for (auto& motor : _M_motors)
     {
@@ -23,12 +29,12 @@ void TurretSubsystem::initialize() override
     }
 }
 
-void TurretSubsystem::refresh() override
+void TurretSubsystem::refresh()
 {
     auto runPid = [](Pid& pid, Motor& motor, float desiredOutput) -> void
     {
         pid.update(desiredOutput - motor.getShaftRPM());
-        motor.setDesiredOutput(pid.getValue());
+        motor.setDesiredOutput(desiredOutput);
     };
 
     for (size_t ii = 0; ii < _M_motors.size(); ii++)
@@ -36,3 +42,19 @@ void TurretSubsystem::refresh() override
         runPid(_M_pidControllers[ii], _M_motors[ii], _M_desiredOutput[ii]);
     }
 }
+
+void TurretSubsystem::setPitch(float elevation)
+{
+    elevation = rpsToRpm(elevation);
+    elevation = rpmToMilliVolts(elevation);
+    _M_desiredOutput[static_cast<uint8_t>(MotorId::PITCH)] = elevation;
+}
+
+void TurretSubsystem::setYaw(float azimuth)
+{
+    azimuth = rpsToRpm(azimuth);
+    azimuth = rpmToMilliVolts(azimuth);
+    _M_desiredOutput[static_cast<uint8_t>(MotorId::YAW)] = azimuth;
+}
+
+}  // namespace control::turret

@@ -20,7 +20,12 @@ float ControlOperatorInterface::getChassisZInput() const
     return _M_remote.getChannel(Remote::Channel::LEFT_VERTICAL);
 }
 
-float ControlOperatorInterface::getChassisRInput() const
+float ControlOperatorInterface::getChassisPitchInput() const
+{
+    return _M_remote.getChannel(Remote::Channel::RIGHT_VERTICAL);
+}
+
+float ControlOperatorInterface::getChassisYawInput() const
 {
     return _M_remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL);
 }
