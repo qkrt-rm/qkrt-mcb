@@ -24,8 +24,8 @@ void TurretCommand::execute()
     float pitch = _M_operatorInterface.getChassisPitchInput();
     float yaw = _M_operatorInterface.getChassisYawInput();
 
-    _M_turret.setPitchRpm(pitch);
-    _M_turret.setYawRpm(yaw);
+    _M_turret.setPitchRps(pitch);
+    _M_turret.setYawRps(yaw);
 }
 
 void TurretCommand::end(bool /* interrupted */)

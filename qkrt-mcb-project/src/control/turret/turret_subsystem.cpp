@@ -43,14 +43,14 @@ void TurretSubsystem::refresh()
     }
 }
 
-void TurretSubsystem::setPitchRpm(float elevation)
+void TurretSubsystem::setPitchRps(float elevation)
 {
     elevation = rpsToRpm(elevation);
     elevation = std::clamp(elevation, -MAX_TURRET_MOTOR_RPM, MAX_TURRET_MOTOR_RPM);
     _M_desiredOutput[static_cast<uint8_t>(MotorId::PITCH)] = elevation;
 }
 
-void TurretSubsystem::setYawRpm(float azimuth)
+void TurretSubsystem::setYawRps(float azimuth)
 {
     azimuth = rpsToRpm(azimuth);
     azimuth = std::clamp(azimuth, -MAX_TURRET_MOTOR_RPM, MAX_TURRET_MOTOR_RPM);
