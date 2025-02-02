@@ -36,10 +36,8 @@ private:
     using Pid = modm::Pid<float>;
     using Motor = tap::motor::DjiMotor;
 
-    static constexpr float MAX_TURRET_MOTOR_RPM        = 300.0f;
-    static constexpr float MAX_TURRET_MOTOR_MILLIVOLTS = 25'000.0f;
-
-    static constexpr float MAX_TURRET_ELEVATION =  M_PI_4;
+    static constexpr float MAX_TURRET_MOTOR_RPM = 300.0f;
+    static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
 
 public:
     TurretSubsystem(Drivers& drivers, const TurretConfig& config);
@@ -57,7 +55,7 @@ private:
     {
         static constexpr float SEC_PER_MIN = 60.0f;
         static constexpr float GEAR_RATIO  = 2.0f;
-
+        
         return rps * SEC_PER_MIN * GEAR_RATIO;
     }
 
