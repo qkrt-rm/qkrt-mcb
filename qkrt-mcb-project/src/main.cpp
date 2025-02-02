@@ -121,6 +121,9 @@ static void initializeIo(Drivers *drivers)
     drivers->terminalSerial.initialize();
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();
+
+    using Uart = tap::communication::serial::Uart;
+    drivers->uart.init<Uart::UartPort::Uart1, 115200>();
 }
 
 static void updateIo(Drivers *drivers)
