@@ -47,8 +47,8 @@ public:
     const char* getName() override { return "Turret"; }
 
 public:
-    void setPitch(float elevation);
-    void setYaw(float azimuth);
+    void setPitchRpm(float elevation);
+    void setYawRpm(float azimuth);
     
 private:
     inline float rpsToRpm(float rps) const
