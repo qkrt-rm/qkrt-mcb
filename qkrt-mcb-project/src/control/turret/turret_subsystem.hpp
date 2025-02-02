@@ -36,7 +36,7 @@ private:
     using Pid = modm::Pid<float>;
     using Motor = tap::motor::DjiMotor;
 
-    static constexpr float MAX_TURRET_MOTOR_RPM        = 320.0f;
+    static constexpr float MAX_TURRET_MOTOR_RPM        = 300.0f;
     static constexpr float MAX_TURRET_MOTOR_MILLIVOLTS = 25'000.0f;
 
     static constexpr float MAX_TURRET_ELEVATION =  M_PI_4;
@@ -53,17 +53,12 @@ public:
     void setYaw(float azimuth);
     
 private:
-    inline float rpsToRpm(float radPerSec) const
+    inline float rpsToRpm(float rps) const
     {
-        static constexpr float RAD_PER_REV = M_TWOPI;
-        static constexpr float GEAR_RATIO  = 1.0f;
+        static constexpr float SEC_PER_MIN = 60.0f;
+        static constexpr float GEAR_RATIO  = 2.0f;
 
-        return radPerSec / RAD_PER_REV * GEAR_RATIO;
-    }
-
-    inline float rpmToMilliVolts(float revPerMin) const
-    {
-        return revPerMin * MAX_TURRET_MOTOR_MILLIVOLTS / MAX_TURRET_MOTOR_RPM;
+        return rps * SEC_PER_MIN * GEAR_RATIO;
     }
 
     std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> _M_desiredOutput;

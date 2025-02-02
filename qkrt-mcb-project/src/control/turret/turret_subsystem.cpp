@@ -34,7 +34,7 @@ void TurretSubsystem::refresh()
     auto runPid = [](Pid& pid, Motor& motor, float desiredOutput) -> void
     {
         pid.update(desiredOutput - motor.getShaftRPM());
-        motor.setDesiredOutput(desiredOutput);
+        motor.setDesiredOutput(pid.getValue());
     };
 
     for (size_t ii = 0; ii < _M_motors.size(); ii++)
@@ -45,15 +45,14 @@ void TurretSubsystem::refresh()
 
 void TurretSubsystem::setPitch(float elevation)
 {
-    elevation = rpsToRpm(elevation);
-    elevation = rpmToMilliVolts(elevation);
-    _M_desiredOutput[static_cast<uint8_t>(MotorId::PITCH)] = elevation;
+    // elevation = rpsToRpm(elevation);
+    // elevation = rpmToMilliVolts(elevation);
+    _M_desiredOutput[static_cast<uint8_t>(MotorId::PITCH)] = 0.0f;
 }
 
 void TurretSubsystem::setYaw(float azimuth)
 {
     azimuth = rpsToRpm(azimuth);
-    azimuth = rpmToMilliVolts(azimuth);
     _M_desiredOutput[static_cast<uint8_t>(MotorId::YAW)] = azimuth;
 }
 

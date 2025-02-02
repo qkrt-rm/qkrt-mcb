@@ -32,6 +32,8 @@ private:
     TurretSubsystem& _M_turret;
     ControlOperatorInterface& _M_operatorInterface;
     Uart& _M_uart;
+
+    float _M_pitchSensitivity, _M_yawSensitivity;
 };
 
 }  // namespace control::turret

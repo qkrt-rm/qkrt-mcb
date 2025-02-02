@@ -23,7 +23,7 @@ Robot::Robot(Drivers& drivers)
                     .pitchId = MotorId::MOTOR6,
                     .yawId   = MotorId::MOTOR5,
                     .canBus  = CanBus::CAN_BUS1,
-                    .turretVelocityPidConfig = modm::Pid<float>::Parameter(500, 3, 0, 70, 100000),
+                    .turretVelocityPidConfig = modm::Pid<float>::Parameter(75, 3, 0, 70, 100000),
                 }),
       _M_turretCommand(_M_turret, drivers.controlOperatorInterface, drivers.uart)
 {

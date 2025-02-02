@@ -78,9 +78,9 @@ private:
         static constexpr float GEAR_RATIO = 19.0f;
         static constexpr float WHEEL_DIAMETER_M = 0.076f;
         static constexpr float WHEEL_CIRCUMFERANCE_M = M_PI * WHEEL_DIAMETER_M;
-        static constexpr float SEC_PER_M = 60.0f;
+        static constexpr float SEC_PER_MIN = 60.0f;
 
-        return (mps / WHEEL_CIRCUMFERANCE_M) * SEC_PER_M * GEAR_RATIO;
+        return (mps / WHEEL_CIRCUMFERANCE_M) * SEC_PER_MIN * GEAR_RATIO;
     }
 
     /// Desired wheel output for each motor
