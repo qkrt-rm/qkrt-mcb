@@ -11,9 +11,8 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
           Motor(&drivers, config.pitchId,  config.canBus, false, "PITCH"),
           Motor(&drivers, config.yawId,    config.canBus, false, "YAW")
       }),
-      _M_elevation(0.0f), _M_azimuth(0.0f),
-      _M_sensitivity(0.1f),
-      _M_yawForwardOffset(0.0f)
+      _M_sensitivity(1.0f),
+      _M_yawForwardOffset(config.yawForwardOffset)
 {
     for (auto& controller : _M_pidControllers)
     {

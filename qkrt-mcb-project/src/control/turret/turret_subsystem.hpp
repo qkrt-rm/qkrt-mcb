@@ -21,6 +21,7 @@ struct TurretConfig
     tap::motor::MotorId yawId;
     tap::can::CanBus canBus;
     modm::Pid<float>::Parameter turretVelocityPidConfig;
+    uint16_t yawForwardOffset;
 };
 
 class TurretSubsystem : public tap::control::Subsystem
@@ -38,6 +39,7 @@ private:
 
     static constexpr float MAX_TURRET_MOTOR_RPM = 300.0f;
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
+    static constexpr float INV_ENC_RESOLUTION   = 1.0f / static_cast<float>(Motor::ENC_RESOLUTION);
 
 public:
     TurretSubsystem(Drivers& drivers, const TurretConfig& config);
@@ -49,6 +51,17 @@ public:
 public:
     void setPitchRps(float elevation);
     void setYawRps(float azimuth);
+
+    /**
+     * @brief Gets the turret's yaw angle in radians relative to its forward direction
+     * 
+     * @return The yaw angle of the turret (azimuth)
+     */
+    inline float getAzimuth() const
+    {
+        uint16_t encoderRaw = _M_motors[static_cast<uint8_t>(MotorId::YAW)].getEncoderWrapped();
+        return static_cast<float>(encoderRaw - _M_yawForwardOffset) * INV_ENC_RESOLUTION;
+    }
     
 private:
     inline float rpsToRpm(float rps) const
@@ -63,10 +76,8 @@ private:
     std::array<Pid,   static_cast<uint8_t>(MotorId::NUM_MOTORS)> _M_pidControllers;
     std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> _M_motors;
 
-    float _M_elevation, _M_azimuth;
     float _M_sensitivity;
-
-    int64_t _M_yawForwardOffset;
+    uint16_t _M_yawForwardOffset;
 };
 
 };  // namespace control::turret
