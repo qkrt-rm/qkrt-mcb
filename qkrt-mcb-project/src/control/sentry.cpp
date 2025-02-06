@@ -17,13 +17,14 @@ Robot::Robot(Drivers& drivers)
                      .canBus       = CanBus::CAN_BUS1,
                      .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000),
                  }),
-      _M_chassisCommand(_M_chassis, drivers.controlOperatorInterface),
+      _M_chassisCommand(_M_chassis, _M_turret, drivers.controlOperatorInterface),
       _M_turret(drivers,
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
                     .yawId   = MotorId::MOTOR5,
                     .canBus  = CanBus::CAN_BUS1,
                     .turretVelocityPidConfig = modm::Pid<float>::Parameter(75, 3, 0, 70, 100000),
+                    .yawForwardOffset = 0,
                 }),
       _M_turretCommand(_M_turret, drivers.controlOperatorInterface, drivers.uart)
 {
