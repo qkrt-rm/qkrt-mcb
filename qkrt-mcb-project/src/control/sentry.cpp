@@ -24,7 +24,7 @@ Robot::Robot(Drivers& drivers)
                     .yawId   = MotorId::MOTOR5,
                     .canBus  = CanBus::CAN_BUS1,
                     .turretVelocityPidConfig = modm::Pid<float>::Parameter(75, 3, 0, 70, 100000),
-                    .yawForwardOffset = 0,
+                    .yawForwardOffset = 6950,
                 }),
       _M_turretCommand(_M_turret, drivers.controlOperatorInterface, drivers.uart)
 {

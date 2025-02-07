@@ -31,6 +31,7 @@ public:
      * @return The normalized value used for turret yaw adjustments.
      */
     float getChassisYawInput() const;
+    
 private:
     tap::communication::serial::Remote& _M_remote;
 };

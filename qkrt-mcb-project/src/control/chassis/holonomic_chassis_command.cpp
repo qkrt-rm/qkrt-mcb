@@ -23,6 +23,8 @@ void HolonomicChassisCommand::execute()
     float z = _M_operatorInterface.getChassisZInput();
     float r = 0.0f;
 
+    volatile float yawAngle = _M_turret.getAzimuth();
+
     float denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
     float leftFront  = (z + x + r) / denominator;
     float leftBack   = (z - x + r) / denominator;
