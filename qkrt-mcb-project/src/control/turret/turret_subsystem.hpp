@@ -60,7 +60,7 @@ public:
     inline float getAzimuth() const
     {
         uint16_t encoderRaw = _M_motors[static_cast<uint8_t>(MotorId::YAW)].getEncoderWrapped();
-        return static_cast<float>(encoderRaw - _M_yawForwardOffset) * INV_ENC_RESOLUTION;
+        return static_cast<float>(_M_yawForwardOffset - encoderRaw) * INV_ENC_RESOLUTION * M_TWOPI;
     }
     
 private:
