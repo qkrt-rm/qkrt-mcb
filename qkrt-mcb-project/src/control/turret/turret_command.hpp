@@ -34,6 +34,7 @@ private:
     Uart& _M_uart;
 
     float _M_pitchSensitivity, _M_yawSensitivity;
+    bool _M_aimAssist;
 };
 
 }  // namespace control::turret

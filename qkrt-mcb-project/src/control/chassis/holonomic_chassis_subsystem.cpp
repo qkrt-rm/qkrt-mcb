@@ -10,8 +10,8 @@ HolonomicChassisSubsystem::HolonomicChassisSubsystem(Drivers& drivers, const Cha
       _M_motors({
           Motor(&drivers, config.leftFrontId,  config.canBus, false, "LF"),
           Motor(&drivers, config.leftBackId,   config.canBus, false, "LB"),
-          Motor(&drivers, config.rightFrontId, config.canBus, true,  "RF"),
-          Motor(&drivers, config.rightBackId,  config.canBus, true,  "RB")
+          Motor(&drivers, config.rightBackId,  config.canBus, true,  "RB"),
+          Motor(&drivers, config.rightFrontId, config.canBus, true,  "RF")
       })
 {
     for (auto& controller : _M_pidControllers)
@@ -29,24 +29,24 @@ void HolonomicChassisSubsystem::initialize()
 }
 
 void HolonomicChassisSubsystem::setWheelVelocities(float leftFront,
-                                          float leftBack,
-                                          float rightFront,
-                                          float rightBack)
+                                                   float leftBack,
+                                                   float rightBack,
+                                                   float rightFront)
 {
     leftFront  = mpsToRpm(leftFront);
     leftBack   = mpsToRpm(leftBack);
-    rightFront = mpsToRpm(rightFront);
     rightBack  = mpsToRpm(rightBack);
+    rightFront = mpsToRpm(rightFront);
 
     leftFront  = std::clamp(leftFront,  -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
     leftBack   = std::clamp(leftBack,   -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-    rightFront = std::clamp(rightFront, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
     rightBack  = std::clamp(rightBack,  -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    rightFront = std::clamp(rightFront, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
 
     _M_desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftFront;
     _M_desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftBack;
-    _M_desiredOutput[static_cast<uint8_t>(MotorId::RF)] = rightFront;
     _M_desiredOutput[static_cast<uint8_t>(MotorId::RB)] = rightBack;
+    _M_desiredOutput[static_cast<uint8_t>(MotorId::RF)] = rightFront;
 }
 
 void HolonomicChassisSubsystem::refresh()

@@ -1,5 +1,8 @@
 #pragma once
 
+namespace qkrt
+{
+
 template<typename T, unsigned int Comp>
 class vec
 {
@@ -152,3 +155,5 @@ public:
         struct { value_type u, v, w; };
     };
 };
+
+}  // namespace qkrt
