@@ -52,6 +52,8 @@ public:
      */
     inline void setElevation(float desiredElevation)
     {
+        if (_M_manualControl) return;
+
         _M_desiredElevation = std::clamp(desiredElevation, -MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION);
     }
     
@@ -71,6 +73,8 @@ public:
      */
     inline void setAzimuth(float desiredAzimuth)
     {
+        if (_M_manualControl) return;
+        
         _M_desiredAzimuth = desiredAzimuth;
     }
 

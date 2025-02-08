@@ -38,58 +38,63 @@ void TurretSubsystem::refresh()
      * - simply implementation of `void TurretSubsystem::setPitchRps(float pitchRps)`
      */
 
-    if (_M_manualControl)
-    {
-        /**
-         * Use RPM PID to continuously rotate turret pitch and yaw based on manual input.
-         */
+    // if (_M_manualControl)
+    // {
+    //     /**
+    //      * Use RPM PID to continuously rotate turret pitch and yaw based on manual input.
+    //      */
         
-        float currentPitchRpm = _M_pitchMotor.getShaftRPM();
-        float currentYawRpm = _M_yawMotor.getShaftRPM();
+    //     float currentPitchRpm = _M_pitchMotor.getShaftRPM();
+    //     float currentYawRpm = _M_yawMotor.getShaftRPM();
 
-        float pitchRpmError = _M_desiredPitchRpm - currentPitchRpm;
-        if (std::abs(pitchRpmError) > DEAD_ZONE_RPM)
-        {
-            _M_pitchRpmPid.update(pitchRpmError);
-            float desiredPitchRpm = _M_pitchRpmPid.getValue();
-            _M_pitchMotor.setDesiredOutput(desiredPitchRpm);
-        }
+    //     float pitchRpmError = _M_desiredPitchRpm - currentPitchRpm;
+    //     if (std::abs(pitchRpmError) > DEAD_ZONE_RPM)
+    //     {
+    //         _M_pitchRpmPid.update(pitchRpmError);
+    //         float desiredPitchRpm = _M_pitchRpmPid.getValue();
+    //         _M_pitchMotor.setDesiredOutput(desiredPitchRpm);
+    //     }
 
-        float yawRpmError = _M_desiredYawRpm - currentYawRpm;
-        if (std::abs(yawRpmError) > DEAD_ZONE_RPM)
-        {
-            _M_yawRpmPid.update(yawRpmError);
-            float desiredYawRpm = _M_yawRpmPid.getValue();
-            _M_yawMotor.setDesiredOutput(desiredYawRpm);
-        }
-    }
-    else
-    {
-        /**
-         * Use angle PID to point turret at target elevation/azimuth.
-         */
+    //     float yawRpmError = _M_desiredYawRpm - currentYawRpm;
+    //     if (std::abs(yawRpmError) > DEAD_ZONE_RPM)
+    //     {
+    //         _M_yawRpmPid.update(yawRpmError);
+    //         float desiredYawRpm = _M_yawRpmPid.getValue();
+    //         _M_yawMotor.setDesiredOutput(desiredYawRpm);
+    //     }
+    // }
+    // else
+    // {
+    //     /**
+    //      * Use angle PID to point turret at target elevation/azimuth.
+    //      */
         
-        float currentElevation = getElevation();
-        float currentAzimuth = getAzimuth();
+    //     float currentElevation = getElevation();
+    //     float currentAzimuth = getAzimuth();
         
-        float elevationError = _M_desiredElevation - currentElevation;
-        if (std::abs(elevationError) > DEAD_ZONE_ANGLE)
-        {
-            _M_pitchAnglePid.update(elevationError);
-            float desiredPitchAngVel = _M_pitchAnglePid.getValue();
-            float desiredPitchRpm    = radPerSecToRpm(desiredPitchAngVel);
-            _M_pitchMotor.setDesiredOutput(desiredPitchRpm);
-        }
+    //     float elevationError = _M_desiredElevation - currentElevation;
+    //     if (std::abs(elevationError) > DEAD_ZONE_ANGLE)
+    //     {
+    //         _M_pitchAnglePid.update(elevationError);
+    //         float desiredPitchAngVel = _M_pitchAnglePid.getValue();
+    //         float desiredPitchRpm    = radPerSecToRpm(desiredPitchAngVel);
+    //         _M_pitchMotor.setDesiredOutput(desiredPitchRpm);
+    //     }
         
-        float azimuthError = _M_desiredAzimuth - currentAzimuth;
-        if (std::abs(azimuthError) > DEAD_ZONE_ANGLE)
-        {
-            _M_yawAnglePid.update(azimuthError);
-            float desiredYawAngVel = _M_yawAnglePid.getValue();
-            float desiredYawRpm    = radPerSecToRpm(desiredYawAngVel);
-            _M_yawMotor.setDesiredOutput(desiredYawRpm);
-        }
-    }
+    //     float azimuthError = _M_desiredAzimuth - currentAzimuth;
+    //     if (std::abs(azimuthError) > DEAD_ZONE_ANGLE)
+    //     {
+    //         _M_yawAnglePid.update(azimuthError);
+    //         float desiredYawAngVel = _M_yawAnglePid.getValue();
+    //         float desiredYawRpm    = radPerSecToRpm(desiredYawAngVel);
+    //         _M_yawMotor.setDesiredOutput(desiredYawRpm);
+    //     }
+    // }
+
+    _M_yawRpmPid.update(_M_desiredYawRpm - _M_yawMotor.getShaftRPM());
+    float desiredYawRpm = _M_yawRpmPid.getValue();
+    _M_yawMotor.setDesiredOutput(desiredYawRpm);
+
 }
 
 void TurretSubsystem::setPitchRps(float pitchRps)

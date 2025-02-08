@@ -25,7 +25,7 @@ void HolonomicChassisCommand::execute()
     
     float x = xInp * std::cos(yawAngle) - zInp * std::sin(yawAngle);
     float z = xInp * std::sin(yawAngle) + zInp * std::cos(yawAngle);
-    float r = 0.0f;
+    float r = _M_operatorInterface.getTurretPitchInput();
     
     float denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
     float leftFront  = (z + x + r) / denominator;
