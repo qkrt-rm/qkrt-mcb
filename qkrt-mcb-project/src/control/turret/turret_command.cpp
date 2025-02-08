@@ -26,9 +26,9 @@ void TurretCommand::execute()
     {
         float elevation = 0.0f;
         float azimuth = 0.0f;
-        
+
         _M_turret.setElevation(elevation);
-        _M_turret.setElevation(azimuth);
+        _M_turret.setAzimuth(azimuth);
     }
     else
     {
