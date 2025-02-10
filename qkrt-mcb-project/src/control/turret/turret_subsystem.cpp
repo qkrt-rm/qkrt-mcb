@@ -18,10 +18,10 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       _M_yawRpmPid  (2.5f, 0.2f, 1.0f, MAX_TURRET_MOTOR_VOLTAGE),
 
       _M_aimLock(true),
-      _M_sensitivity(1.0f),
-      _M_yawForwardOffset(config.yawForwardOffset),
-      _M_pitchHorizontalOffset(config.pitchHorizontalOffset)
+      _M_sensitivity(1.0f)
 {
+    _M_pitchHorizontalOffset = encoderToRad(config.pitchHorizontalOffset);
+    _M_yawForwardOffset = encoderToRad(config.yawForwardOffset);
 }
 
 void TurretSubsystem::initialize()
@@ -45,6 +45,18 @@ void TurretSubsystem::refresh()
          * Use angle PID to point turret at target elevation/azimuth.
          */
 
+        /**
+         * @brief Computes the shortest angular error between two angles.
+         *
+         * This function calculates the smallest difference between a desired angle 
+         * and the current angle, ensuring the result is within the range [-π, π]. 
+         * This prevents issues where an angle error of, for example, 350° would be 
+         * treated as -350° instead of 10°.
+         *
+         * @param desiredAngle The target angle in radians.
+         * @param currentAngle The current angle in radians.
+         * @return The shortest angular difference in radians, constrained to [-π, π].
+         */
         auto getOptimalError = [](float desiredAngle, float currentAngle) -> float
             {
                 float error = desiredAngle - currentAngle;

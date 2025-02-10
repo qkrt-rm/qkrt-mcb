@@ -35,10 +35,9 @@ private:
     static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
     
     static constexpr float DEAD_ZONE_ANGLE = 0.01f;
-    static constexpr float DEAD_ZONE_RPM = 5.0f;
+    static constexpr float DEAD_ZONE_RPM = 0.9f;
     
     static constexpr float TURRET_MOTOR_GEAR_RATIO = 1.0f;
-    static constexpr float INV_ENC_RESOLUTION = 1.0f / static_cast<float>(Motor::ENC_RESOLUTION);
     
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
 
@@ -65,8 +64,8 @@ public:
      */
     inline float getElevation() const
     {
-        return static_cast<float>(_M_pitchHorizontalOffset - _M_pitchMotor.getEncoderWrapped())
-             * INV_ENC_RESOLUTION * M_TWOPI;
+        uint16_t encoderRaw = _M_pitchMotor.getEncoderWrapped();
+        return encoderToRad(encoderRaw) - _M_pitchHorizontalOffset;
     }
 
     /**
@@ -84,8 +83,8 @@ public:
      */
     inline float getAzimuth() const
     {
-        return static_cast<float>(_M_yawForwardOffset - _M_yawMotor.getEncoderWrapped())
-             * INV_ENC_RESOLUTION * M_TWOPI;
+        uint16_t encoderRaw = _M_yawMotor.getEncoderWrapped();
+        return encoderToRad(encoderRaw) - _M_yawForwardOffset;
     }
 
     /**
@@ -107,21 +106,19 @@ public:
     void unlock() { _M_aimLock = false; }
 
 private:
-    static constexpr float SEC_PER_MIN = 60.0f;
-
-    inline float radPerSecToRpm(float radPerSec) const
+    inline float encoderToRad(uint16_t encoder) const
     {
-        return radPerSec * SEC_PER_MIN / M_TWOPI * TURRET_MOTOR_GEAR_RATIO;
+        static constexpr float INV_ENC_RESOLUTION
+            = 1.0f / static_cast<float>(Motor::ENC_RESOLUTION);
+
+        return static_cast<float>(encoder) * INV_ENC_RESOLUTION * M_TWOPI;
     }
 
     inline float rpsToRpm(float rps) const
     {
-        return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
-    }
+        static constexpr float SEC_PER_MIN = 60.0f;
 
-    inline float rpsToRadPerSec(float rps) const
-    {
-        return rps * M_TWOPI;
+        return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
 
     Motor _M_pitchMotor, _M_yawMotor;
