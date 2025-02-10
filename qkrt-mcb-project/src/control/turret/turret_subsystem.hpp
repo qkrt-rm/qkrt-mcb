@@ -36,9 +36,7 @@ private:
     
     static constexpr float DEAD_ZONE_ANGLE = 0.01f;
     static constexpr float DEAD_ZONE_RPM = 0.9f;
-    
-    static constexpr float TURRET_MOTOR_GEAR_RATIO = 1.0f;
-    
+        
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
 
 public:
@@ -117,6 +115,7 @@ private:
     inline float rpsToRpm(float rps) const
     {
         static constexpr float SEC_PER_MIN = 60.0f;
+        static constexpr float TURRET_MOTOR_GEAR_RATIO = 1.0f;
 
         return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
