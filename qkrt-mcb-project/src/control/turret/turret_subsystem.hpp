@@ -3,14 +3,13 @@
 #include "drivers.hpp"
 
 #include <tap/control/subsystem.hpp>
-#include "tap/util_macros.hpp"
-
-#include "tap/motor/dji_motor.hpp"
-#include "modm/math/filter/pid.hpp"
+#include <tap/motor/dji_motor.hpp>
+#include <tap/util_macros.hpp>
 
 #include <array>
 
 #include "math/vector.hpp"
+#include "math/filter/pid.hpp"
 
 namespace control::turret
 {
@@ -19,27 +18,28 @@ struct TurretConfig
 {
     tap::motor::MotorId pitchId;
     tap::motor::MotorId yawId;
+    bool pitchInverted;
+    bool yawInverted;
     tap::can::CanBus canBus;
-    modm::Pid<float>::Parameter turretVelocityPidConfig;
     uint16_t yawForwardOffset;
+    uint16_t pitchHorizontalOffset;
 };
 
 class TurretSubsystem : public tap::control::Subsystem
 {
 private:
-    enum class MotorId : uint8_t
-    {
-        PITCH = 0,
-        YAW,
-        NUM_MOTORS,
-    };
-
-    using Pid = modm::Pid<float>;
     using Motor = tap::motor::DjiMotor;
+    using Pid = qkrt::Pid<float>;
 
     static constexpr float MAX_TURRET_MOTOR_RPM = 300.0f;
+    static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
+    
+    static constexpr float DEAD_ZONE_ANGLE = 0.01f;
+    static constexpr float DEAD_ZONE_RPM = 0.9f;
+    
+    static constexpr float TURRET_MOTOR_GEAR_RATIO = 1.0f;
+    
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
-    static constexpr float INV_ENC_RESOLUTION   = 1.0f / static_cast<float>(Motor::ENC_RESOLUTION);
 
 public:
     TurretSubsystem(Drivers& drivers, const TurretConfig& config);
@@ -49,35 +49,91 @@ public:
     const char* getName() override { return "Turret"; }
 
 public:
-    void setPitchRps(float elevation);
-    void setYawRps(float azimuth);
+    /**
+     * @brief Adjusts the pitch motor to a desired elevation angle
+     */
+    inline void setElevation(float desiredElevation)
+    {
+        _M_desiredElevation = std::clamp(desiredElevation, -MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION);
+    }
+    
+    /**
+     * @brief Gets the turret's pitch angle in radians relative to horizontal plane.
+     * 
+     * @return The pitch angle of the turret (elevation).
+     */
+    inline float getElevation() const
+    {
+        uint16_t encoderRaw = _M_pitchMotor.getEncoderWrapped();
+        return encoderToRad(encoderRaw) - _M_pitchHorizontalOffset;
+    }
 
     /**
-     * @brief Gets the turret's yaw angle in radians relative to its forward direction
+     * @brief Adjusts the yaw motor to a desired azimuth angle
+     */
+    inline void setAzimuth(float desiredAzimuth)
+    {   
+        _M_desiredAzimuth = desiredAzimuth;
+    }
+
+    /**
+     * @brief Gets the turret's yaw angle in radians relative to its forward direction.
      * 
-     * @return The yaw angle of the turret (azimuth)
+     * @return The yaw angle of the turret (azimuth).
      */
     inline float getAzimuth() const
     {
-        uint16_t encoderRaw = _M_motors[static_cast<uint8_t>(MotorId::YAW)].getEncoderWrapped();
-        return static_cast<float>(_M_yawForwardOffset - encoderRaw) * INV_ENC_RESOLUTION * M_TWOPI;
+        uint16_t encoderRaw = _M_yawMotor.getEncoderWrapped();
+        return encoderToRad(encoderRaw) - _M_yawForwardOffset;
     }
-    
+
+    /**
+     * @brief Rotates the pitch motor at a specified revolutions per second.
+     * 
+     * @param pitchRps Desired revolutions per second of the pitch motor.
+     */
+    void setPitchRps(float pitchRps);
+
+    /**
+     * @brief Rotates the yaw motor at a specified revolutions per second.
+     * 
+     * @param yawRps Desired revolutions per second of the yaw motor.
+     */
+    void setYawRps(float yawRps);
+
+    void lock() { _M_aimLock = true; }
+
+    void unlock() { _M_aimLock = false; }
+
 private:
+    inline float encoderToRad(uint16_t encoder) const
+    {
+        static constexpr float INV_ENC_RESOLUTION
+            = 1.0f / static_cast<float>(Motor::ENC_RESOLUTION);
+
+        return static_cast<float>(encoder) * INV_ENC_RESOLUTION * M_TWOPI;
+    }
+
     inline float rpsToRpm(float rps) const
     {
         static constexpr float SEC_PER_MIN = 60.0f;
-        static constexpr float GEAR_RATIO  = 2.0f;
-        
-        return rps * SEC_PER_MIN * GEAR_RATIO;
+
+        return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
 
-    std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> _M_desiredOutput;
-    std::array<Pid,   static_cast<uint8_t>(MotorId::NUM_MOTORS)> _M_pidControllers;
-    std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> _M_motors;
+    Motor _M_pitchMotor, _M_yawMotor;
+    float _M_desiredPitchVoltage, _M_desiredYawVoltage;
 
+    float _M_desiredElevation, _M_desiredAzimuth;
+    Pid _M_elevationPid, _M_azimuthPid;
+
+    float _M_desiredPitchRpm, _M_desiredYawRpm;
+    Pid _M_pitchRpmPid, _M_yawRpmPid;
+
+    bool _M_aimLock;
     float _M_sensitivity;
     uint16_t _M_yawForwardOffset;
+    uint16_t _M_pitchHorizontalOffset;
 };
 
 };  // namespace control::turret

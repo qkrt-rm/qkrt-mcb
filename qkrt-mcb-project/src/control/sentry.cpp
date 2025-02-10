@@ -15,16 +15,18 @@ Robot::Robot(Drivers& drivers)
                      .rightBackId  = MotorId::MOTOR3,
                      .rightFrontId = MotorId::MOTOR4,
                      .canBus       = CanBus::CAN_BUS1,
-                     .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000),
+                     .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
                  }),
       _M_chassisCommand(_M_chassis, _M_turret, drivers.controlOperatorInterface),
       _M_turret(drivers,
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
                     .yawId   = MotorId::MOTOR5,
+                    .pitchInverted = false,
+                    .yawInverted = true,
                     .canBus  = CanBus::CAN_BUS1,
-                    .turretVelocityPidConfig = modm::Pid<float>::Parameter(75, 3, 0, 70, 100000),
-                    .yawForwardOffset = 6950,
+                    .yawForwardOffset = 5455u,
+                    .pitchHorizontalOffset = 0u,  // TODO: get this number when pitch motor is mounted
                 }),
       _M_turretCommand(_M_turret, drivers.controlOperatorInterface, drivers.uart)
 {

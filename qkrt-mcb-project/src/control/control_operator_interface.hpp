@@ -25,12 +25,12 @@ public:
     /**
      * @return The normalized value used for turret pitch adjustments.
      */
-    float getChassisPitchInput() const;
+    float getTurretPitchInput() const;
 
     /**
      * @return The normalized value used for turret yaw adjustments.
      */
-    float getChassisYawInput() const;
+    float getTurretYawInput() const;
     
 private:
     tap::communication::serial::Remote& _M_remote;

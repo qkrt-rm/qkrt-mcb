@@ -19,19 +19,21 @@ void HolonomicChassisCommand::initialize()
 
 void HolonomicChassisCommand::execute()
 {
-    float x = _M_operatorInterface.getChassisXInput();
-    float z = _M_operatorInterface.getChassisZInput();
-    float r = 0.0f;
-
-    volatile float yawAngle = _M_turret.getAzimuth();
-
+    float xInp = _M_operatorInterface.getChassisXInput();
+    float zInp = _M_operatorInterface.getChassisZInput();
+    float yawAngle = _M_turret.getAzimuth();
+    
+    float x = xInp * std::cos(yawAngle) - zInp * std::sin(yawAngle);
+    float z = xInp * std::sin(yawAngle) + zInp * std::cos(yawAngle);
+    float r = _M_operatorInterface.getTurretPitchInput();
+    
     float denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
     float leftFront  = (z + x + r) / denominator;
     float leftBack   = (z - x + r) / denominator;
     float rightFront = (z - x - r) / denominator;
     float rightBack  = (z + x - r) / denominator;
 
-    _M_chassis.setWheelVelocities(leftFront, leftBack, rightFront, rightBack);
+    _M_chassis.setWheelVelocities(leftFront, leftBack, rightBack, rightFront);
 }
 
 void HolonomicChassisCommand::end(bool /* interrupted */)

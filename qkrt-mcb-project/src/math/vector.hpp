@@ -1,21 +1,18 @@
 #pragma once
 
-template<typename T, unsigned int Comp>
-class vec
+#include <cstddef>
+
+namespace qkrt
 {
-};
 
-typedef vec<float, 2>   vec2;
-typedef vec<float, 3>   vec3;
+template <size_t L, typename T>
+class vec;
 
-typedef vec<int, 2>     vec2i;
-typedef vec<int, 3>     vec3i;
-
-template<typename T>
-class vec<T, 2>
+template <typename T>
+class vec<2, T>
 {
 private:
-    typedef vec<T, 2>       class_type;
+    typedef vec<2, T>       class_type;
     typedef T               value_type;
 public:
     vec(const value_type& _v = 0)
@@ -80,10 +77,10 @@ public:
 };
 
 template<typename T>
-class vec<T, 3>
+class vec<3, T>
 {
 private:
-    typedef vec<T, 3>       class_type;
+    typedef vec<3, T>       class_type;
     typedef T               value_type;
 public:
     vec(const T& _v = 0)
@@ -152,3 +149,5 @@ public:
         struct { value_type u, v, w; };
     };
 };
+
+}  // namespace qkrt

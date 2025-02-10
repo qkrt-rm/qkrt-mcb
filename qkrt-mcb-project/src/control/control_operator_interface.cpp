@@ -12,22 +12,22 @@ ControlOperatorInterface::ControlOperatorInterface(tap::communication::serial::R
 
 float ControlOperatorInterface::getChassisXInput() const
 {
-    return _M_remote.getChannel(Remote::Channel::LEFT_HORIZONTAL);
+    return std::clamp(_M_remote.getChannel(Remote::Channel::LEFT_HORIZONTAL), -1.0f, 1.0f);
 }
 
 float ControlOperatorInterface::getChassisZInput() const
 {
-    return _M_remote.getChannel(Remote::Channel::LEFT_VERTICAL);
+    return std::clamp(_M_remote.getChannel(Remote::Channel::LEFT_VERTICAL), -1.0f, 1.0f);
 }
 
-float ControlOperatorInterface::getChassisPitchInput() const
+float ControlOperatorInterface::getTurretPitchInput() const
 {
-    return _M_remote.getChannel(Remote::Channel::RIGHT_VERTICAL);
+    return std::clamp(_M_remote.getChannel(Remote::Channel::RIGHT_VERTICAL), -1.0f, 1.0f);
 }
 
-float ControlOperatorInterface::getChassisYawInput() const
+float ControlOperatorInterface::getTurretYawInput() const
 {
-    return _M_remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL);
+    return std::clamp(_M_remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f);
 }
 
 }  // control

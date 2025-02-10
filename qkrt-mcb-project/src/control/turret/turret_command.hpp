@@ -34,6 +34,9 @@ private:
     Uart& _M_uart;
 
     float _M_pitchSensitivity, _M_yawSensitivity;
+
+    // TODO: change to some target data structure when it exists
+    void* _M_target;
 };
 
 }  // namespace control::turret
