@@ -84,7 +84,7 @@ public:
      */
     inline float getAzimuth() const
     {
-        return static_cast<float>(/* _M_yawForwardOffset - */ _M_yawMotor.getEncoderWrapped())
+        return static_cast<float>(_M_yawForwardOffset - _M_yawMotor.getEncoderWrapped())
              * INV_ENC_RESOLUTION * M_TWOPI;
     }
 
