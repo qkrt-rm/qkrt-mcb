@@ -30,9 +30,11 @@ public:
 
     void update(const T& error)
     {
-        errorSum += error;
+        T newErrorSum = error + errorSum;
 
-        T integral = std::clamp(errorSum, -maxErrorSum, maxErrorSum);
+        T integral = (std::abs(newErrorSum) <= maxErrorSum)
+                   ? newErrorSum
+                   : errorSum;
         T derivative = error - prevError;
 
         output = kp * error
@@ -42,6 +44,13 @@ public:
 
         prevError = error;
         errorSum = integral;
+    }
+
+    void reset()
+    {
+        prevError = 0;
+        errorSum = 0;
+        output = 0;
     }
 
     T getValue() const { return output; }

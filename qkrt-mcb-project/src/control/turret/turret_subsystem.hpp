@@ -32,12 +32,15 @@ private:
     using Pid = qkrt::Pid<float>;
 
     static constexpr float MAX_TURRET_MOTOR_RPM = 300.0f;
-    static constexpr float DEAD_ZONE_RPM = 0.9f;
+    static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
+    
+    static constexpr float DEAD_ZONE_ANGLE = 0.01f;
+    static constexpr float DEAD_ZONE_RPM = 5.0f;
+    
+    static constexpr float TURRET_MOTOR_GEAR_RATIO = 1.0f;
+    static constexpr float INV_ENC_RESOLUTION = 1.0f / static_cast<float>(Motor::ENC_RESOLUTION);
     
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
-    static constexpr float DEAD_ZONE_ANGLE = 0.01f;
-
-    static constexpr float INV_ENC_RESOLUTION   = 1.0f / static_cast<float>(Motor::ENC_RESOLUTION);
 
 public:
     TurretSubsystem(Drivers& drivers, const TurretConfig& config);
@@ -52,8 +55,6 @@ public:
      */
     inline void setElevation(float desiredElevation)
     {
-        if (_M_manualControl) return;
-
         _M_desiredElevation = std::clamp(desiredElevation, -MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION);
     }
     
@@ -72,9 +73,7 @@ public:
      * @brief Adjusts the yaw motor to a desired azimuth angle
      */
     inline void setAzimuth(float desiredAzimuth)
-    {
-        if (_M_manualControl) return;
-        
+    {   
         _M_desiredAzimuth = desiredAzimuth;
     }
 
@@ -85,7 +84,7 @@ public:
      */
     inline float getAzimuth() const
     {
-        return static_cast<float>(_M_yawForwardOffset - _M_yawMotor.getEncoderWrapped())
+        return static_cast<float>(/* _M_yawForwardOffset - */ _M_yawMotor.getEncoderWrapped())
              * INV_ENC_RESOLUTION * M_TWOPI;
     }
 
@@ -103,18 +102,21 @@ public:
      */
     void setYawRps(float yawRps);
 
+    void lock() { _M_aimLock = true; }
+
+    void unlock() { _M_aimLock = false; }
+
 private:
     static constexpr float SEC_PER_MIN = 60.0f;
-    static constexpr float GEAR_RATIO = 2.0f;
 
     inline float radPerSecToRpm(float radPerSec) const
     {
-        return radPerSec * SEC_PER_MIN / M_TWOPI * GEAR_RATIO;
+        return radPerSec * SEC_PER_MIN / M_TWOPI * TURRET_MOTOR_GEAR_RATIO;
     }
 
     inline float rpsToRpm(float rps) const
     {
-        return rps * SEC_PER_MIN * GEAR_RATIO;
+        return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
 
     inline float rpsToRadPerSec(float rps) const
@@ -123,14 +125,15 @@ private:
     }
 
     Motor _M_pitchMotor, _M_yawMotor;
+    float _M_desiredPitchVoltage, _M_desiredYawVoltage;
 
     float _M_desiredElevation, _M_desiredAzimuth;
-    Pid _M_pitchAnglePid, _M_yawAnglePid;
+    Pid _M_elevationPid, _M_azimuthPid;
 
     float _M_desiredPitchRpm, _M_desiredYawRpm;
     Pid _M_pitchRpmPid, _M_yawRpmPid;
 
-    bool _M_manualControl;
+    bool _M_aimLock;
     float _M_sensitivity;
     uint16_t _M_yawForwardOffset;
     uint16_t _M_pitchHorizontalOffset;
