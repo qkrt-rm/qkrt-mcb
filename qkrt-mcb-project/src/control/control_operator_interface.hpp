@@ -31,6 +31,8 @@ public:
      * @return The normalized value used for turret yaw adjustments.
      */
     float getTurretYawInput() const;
+
+    bool getWheelButton() const;
     
 private:
     tap::communication::serial::Remote& _M_remote;

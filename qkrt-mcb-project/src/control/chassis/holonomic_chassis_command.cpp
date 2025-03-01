@@ -5,10 +5,12 @@ namespace control::chassis
 
 HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                                                  turret::TurretSubsystem& turret,
-                                                 ControlOperatorInterface& operatorInterface)
+                                                 ControlOperatorInterface& operatorInterface,
+                                                 tap::communication::sensors::imu::bmi088::Bmi088& imu)
     : _M_chassis(chassis),
       _M_turret(turret),
-      _M_operatorInterface(operatorInterface)
+      _M_operatorInterface(operatorInterface),
+      _M_imu(imu)
 {
     addSubsystemRequirement(&chassis);
 }
@@ -25,6 +27,9 @@ void HolonomicChassisCommand::execute()
     float xInp = _M_operatorInterface.getChassisXInput();
     float zInp = _M_operatorInterface.getChassisZInput();
     float yawAngle = _M_turret.getAzimuth();
+
+    float test = _M_imu.getPitch();
+    
     
     float x = xInp * std::cos(yawAngle) - zInp * std::sin(yawAngle);
     float z = xInp * std::sin(yawAngle) + zInp * std::cos(yawAngle);
