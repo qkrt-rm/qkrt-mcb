@@ -19,13 +19,16 @@ void HolonomicChassisCommand::initialize()
 
 void HolonomicChassisCommand::execute()
 {
+
+    static bool beyblade_on = _M_operatorInterface.getWheelButton();
+    
     float xInp = _M_operatorInterface.getChassisXInput();
     float zInp = _M_operatorInterface.getChassisZInput();
     float yawAngle = _M_turret.getAzimuth();
     
     float x = xInp * std::cos(yawAngle) - zInp * std::sin(yawAngle);
     float z = xInp * std::sin(yawAngle) + zInp * std::cos(yawAngle);
-    float r = _M_operatorInterface.getTurretPitchInput();
+    float r = beyblade_on ? .2f : 0;
     
     float denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
     float leftFront  = (z + x + r) / denominator;
@@ -34,6 +37,7 @@ void HolonomicChassisCommand::execute()
     float rightBack  = (z + x - r) / denominator;
 
     _M_chassis.setWheelVelocities(leftFront, leftBack, rightBack, rightFront);
+    
 }
 
 void HolonomicChassisCommand::end(bool /* interrupted */)

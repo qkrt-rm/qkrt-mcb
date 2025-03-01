@@ -5,6 +5,8 @@ using tap::communication::serial::Remote;
 namespace control
 {
 
+constexpr int16_t WHEEL_DEADZONE = 10u;
+
 ControlOperatorInterface::ControlOperatorInterface(tap::communication::serial::Remote& remote)
     : _M_remote(remote)
 {
@@ -29,5 +31,11 @@ float ControlOperatorInterface::getTurretYawInput() const
 {
     return std::clamp(_M_remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f);
 }
+
+bool ControlOperatorInterface::getWheelButton() const
+{
+    return _M_remote.getWheel() < -WHEEL_DEADZONE;
+}
+
 
 }  // control
