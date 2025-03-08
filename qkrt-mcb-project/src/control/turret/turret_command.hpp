@@ -16,6 +16,7 @@ private:
 public:
     TurretCommand(TurretSubsystem& chassis,
                   ControlOperatorInterface& operatorInterface,
+                  tap::communication::sensors::imu::bmi088::Bmi088& imu,
                   Uart& uart);
 
     void initialize() override;
@@ -31,6 +32,7 @@ public:
 private:
     TurretSubsystem& _M_turret;
     ControlOperatorInterface& _M_operatorInterface;
+    tap::communication::sensors::imu::bmi088::Bmi088& _M_imu;
     Uart& _M_uart;
 
     float _M_pitchSensitivity, _M_yawSensitivity;

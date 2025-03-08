@@ -5,9 +5,11 @@ namespace control::turret
 
 TurretCommand::TurretCommand(TurretSubsystem& turret,
                              ControlOperatorInterface& operatorInterface,
+                             tap::communication::sensors::imu::bmi088::Bmi088& imu,
                              Uart& uart)
     : _M_turret(turret),
       _M_operatorInterface(operatorInterface),
+      _M_imu(imu),
       _M_uart(uart),
       _M_pitchSensitivity(1.0f), _M_yawSensitivity(1.0f),
       _M_target(nullptr)
@@ -33,7 +35,7 @@ void TurretCommand::execute()
     // acc += static_cast<float>(dt * Speed) * 1e-6;
     // prev = curr;
 
-    if (_M_target == nullptr)
+    if (_M_target != nullptr)
     {
         _M_turret.lock();
 
@@ -49,9 +51,10 @@ void TurretCommand::execute()
 
         float pitchInp = _M_operatorInterface.getTurretPitchInput();
         float yawInp = _M_operatorInterface.getTurretYawInput();
+        float imuYawRevPerSec = _M_imu.getGz() / 360.0f;
     
         _M_turret.setPitchRps(pitchInp);
-        _M_turret.setYawRps(yawInp);
+        _M_turret.setYawRps(yawInp - imuYawRevPerSec);
     }
 }
 

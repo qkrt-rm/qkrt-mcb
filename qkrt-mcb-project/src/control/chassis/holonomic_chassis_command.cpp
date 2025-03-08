@@ -5,12 +5,10 @@ namespace control::chassis
 
 HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                                                  turret::TurretSubsystem& turret,
-                                                 ControlOperatorInterface& operatorInterface,
-                                                 tap::communication::sensors::imu::bmi088::Bmi088& imu)
+                                                 ControlOperatorInterface& operatorInterface)
     : _M_chassis(chassis),
       _M_turret(turret),
-      _M_operatorInterface(operatorInterface),
-      _M_imu(imu)
+      _M_operatorInterface(operatorInterface)
 {
     addSubsystemRequirement(&chassis);
 }
@@ -20,20 +18,14 @@ void HolonomicChassisCommand::initialize()
 }
 
 void HolonomicChassisCommand::execute()
-{
-
-    static bool beyblade_on = _M_operatorInterface.getWheelButton();
-    
+{   
     float xInp = _M_operatorInterface.getChassisXInput();
     float zInp = _M_operatorInterface.getChassisZInput();
     float yawAngle = _M_turret.getAzimuth();
 
-    float test = _M_imu.getPitch();
-    
-    
     float x = xInp * std::cos(yawAngle) - zInp * std::sin(yawAngle);
     float z = xInp * std::sin(yawAngle) + zInp * std::cos(yawAngle);
-    float r = beyblade_on ? .2f : 0;
+    float r = _M_operatorInterface.getWheelButton() ? 0.2f : 0.0f;
     
     float denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
     float leftFront  = (z + x + r) / denominator;

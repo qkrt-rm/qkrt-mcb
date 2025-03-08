@@ -17,9 +17,7 @@ private:
 public:
     HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                             turret::TurretSubsystem& turret,
-                            ControlOperatorInterface& operatorInterface,
-                            tap::communication::sensors::imu::bmi088::Bmi088& imu
-                            );
+                            ControlOperatorInterface& operatorInterface);
 
     void initialize() override;
 
@@ -34,7 +32,6 @@ private:
     HolonomicChassisSubsystem& _M_chassis;
     turret::TurretSubsystem& _M_turret;
     ControlOperatorInterface& _M_operatorInterface;
-    tap::communication::sensors::imu::bmi088::Bmi088& _M_imu;
 };
 
 }  // namespace control::chassis
