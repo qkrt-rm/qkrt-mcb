@@ -15,7 +15,16 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
 
       _M_desiredPitchRpm(0.0f), _M_desiredYawRpm(0.0f),
       _M_pitchRpmPid(2.5f, 0.2f, 1.0f, MAX_TURRET_MOTOR_VOLTAGE),
-      _M_yawRpmPid  (25.0f, 0.3f, 15.0f, MAX_TURRET_MOTOR_VOLTAGE),
+      _M_yawRpmPid  (25.0f, 10.0f, 0.0f, MAX_TURRET_MOTOR_VOLTAGE),
+      // 1.0f, 0.3f, 0.0f Bad
+      // 10.0f, 0.3f, 0.0f Too little
+      // 20.0f, 0.3f, 0.0f Good?
+      // 25.0f, 0.3f, 0.0f Good
+        //25.0f, 10.0f, 0.0f Very Good so far
+      // 30.0f, 0.3f, 0.0f Better?
+      // 35.0f, 0.3f, 0.0f Less good
+      // 50.0f, 0.3f, 0.0f Too much
+      // 100.0f, 0.3f, 0.0f, Bad
 
       _M_aimLock(true),
       _M_sensitivity(1.0f)

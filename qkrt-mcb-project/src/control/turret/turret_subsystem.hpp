@@ -63,7 +63,7 @@ public:
     inline float getElevation() const
     {
         uint16_t encoderRaw = _M_pitchMotor.getEncoderWrapped();
-        return encoderToRad(encoderRaw) - _M_pitchHorizontalOffset;
+        return _M_pitchHorizontalOffset - encoderToRad(encoderRaw);
     }
 
     /**
@@ -82,7 +82,7 @@ public:
     inline float getAzimuth() const
     {
         uint16_t encoderRaw = _M_yawMotor.getEncoderWrapped();
-        return encoderToRad(encoderRaw) - _M_yawForwardOffset;
+        return _M_yawForwardOffset - encoderToRad(encoderRaw);
     }
 
     /**
@@ -129,10 +129,10 @@ private:
     float _M_desiredPitchRpm, _M_desiredYawRpm;
     Pid _M_pitchRpmPid, _M_yawRpmPid;
 
+    float _M_yawForwardOffset, _M_pitchHorizontalOffset;
+
     bool _M_aimLock;
     float _M_sensitivity;
-    uint16_t _M_yawForwardOffset;
-    uint16_t _M_pitchHorizontalOffset;
 };
 
 };  // namespace control::turret

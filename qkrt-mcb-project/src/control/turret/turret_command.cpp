@@ -54,7 +54,7 @@ void TurretCommand::execute()
         float imuYawRevPerSec = _M_imu.getGz() / 360.0f;
     
         _M_turret.setPitchRps(pitchInp);
-        _M_turret.setYawRps(yawInp);
+        _M_turret.setYawRps(yawInp - imuYawRevPerSec);
     }
 }
 
