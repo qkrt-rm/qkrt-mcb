@@ -23,17 +23,24 @@
 #include <tap/drivers.hpp>
 
 #include "control/control_operator_interface.hpp"
+#include "communication/serial/vision_coprocessor.hpp"
+#include "communication/serial/logger.hpp"
 
 class Drivers : public tap::Drivers
 {
     Drivers()
-        : tap::Drivers(), controlOperatorInterface(remote)
+        : tap::Drivers()
+        , controlOperatorInterface(this)
+        , visionCoprocessor(this)
+        , logger(this)
     {
     }
     
     friend class DriversSingleton;
 public:
     control::ControlOperatorInterface controlOperatorInterface;
+    communication::serial::VisionCoprocessor visionCoprocessor;
+    communication::serial::Logger logger;
 };
 
 #endif  // DRIVERS_HPP_

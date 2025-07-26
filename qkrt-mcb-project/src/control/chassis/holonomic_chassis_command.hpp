@@ -15,9 +15,9 @@ class HolonomicChassisCommand : public tap::control::Command
 private:
     static constexpr float MAX_CHASSIS_SPEED_MPS = 1.0f;
 public:
-    HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
-                            turret::TurretSubsystem& turret,
-                            ControlOperatorInterface& operatorInterface);
+    HolonomicChassisCommand(Drivers& drivers,
+                            HolonomicChassisSubsystem& chassis,
+                            turret::TurretSubsystem& turret);
 
     void initialize() override;
 

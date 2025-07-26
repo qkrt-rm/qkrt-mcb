@@ -17,7 +17,7 @@ Robot::Robot(Drivers& drivers)
                      .canBus       = CanBus::CAN_BUS1,
                      .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
                  }),
-      _M_chassisCommand(_M_chassis, _M_turret, drivers.controlOperatorInterface),
+      _M_chassisCommand(drivers, _M_chassis, _M_turret),
       _M_turret(drivers,
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
@@ -28,7 +28,7 @@ Robot::Robot(Drivers& drivers)
                     .yawForwardOffset = 5455u,
                     .pitchHorizontalOffset = 0u,  // TODO: get this number when pitch motor is mounted
                 }),
-      _M_turretCommand(_M_turret, drivers.controlOperatorInterface, drivers.uart)
+      _M_turretCommand(drivers, _M_turret)
 {
 }
 

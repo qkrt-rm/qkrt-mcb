@@ -2,8 +2,9 @@
 
 #include <tap/control/command.hpp>
 
-#include "control/control_operator_interface.hpp"
 #include "control/turret/turret_subsystem.hpp"
+#include "control/control_operator_interface.hpp"
+#include "communication/logger.hpp"
 
 namespace control::turret
 {
@@ -11,12 +12,10 @@ namespace control::turret
 class TurretCommand : public tap::control::Command
 {
 private:
-    using Uart = tap::communication::serial::Uart;
+    using TerminalSerial = tap::communication::serial::TerminalSerial;
 
 public:
-    TurretCommand(TurretSubsystem& chassis,
-                  ControlOperatorInterface& operatorInterface,
-                  Uart& uart);
+    TurretCommand(Drivers& drivers, TurretSubsystem& chassis);
 
     void initialize() override;
 
@@ -31,7 +30,7 @@ public:
 private:
     TurretSubsystem& _M_turret;
     ControlOperatorInterface& _M_operatorInterface;
-    Uart& _M_uart;
+    communication::Logger& _M_logger;
 
     float _M_pitchSensitivity, _M_yawSensitivity;
 

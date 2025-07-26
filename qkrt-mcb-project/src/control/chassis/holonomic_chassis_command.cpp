@@ -3,12 +3,12 @@
 namespace control::chassis
 {
 
-HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
-                                                 turret::TurretSubsystem& turret,
-                                                 ControlOperatorInterface& operatorInterface)
+HolonomicChassisCommand::HolonomicChassisCommand(Drivers& drivers,
+                                                 HolonomicChassisSubsystem& chassis,
+                                                 turret::TurretSubsystem& turret)
     : _M_chassis(chassis),
       _M_turret(turret),
-      _M_operatorInterface(operatorInterface)
+      _M_operatorInterface(drivers.controlOperatorInterface)
 {
     addSubsystemRequirement(&chassis);
 }

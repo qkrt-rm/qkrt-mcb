@@ -2,13 +2,20 @@
 
 #include <tap/communication/serial/remote.hpp>
 
+namespace tap
+{
+class Drivers;
+}  // namespace tap
+
 namespace control
 {
 
 class ControlOperatorInterface
 {
+    using Remote = tap::communication::serial::Remote;
+
 public:
-    ControlOperatorInterface(tap::communication::serial::Remote& remote);
+    ControlOperatorInterface(tap::Drivers* drivers);
     DISALLOW_COPY_AND_ASSIGN(ControlOperatorInterface)
     ~ControlOperatorInterface() = default;
 
@@ -33,7 +40,7 @@ public:
     float getTurretYawInput() const;
     
 private:
-    tap::communication::serial::Remote& _M_remote;
+    Remote& _M_remote;
 };
 
-}  // control
+}  // namespace control

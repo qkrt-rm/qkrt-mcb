@@ -1,12 +1,12 @@
 #include "control_operator_interface.hpp"
 
-using tap::communication::serial::Remote;
+#include <tap/drivers.hpp>
 
 namespace control
 {
 
-ControlOperatorInterface::ControlOperatorInterface(tap::communication::serial::Remote& remote)
-    : _M_remote(remote)
+ControlOperatorInterface::ControlOperatorInterface(tap::Drivers* drivers)
+    : _M_remote(drivers->remote)
 {
 }
 
