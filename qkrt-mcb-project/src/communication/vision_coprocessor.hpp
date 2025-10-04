@@ -1,6 +1,8 @@
+#pragma once
+
 #include "tap/communication/serial/dji_serial.hpp"
 #include "tap/communication/serial/uart.hpp"
-#include "control/turret/turret_command.hpp"
+
 
 namespace tap::communication::serial
 {
@@ -24,7 +26,7 @@ namespace tap::communication::serial
             * @param[in] completeMessage Reference to the received message.
             */
 
-            void messageReceiveCallback(const ReceivedSerialMessage& completeMessage);
+            void messageReceiveCallback(const ReceivedSerialMessage& completeMessage) override;
 
 
     };
