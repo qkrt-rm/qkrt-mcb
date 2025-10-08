@@ -9,7 +9,6 @@ namespace tap::communication::serial
     class VisionCoprocessor : public DJISerial 
     {
         public:
-            static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart1;
             /**
             * Construct MyDJISerial.
             *
@@ -17,9 +16,8 @@ namespace tap::communication::serial
             * @param[in] port UART port to use.
             * @param[in] crcEnforcement Enable/disable RX CRC enforcement.
             */
-            VisionCoprocessor(Drivers* drivers, Uart::UartPort port, bool isRxCRCEnforcementEnabled);
+            VisionCoprocessor(Drivers* drivers);
 
-        protected:
             /**
             * Callback executed when a full message has been received.
             *
@@ -28,6 +26,14 @@ namespace tap::communication::serial
 
             void messageReceiveCallback(const ReceivedSerialMessage& completeMessage) override;
 
+            void initialize();
+
+        private:
+        
+        Drivers* drivers;
+
+        static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart1;
+        static constexpr uint32_t BAUD_RATE = 115200;
 
     };
 }
