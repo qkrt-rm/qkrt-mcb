@@ -2,11 +2,19 @@
 
 #include "tap/communication/serial/dji_serial.hpp"
 #include "tap/communication/serial/uart.hpp"
+#include "logger.hpp" // Ensure this header defines the Logger class or type
+
+#include "aim_message.hpp"
 
 
-namespace tap::communication::serial
+namespace src
 {
-    class VisionCoprocessor : public DJISerial 
+class Drivers;
+}
+namespace communication
+{
+    using tap::communication::serial::Uart;
+    class VisionCoprocessor : public tap::communication::serial::DJISerial
     {
         public:
             /**
@@ -28,14 +36,22 @@ namespace tap::communication::serial
 
             void initialize();
 
+            const TurretData& getTurretData() const;
+
         private:
         
-        Drivers* drivers;
+            Drivers* drivers;
 
             static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart1;
-        static constexpr uint32_t BAUD_RATE = 115200;
-        static constexpr uint16_t OFFLINE_TIMEOUT_MS = 2000;
+            static constexpr uint32_t BAUD_RATE = 115200;
+            static constexpr uint16_t OFFLINE_TIMEOUT_MS = 2000;
+
         tap::arch::MilliTimeout offlineTimeout;
+            static constexpr uint32_t BAUD_RATE = 115200;
+
+            communication::serial::Logger & _M_logger;
+
+            TurretData lastTurretData;
 
     };
 }
