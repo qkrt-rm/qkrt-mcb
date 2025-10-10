@@ -4,10 +4,12 @@
 namespace tap::communication::serial {
 
     VisionCoprocessor::VisionCoprocessor(Drivers* drivers)
-    : DJISerial(drivers, VISION_COPROCESSOR_UART_PORT), drivers(drivers) {}
+    : DJISerial(drivers, VISION_COPROCESSOR_UART_PORT), drivers(drivers), offlineTimeout() {}
 
     void VisionCoprocessor::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
     {
+
+        offlineTimeout.restart(OFFLINE_TIMEOUT_MS);
 
         // Extract the payload
         const uint8_t* payload = completeMessage.data;
@@ -17,6 +19,8 @@ namespace tap::communication::serial {
         std::memcpy(&x, payload, sizeof(float));
         std::memcpy(&y, payload + sizeof(float), sizeof(float));
         std::memcpy(&z, payload + 2 * sizeof(float), sizeof(float));
+
+        
     }
 
     void VisionCoprocessor::initialize()

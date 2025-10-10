@@ -32,8 +32,10 @@ namespace tap::communication::serial
         
         Drivers* drivers;
 
-        static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart1;
+            static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart1;
         static constexpr uint32_t BAUD_RATE = 115200;
+        static constexpr uint16_t OFFLINE_TIMEOUT_MS = 2000;
+        tap::arch::MilliTimeout offlineTimeout;
 
     };
 }
