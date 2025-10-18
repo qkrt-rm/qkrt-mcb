@@ -38,13 +38,8 @@ namespace communication
             static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart3;
 
             static constexpr uint32_t BAUD_RATE = 115200;
-            static constexpr uint16_t OFFLINE_TIMEOUT_MS = 2000;
-
-        tap::arch::MilliTimeout offlineTimeout;
-            static constexpr uint32_t BAUD_RATE = 115200;
 
             static constexpr uint16_t OFFLINE_TIMEOUT_MS = 2000;
-
 
             tap::arch::MilliTimeout offlineTimeout;
 

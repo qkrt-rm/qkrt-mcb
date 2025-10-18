@@ -4,7 +4,7 @@
 namespace communication {
 
     VisionCoprocessor::VisionCoprocessor(Drivers* drivers)
-    : DJISerial(drivers, VISION_COPROCESSOR_UART_PORT), drivers(drivers) {}
+    : DJISerial(drivers, VISION_COPROCESSOR_UART_PORT), drivers(drivers), _M_logger(drivers->logger) {}
 
     void VisionCoprocessor::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
     {
