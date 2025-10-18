@@ -17,37 +17,36 @@ namespace communication
     class VisionCoprocessor : public tap::communication::serial::DJISerial
     {
         public:
-            /**
-            * Construct MyDJISerial.
-            *
-            * @param[in] drivers Pointer to TAP drivers.
-            * @param[in] port UART port to use.
-            * @param[in] crcEnforcement Enable/disable RX CRC enforcement.
-            */
+   
             VisionCoprocessor(Drivers* drivers);
 
-            /**
-            * Callback executed when a full message has been received.
-            *
-            * @param[in] completeMessage Reference to the received message.
-            */
 
             void messageReceiveCallback(const ReceivedSerialMessage& completeMessage) override;
 
             void initialize();
 
             const TurretData& getTurretData() const;
+            
+            bool VisionCoprocessor::isOnline() const;
+
 
         private:
+
         
             Drivers* drivers;
 
-            static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart1;
+            static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart3;
+
             static constexpr uint32_t BAUD_RATE = 115200;
 
-            communication::serial::Logger & _M_logger;
+            static constexpr uint16_t OFFLINE_TIMEOUT_MS = 2000;
 
-            TurretData lastTurretData;
+
+            tap::arch::MilliTimeout offlineTimeout;
+
+            serial::Logger & _M_logger;         //member that references logger object
+
+            TurretData lastTurretData;          //struct with turret data from jetson
 
     };
 }

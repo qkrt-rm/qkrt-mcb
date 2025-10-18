@@ -8,5 +8,5 @@ namespace communication
         float xPos;
         float yPos;
         float zPos;
-    };
+    } modm_packed;
 }
