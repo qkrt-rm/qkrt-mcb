@@ -2,12 +2,11 @@
 
 #include "tap/communication/serial/dji_serial.hpp"
 #include "tap/communication/serial/uart.hpp"
-#include "logger.hpp" // Ensure this header defines the Logger class or type
-
+#include "logger.hpp" 
 #include "aim_message.hpp"
 
 
-namespace src
+namespace tap
 {
 class Drivers;
 }
@@ -18,7 +17,7 @@ namespace communication
     {
         public:
    
-            VisionCoprocessor(Drivers* drivers);
+            VisionCoprocessor(tap::Drivers* drivers);
 
 
             void messageReceiveCallback(const ReceivedSerialMessage& completeMessage) override;
@@ -27,13 +26,13 @@ namespace communication
 
             const TurretData& getTurretData() const;
             
-            bool VisionCoprocessor::isOnline() const;
+            bool isOnline() const;  
 
 
         private:
 
         
-            Drivers* drivers;
+            tap::Drivers* drivers;
 
             static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart3;
 
@@ -43,7 +42,7 @@ namespace communication
 
             tap::arch::MilliTimeout offlineTimeout;
 
-            serial::Logger & _M_logger;         //member that references logger object
+            serial::Logger _M_logger;         //member that references logger object
 
             TurretData lastTurretData;          //struct with turret data from jetson
 

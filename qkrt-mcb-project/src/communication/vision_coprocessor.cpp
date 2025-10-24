@@ -3,8 +3,8 @@
 
 namespace communication {
 
-    VisionCoprocessor::VisionCoprocessor(Drivers* drivers)
-    : DJISerial(drivers, VISION_COPROCESSOR_UART_PORT), drivers(drivers), _M_logger(drivers->logger) {}
+    VisionCoprocessor::VisionCoprocessor(tap::Drivers* drivers)
+    : DJISerial(drivers, VISION_COPROCESSOR_UART_PORT), drivers(drivers), _M_logger(drivers) {}
 
     void VisionCoprocessor::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
     {
@@ -14,7 +14,12 @@ namespace communication {
         if (completeMessage.header.dataLength == sizeof(lastTurretData))
         {
             memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
-            _M_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", lastTurretData.xPos, lastTurretData.yPos, lastTurretData.zPos);
+
+            float x = lastTurretData.xPos;
+            float y = lastTurretData.yPos;
+            float z = lastTurretData.zPos;
+
+            _M_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
         }
 
     }
