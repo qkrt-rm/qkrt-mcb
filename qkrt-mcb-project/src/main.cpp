@@ -124,7 +124,8 @@ static void initializeIo(Drivers *drivers)
 
     using Uart = tap::communication::serial::Uart;
     drivers->uart.init<Uart::UartPort::Uart1, 115200>();
-    drivers->uart.init<Uart::UartPort::Uart6, 115200>();
+    //drivers->uart.init<Uart::UartPort::Uart6, 115200>();
+    drivers->visionCoprocessor.initialize();
 }
 
 static void updateIo(Drivers *drivers)
@@ -136,4 +137,5 @@ static void updateIo(Drivers *drivers)
     drivers->refSerial.updateSerial();
     drivers->remote.read();
     drivers->bmi088.periodicIMUUpdate();
+    drivers->visionCoprocessor.updateSerial();
 }
