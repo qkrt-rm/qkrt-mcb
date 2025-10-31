@@ -124,6 +124,7 @@ static void initializeIo(Drivers *drivers)
 
     using Uart = tap::communication::serial::Uart;
     drivers->uart.init<Uart::UartPort::Uart1, 115200>();
+    drivers->uart.init<Uart::UartPort::Uart6, 115200>();
 }
 
 static void updateIo(Drivers *drivers)

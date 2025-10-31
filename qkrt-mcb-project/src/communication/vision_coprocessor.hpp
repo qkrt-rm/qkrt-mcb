@@ -34,7 +34,7 @@ namespace communication
         
             tap::Drivers* drivers;
 
-            static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart3;
+            static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart6;
 
             static constexpr uint32_t BAUD_RATE = 115200;
 
