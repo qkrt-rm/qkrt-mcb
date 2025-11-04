@@ -11,7 +11,7 @@ namespace communication {
         //TODO: Switchcase based on message type, seperate decode func
         offlineTimeout.restart(OFFLINE_TIMEOUT_MS);
 
-        if (completeMessage.header.dataLength == sizeof(lastTurretData))
+        //if (completeMessage.header.dataLength == sizeof(lastTurretData))
         {
             memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
 
@@ -20,6 +20,7 @@ namespace communication {
             float z = lastTurretData.zPos;
 
             _M_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
+            _M_logger.printf("HEllio");
         }
 
     }
