@@ -8,8 +8,8 @@ namespace communication::serial
 VisionCoprocessor::VisionCoprocessor(tap::Drivers* drivers)
     : DJISerial(drivers, VISION_COPROCESSOR_UART_PORT)
 {
-    assert(visionCoprocessorInstance == nullptr);
-    visionCoprocessorInstance = this;
+    // assert(visionCoprocessorInstance == nullptr);
+    // visionCoprocessorInstance = this;
 }
 
 void VisionCoprocessor::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
