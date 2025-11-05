@@ -14,9 +14,8 @@ private:
     using Uart = tap::communication::serial::Uart;
 
 public:
-    TurretCommand(TurretSubsystem& chassis,
-                  ControlOperatorInterface& operatorInterface,
-                  Uart& uart);
+    TurretCommand(Drivers& drivers, TurretSubsystem& chassis,
+                  ControlOperatorInterface& operatorInterface);
 
     void initialize() override;
 
@@ -31,9 +30,10 @@ public:
 private:
     TurretSubsystem& _M_turret;
     ControlOperatorInterface& _M_operatorInterface;
-    Uart& _M_uart;
 
     float _M_pitchSensitivity, _M_yawSensitivity;
+
+    communication::serial:: Logger & _M_Logger2;
 
     // TODO: change to some target data structure when it exists
     void* _M_target;

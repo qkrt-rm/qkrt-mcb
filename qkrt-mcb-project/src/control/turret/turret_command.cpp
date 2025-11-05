@@ -3,12 +3,11 @@
 namespace control::turret
 {
 
-TurretCommand::TurretCommand(TurretSubsystem& turret,
-                             ControlOperatorInterface& operatorInterface,
-                             Uart& uart)
+TurretCommand::TurretCommand(Drivers& drivers, TurretSubsystem& turret,
+                             ControlOperatorInterface& operatorInterface)
     : _M_turret(turret),
       _M_operatorInterface(operatorInterface),
-      _M_uart(uart),
+      _M_Logger2(drivers.logger),
       _M_pitchSensitivity(1.0f), _M_yawSensitivity(1.0f),
       _M_target(nullptr)
 {
@@ -49,7 +48,11 @@ void TurretCommand::execute()
 
         float pitchInp = _M_operatorInterface.getTurretPitchInput();
         float yawInp = _M_operatorInterface.getTurretYawInput();
-    
+
+        _M_Logger2.printf("turret yaw (azimuth): %.3f\n", _M_turret.getAzimuth());
+        _M_Logger2.delay(200);
+
+
         _M_turret.setPitchRps(pitchInp);
         _M_turret.setYawRps(yawInp);
     }

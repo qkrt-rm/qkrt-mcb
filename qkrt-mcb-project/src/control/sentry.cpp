@@ -28,7 +28,7 @@ Robot::Robot(Drivers& drivers)
                     .yawForwardOffset = 5455u,
                     .pitchHorizontalOffset = 0u,  // TODO: get this number when pitch motor is mounted
                 }),
-      _M_turretCommand(_M_turret, drivers.controlOperatorInterface, drivers.uart)
+      _M_turretCommand(drivers, _M_turret, drivers.controlOperatorInterface)
 {
 }
 
