@@ -4,6 +4,7 @@
 
 #include "control/control_operator_interface.hpp"
 #include "control/turret/turret_subsystem.hpp"
+#include "communication/logger.hpp"
 
 namespace control::turret
 {
@@ -33,7 +34,7 @@ private:
 
     float _M_pitchSensitivity, _M_yawSensitivity;
 
-    communication::serial:: Logger & _M_Logger2;
+    communication::serial:: Logger & _M_logger;
 
     // TODO: change to some target data structure when it exists
     void* _M_target;
