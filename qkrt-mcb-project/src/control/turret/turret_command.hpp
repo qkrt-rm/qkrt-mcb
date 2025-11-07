@@ -30,11 +30,14 @@ public:
 
 private:
     TurretSubsystem& _M_turret;
+    
+    Drivers & driver;
+
     ControlOperatorInterface& _M_operatorInterface;
 
     float _M_pitchSensitivity, _M_yawSensitivity;
 
-   // communication::serial::Logger & _M_logger;
+    communication::serial::Logger & _M_logger;
 
     // TODO: change to some target data structure when it exists
     void* _M_target;

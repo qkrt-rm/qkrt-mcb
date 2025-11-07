@@ -41,7 +41,7 @@ namespace communication
 
             tap::arch::MilliTimeout offlineTimeout;
 
-            serial::Logger* _M_logger;         //member that references logger object
+            //serial::Logger* _M_logger;         //member that references logger object
 
             TurretData lastTurretData;          //struct with turret data from jetson
 
