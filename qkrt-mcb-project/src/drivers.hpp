@@ -31,16 +31,17 @@ class Drivers : public tap::Drivers
     Drivers()
         : tap::Drivers()
         , controlOperatorInterface(remote)
-        , visionCoprocessor(this)
         , logger(this)
+        , visionCoprocessor(this)
+       
     {
     }
     
     friend class DriversSingleton;
 public:
     control::ControlOperatorInterface controlOperatorInterface;
-    communication::VisionCoprocessor visionCoprocessor;
     communication::serial::Logger logger;
+    communication::VisionCoprocessor visionCoprocessor;
 };
 
 #endif  // DRIVERS_HPP_
