@@ -13,18 +13,16 @@ namespace communication {
         offlineTimeout.restart(OFFLINE_TIMEOUT_MS);
 
         //if (completeMessage.header.dataLength == sizeof(lastTurretData))
-        {
-            memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
+        
+        memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
 
-            lastTurretData.xPos = 60.1;
-            float y = lastTurretData.yPos;
-            float z = lastTurretData.zPos;
+        lastTurretData.xPos = 80.51;
+        float y = lastTurretData.yPos;
+        float z = lastTurretData.zPos;
 
             //_M_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
             //_M_logger->printf("HEllio");
             //_M_logger->delay(200);
-
-        }
 
     }
 
