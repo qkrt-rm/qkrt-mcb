@@ -4,7 +4,8 @@
 
 #include "control/control_operator_interface.hpp"
 #include "control/turret/turret_subsystem.hpp"
-#include "communication/logger.hpp"
+#include "communication/serial/logger.hpp"
+#include "communication/vision_coprocessor.hpp"
 
 namespace control::turret
 {
@@ -31,13 +32,13 @@ public:
 private:
     TurretSubsystem& _M_turret;
     
-    Drivers & driver;
+    communication::VisionCoprocessor& _M_visionCoprocessor;
 
     ControlOperatorInterface& _M_operatorInterface;
 
     float _M_pitchSensitivity, _M_yawSensitivity;
 
-    communication::serial::Logger & _M_logger;
+    communication::serial::Logger& _M_logger;
 
     // TODO: change to some target data structure when it exists
     void* _M_target;

@@ -24,7 +24,7 @@
 
 #include "control/control_operator_interface.hpp"
 #include "communication/vision_coprocessor.hpp"
-#include "communication/logger.hpp"
+#include "communication/serial/logger.hpp"
 
 class Drivers : public tap::Drivers
 {

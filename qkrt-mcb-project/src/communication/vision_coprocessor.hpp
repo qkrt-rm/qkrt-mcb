@@ -1,23 +1,23 @@
 #pragma once
 
-#include "tap/communication/serial/dji_serial.hpp"
-#include "tap/communication/serial/uart.hpp"
-#include "logger.hpp" 
-#include "aim_message.hpp"
+#include <tap/communication/serial/dji_serial.hpp>
+#include <tap/communication/serial/uart.hpp>
+#include <tap/architecture/timeout.hpp>
 
-namespace tap
-{
+#include "aim_message.hpp"
+#include "communication/serial/logger.hpp"
+
 class Drivers;
-}
+
 namespace communication
 {
     using tap::communication::serial::Uart;
+
     class VisionCoprocessor : public tap::communication::serial::DJISerial
     {
         public:
    
-            VisionCoprocessor(tap::Drivers* drivers);
-
+            VisionCoprocessor(Drivers* drivers);
 
             void messageReceiveCallback(const ReceivedSerialMessage& completeMessage) override;
 
@@ -29,10 +29,6 @@ namespace communication
 
 
         private:
-
-        
-            tap::Drivers* drivers;
-
             static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart6;
 
             static constexpr uint32_t BAUD_RATE = 115200;
@@ -41,7 +37,7 @@ namespace communication
 
             tap::arch::MilliTimeout offlineTimeout;
 
-            //serial::Logger* _M_logger;         //member that references logger object
+            serial::Logger& _M_logger;         //member that references logger object
 
             TurretData lastTurretData;          //struct with turret data from jetson
 

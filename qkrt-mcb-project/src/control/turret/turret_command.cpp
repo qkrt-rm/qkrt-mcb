@@ -7,7 +7,7 @@ using communication::TurretData;
 TurretCommand::TurretCommand(Drivers& drivers, TurretSubsystem& turret,
                              ControlOperatorInterface& operatorInterface)
     : _M_turret(turret),
-      driver(drivers),
+      _M_visionCoprocessor(drivers.visionCoprocessor),
       _M_operatorInterface(operatorInterface),
       _M_pitchSensitivity(1.0f), _M_yawSensitivity(1.0f),
       _M_logger(drivers.logger),
@@ -34,6 +34,8 @@ void TurretCommand::execute()
     // acc += static_cast<float>(dt * Speed) * 1e-6;
     // prev = curr;
 
+    volatile TurretData data = _M_visionCoprocessor.getTurretData();
+
     if (false)
     {
         _M_turret.lock();
@@ -51,15 +53,7 @@ void TurretCommand::execute()
         float pitchInp = _M_operatorInterface.getTurretPitchInput();
         float yawInp = _M_operatorInterface.getTurretYawInput();
         
-        TurretData data = driver.visionCoprocessor.getTurretData();
-        bool is_CV_online = driver.visionCoprocessor.isOnline();
-
-        // _M_logger.printf("turret yaw (azimuth): %.3f\n", _M_turret.getAzimuth());
-        // _M_logger.delay(200);
-        
-        float x = data.xPos;
-        _M_logger.printf("turret yaw (azimuth): %.3f\n", x);
-        _M_logger.delay(200);
+        // bool is_CV_online = _M_visionCoprocessor.isOnline();
 
         _M_turret.setPitchRps(pitchInp);
         _M_turret.setYawRps(yawInp);
