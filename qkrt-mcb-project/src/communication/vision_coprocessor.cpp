@@ -11,20 +11,19 @@ namespace communication {
     void VisionCoprocessor::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
     {
         //TODO: Switchcase based on message type, seperate decode func
-        // offlineTimeout.restart(OFFLINE_TIMEOUT_MS);
+        offlineTimeout.restart(OFFLINE_TIMEOUT_MS);
 
-        //if (completeMessage.header.dataLength == sizeof(lastTurretData))
-        
-        memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
+        if (completeMessage.header.dataLength == sizeof(lastTurretData))
+        {
+            memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
 
-        float x = lastTurretData.xPos;
-        float y = lastTurretData.yPos;
-        float z = lastTurretData.zPos;
+            float x = lastTurretData.xPos;
+            float y = lastTurretData.yPos;
+            float z = lastTurretData.zPos;
 
-        // _M_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
-        _M_logger.printf("test1");
-        _M_logger.delay(200);
-
+            _M_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
+            _M_logger.delay(200);
+        }
     }
 
     void VisionCoprocessor::initialize()
@@ -35,7 +34,6 @@ namespace communication {
     bool VisionCoprocessor::isOnline() const { return !offlineTimeout.isExpired(); }
 
     const TurretData& VisionCoprocessor::getTurretData() const {
-        _M_logger.printf("test2");
         return lastTurretData;
     }
     
