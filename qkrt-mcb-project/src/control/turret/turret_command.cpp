@@ -36,15 +36,31 @@ void TurretCommand::execute()
 
     volatile TurretData data = _M_visionCoprocessor.getTurretData();
 
-    if (false)
+    const float xConst = 0.0f;
+    const float yConst = 0.0f;
+    const float zConst = 0.0f;
+
+    float xPos = data.xPos + xConst;
+    float yPos = data.yPos + yConst;
+    float zPos = data.zPos + zConst;
+
+    float aimAzimuth = std::atan2(xPos, yPos);
+    float groundDist = std::hypot(xPos, yPos);
+    float aimElevation = std::atan2(zPos, groundDist);
+
+    // aimAzimuth = aimAzimuth * (180.0f / M_PI);
+
+    _M_logger.printf("Message Recieved: Azimuth=%.3f\n", static_cast<double>(aimAzimuth));
+
+    if (true)
     {
         _M_turret.lock();
 
-        float desiredElevation = 0.0f;
-        float desiredAzimuth = 0.0f;
+        float desiredElevation = 0;
+        float desiredAzimuth = 0;
 
         _M_turret.setElevation(desiredElevation);
-        _M_turret.setAzimuth(desiredAzimuth);
+        _M_turret.setAzimuth(aimAzimuth);
     }
     else
     {
