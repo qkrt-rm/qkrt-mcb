@@ -56,10 +56,10 @@ void TurretCommand::execute()
     {
         _M_turret.lock();
 
-        float desiredElevation = 0;
-        float desiredAzimuth = 0;
+        //float desiredElevation = 0;
+        //float desiredAzimuth = 0;
 
-        _M_turret.setElevation(desiredElevation);
+        _M_turret.setElevation(aimAzimuth);
         _M_turret.setAzimuth(aimAzimuth);
     }
     else
