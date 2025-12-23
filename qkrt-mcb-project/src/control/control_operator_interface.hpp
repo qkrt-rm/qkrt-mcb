@@ -1,0 +1,51 @@
+#pragma once
+
+#include <tap/communication/serial/remote.hpp>
+
+namespace control
+{
+
+class ControlOperatorInterface
+{
+public:
+    ControlOperatorInterface(tap::communication::serial::Remote& remote);
+    DISALLOW_COPY_AND_ASSIGN(ControlOperatorInterface)
+    ~ControlOperatorInterface() = default;
+
+    /**
+     * @return The normalized value used for left and right chassis movement.
+     */
+    float getChassisXInput() const;
+
+    /**
+     * @return The normalized value used for forward and backward chassis movement.
+     */
+    float getChassisZInput() const;
+
+    /**
+     * @return The normalized value used for turret pitch adjustments.
+     */
+    float getTurretPitchInput() const;
+
+    /**
+     * @return The normalized value used for turret yaw adjustments.
+     */
+    float getTurretYawInput() const;
+
+    /**
+    * @return True if the flywheel input is active.
+    */
+    bool getFlyWheelInput();
+
+    /**
+    * @return True if the Agitator input is active.
+    */
+    bool getAgitatorInput();
+
+
+    
+private:
+    tap::communication::serial::Remote& _M_remote;
+};
+
+}  // control

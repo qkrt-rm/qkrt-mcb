@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Queen's Knights Robotics Team <qkrt@engsoc.queensu.ca>
+ * Copyright (c) 2020-2021 Queen's Knights Robotics Team
  *
  * This file is part of qkrt-mcb.
  *
@@ -17,23 +17,34 @@
  * along with qkrt-mcb.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef DRIVERS_HPP_
-#define DRIVERS_HPP_
+#include "flywheel_on_command.hpp"
 
-#include <tap/drivers.hpp>
+#include "tap/control/command.hpp"
+
+#include "flywheel_subsystem.hpp"
+
+#include "tap/communication/gpio/leds.hpp"
 
 #include "control/control_operator_interface.hpp"
 
-class Drivers : public tap::Drivers
+namespace control
 {
-    Drivers()
-        : tap::Drivers(), controlOperatorInterface(remote)
-    {
-    }
-    
-    friend class DriversSingleton;
-public:
-    control::ControlOperatorInterface controlOperatorInterface;
-};
+namespace flywheel
+{
+void FlywheelOnCommand::initialize() {}
 
-#endif  // DRIVERS_HPP_
+void FlywheelOnCommand::execute() 
+{    
+    //operatorInterface.pollInputDevices();
+
+    if (operatorInterface.getFlyWheelInput())
+        flywheel->setDesiredOutput(spinning_pwm);
+    else
+        flywheel->setDesiredOutput(OFF_PWM); 
+}
+
+void FlywheelOnCommand::end(bool) { flywheel->setDesiredOutput(0.25f); }
+
+bool FlywheelOnCommand::isFinished() const { return false; }
+}  // namespace flywheel
+}  // namespace control
