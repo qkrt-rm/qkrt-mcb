@@ -27,6 +27,10 @@
 
 #include "control/control_operator_interface.hpp"
 
+#include "control/control_flags/control_flags.hpp"
+
+using namespace control;
+
 namespace control
 {
 namespace flywheel
@@ -38,10 +42,12 @@ void FlywheelOnCommand::execute()
     if (operatorInterface.getFlyWheelInput())
         flywheel->setDesiredOutput(spinning_pwm);
     else
-        flywheel->setDesiredOutput(OFF_PWM); 
+        flywheel->setDesiredOutput(flags::OFF_PWM); 
 }
 
-void FlywheelOnCommand::end(bool) { flywheel->setDesiredOutput(OFF_PWM); }
+void FlywheelOnCommand::end(bool) {
+    flywheel->setDesiredOutput(flags::OFF_PWM);
+}
 
 bool FlywheelOnCommand::isFinished() const { return false; }
 }  // namespace flywheel

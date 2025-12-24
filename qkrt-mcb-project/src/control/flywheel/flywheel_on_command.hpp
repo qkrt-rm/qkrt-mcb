@@ -56,7 +56,6 @@ private:
     FlywheelSubsystem *flywheel;
     ControlOperatorInterface& operatorInterface;
     float spinning_pwm;
-    static constexpr float OFF_PWM = 0.25f;
 
 };  // class FlywheelOnCommand
 }  // namespace flywheel
