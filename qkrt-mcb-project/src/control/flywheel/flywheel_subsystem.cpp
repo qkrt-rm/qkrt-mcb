@@ -22,6 +22,11 @@
 #include "tap/communication/serial/remote.hpp"
 #include "drivers.hpp"
 
+<<<<<<< HEAD
+=======
+#include "control/control_flags/control_flags.hpp"
+
+>>>>>>> aa0398a (Added temporary controls flag file. Investigating interrupt support)
 using namespace control;
 
 namespace control::flywheel
@@ -32,10 +37,17 @@ FlywheelSubsystem::FlywheelSubsystem(Drivers& drivers)
 }
         
 void FlywheelSubsystem::initialize() { 
+<<<<<<< HEAD
     drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN1);
     drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN2);
     drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN3);
     drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN4);
+=======
+    drivers->pwm.write(flags::OFF_PWM, FLYWHEEL_MOTOR_PIN1);
+    drivers->pwm.write(flags::OFF_PWM, FLYWHEEL_MOTOR_PIN2);
+    drivers->pwm.write(flags::OFF_PWM, FLYWHEEL_MOTOR_PIN3);
+    drivers->pwm.write(flags::OFF_PWM, FLYWHEEL_MOTOR_PIN4);
+>>>>>>> aa0398a (Added temporary controls flag file. Investigating interrupt support)
 }
 
 void FlywheelSubsystem::refresh() {}

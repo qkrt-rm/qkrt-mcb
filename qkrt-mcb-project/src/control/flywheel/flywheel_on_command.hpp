@@ -53,11 +53,17 @@ public:
     const char *getName() const override { return "flywheel on command"; }
 
 private:
+<<<<<<< HEAD
     FlywheelSubsystem &m_flywheel;
     ControlOperatorInterface& m_operatorInterface;
 
     float m_flywheelPWM;
     static constexpr float OFF_PWM = 0.25f;
+=======
+    FlywheelSubsystem *flywheel;
+    ControlOperatorInterface& operatorInterface;
+    float spinning_pwm;
+>>>>>>> aa0398a (Added temporary controls flag file. Investigating interrupt support)
 
 };  // class FlywheelOnCommand
 }  // namespace flywheel
