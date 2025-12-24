@@ -33,7 +33,7 @@ float ControlOperatorInterface::getTurretYawInput() const
 
 
 
-/// Adding Flywheel Input
+// Adding Flywheel Input
 bool ControlOperatorInterface::getFlyWheelInput() {
     return _M_remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::UP;
 }
@@ -41,7 +41,13 @@ bool ControlOperatorInterface::getFlyWheelInput() {
 // Adding Agitator Input
 bool ControlOperatorInterface::getAgitatorInput() {
     return _M_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
+}
 
+// Adding Emergency Stop Input
+bool ControlOperatorInterface::getEmergencyStopInput() {
+    return false;
+    // Find a button on the remote for it.
+    //return _M_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
 }
 
 }  // control

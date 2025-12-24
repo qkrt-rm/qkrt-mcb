@@ -42,6 +42,12 @@ public:
     */
     bool getAgitatorInput();
 
+    /**
+     * @return True if the emergency stop button is pushed.
+     */
+    bool getEmergencyStopInput();
+
+
 
     
 private:
