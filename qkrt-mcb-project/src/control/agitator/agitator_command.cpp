@@ -38,8 +38,6 @@ AgitatorCommand::AgitatorCommand(
 
 void AgitatorCommand::execute()
 {
-    //operatorInterface.pollInputDevices();
-
     float newIndexerSpeed = internal::indexerBoost ? indexerSpeed  + 20.0f : indexerSpeed;
 
     if (operatorInterface.getAgitatorInput()) 
@@ -48,6 +46,8 @@ void AgitatorCommand::execute()
         agitator.setSetpoint(0);
 }
 
-void AgitatorCommand::end(bool) { agitator.setSetpoint(0); }
+void AgitatorCommand::end(bool) {
+    agitator.setSetpoint(0);
+}
 
 };  // namespace control::chassis

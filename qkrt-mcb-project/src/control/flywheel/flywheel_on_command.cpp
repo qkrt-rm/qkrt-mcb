@@ -35,15 +35,13 @@ void FlywheelOnCommand::initialize() {}
 
 void FlywheelOnCommand::execute() 
 {    
-    //operatorInterface.pollInputDevices();
-
     if (operatorInterface.getFlyWheelInput())
         flywheel->setDesiredOutput(spinning_pwm);
     else
         flywheel->setDesiredOutput(OFF_PWM); 
 }
 
-void FlywheelOnCommand::end(bool) { flywheel->setDesiredOutput(0.25f); }
+void FlywheelOnCommand::end(bool) { flywheel->setDesiredOutput(OFF_PWM); }
 
 bool FlywheelOnCommand::isFinished() const { return false; }
 }  // namespace flywheel

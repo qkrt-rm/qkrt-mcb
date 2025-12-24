@@ -68,7 +68,7 @@ private:
 
 
     /**
-     * @brief Agiator subsystem for the sentry robot
+     * @brief Agitator subsystem for the sentry robot
      */
     tap::motor::DjiMotor _M_agitator;
     agitator::VelocityAgitatorSubsystem _M_velocityAgitatorSubsystem;
