@@ -34,6 +34,12 @@ public:
     bool getEmergencyStopInput() const { return m_emergencystopInput; };
 
 
+    /**
+     * @return True if the emergency stop button is pushed.
+     */
+    bool getEmergencyStopInput();
+
+
 
     
 private:
