@@ -33,27 +33,7 @@ void ControlOperatorInterface::pollInputDevices()
             m_emergencystopInput = m_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::DOWN;
 
 
-<<<<<<< HEAD
     }
-=======
-
-
-// Adding Flywheel Input
-bool ControlOperatorInterface::getFlyWheelInput() {
-    return _M_remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::UP;
-}
-
-// Adding Agitator Input
-bool ControlOperatorInterface::getAgitatorInput() {
-    return _M_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
-}
-
-// Adding Emergency Stop Input
-bool ControlOperatorInterface::getEmergencyStopInput() {
-    return false;
-    // Find a button on the remote for it.
-    //return _M_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
->>>>>>> 6081a8c (Starting work emergency stop)
 }
 
 }  // control
