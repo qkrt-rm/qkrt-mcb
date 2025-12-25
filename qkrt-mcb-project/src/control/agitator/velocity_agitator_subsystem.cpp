@@ -35,21 +35,21 @@ VelocityAgitatorSubsystem::VelocityAgitatorSubsystem(
     const control::algorithms::EduPidConfig& pidConfig,
     tap::motor::DjiMotor& agitator)
     : Subsystem(&drivers),
-      agitator(agitator),
-      velocityPid(pidConfig)
+      m_agitator(agitator),
+      m_velocityPid(pidConfig)
 {
 }
 
-void VelocityAgitatorSubsystem::initialize() { agitator.initialize(); }
+void VelocityAgitatorSubsystem::initialize() { m_agitator.initialize(); }
 
 void VelocityAgitatorSubsystem::refresh() {
     if(!isOnline()){
         calibrated = false;
     }
     if(calibrated){
-        velocityPid.runControllerDerivateError(getSetpoint() - getCurrentValue(), tap::arch::clock::getTimeMilliseconds() - prevTime);
+        m_velocityPid.runControllerDerivateError(getSetpoint() - getCurrentValue(), tap::arch::clock::getTimeMilliseconds() - prevTime);
         prevTime = tap::arch::clock::getTimeMilliseconds();
-        agitator.setDesiredOutput(velocityPid.getOutput());
+        m_agitator.setDesiredOutput(m_velocityPid.getOutput());
     }else{
         calibrateHere();
     }
@@ -61,7 +61,7 @@ float VelocityAgitatorSubsystem::getSetpoint() const {
 
 float VelocityAgitatorSubsystem::getCurrentValue() const {
     
-    return agitator.getShaftRPM() / AGITATOR_GEAR_RATIO_M2006 * (M_TWOPI / 60);
+    return m_agitator.getShaftRPM() / AGITATOR_GEAR_RATIO_M2006 * (M_TWOPI / 60);
 }
 
 bool VelocityAgitatorSubsystem::calibrateHere() {
@@ -75,7 +75,7 @@ bool VelocityAgitatorSubsystem::calibrateHere() {
 }
 
 bool VelocityAgitatorSubsystem::isOnline() {
-    return agitator.isMotorOnline();
+    return m_agitator.isMotorOnline();
 }
 
 float VelocityAgitatorSubsystem::getCurrentValueIntegral() const {
@@ -85,6 +85,6 @@ float VelocityAgitatorSubsystem::getCurrentValueIntegral() const {
 float VelocityAgitatorSubsystem::getUncalibratedAgitatorAngle() const
 {
     return (2.0f * M_PI / static_cast<float>(DjiMotor::ENC_RESOLUTION)) *
-           agitator.getEncoderUnwrapped() / AGITATOR_GEAR_RATIO_M2006;
+           m_agitator.getEncoderUnwrapped() / AGITATOR_GEAR_RATIO_M2006;
 }
 }  // namespace control::agitator

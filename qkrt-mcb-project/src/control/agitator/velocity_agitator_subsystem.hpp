@@ -131,9 +131,9 @@ private:
     /// @return Uncalibrated agitator angle.
     float getUncalibratedAgitatorAngle() const;
 
-    tap::motor::DjiMotor& agitator;
+    tap::motor::DjiMotor& m_agitator;
 
-    control::algorithms::EduPid velocityPid;
+    control::algorithms::EduPid m_velocityPid;
 
     float velocitySetpoint{0};
 

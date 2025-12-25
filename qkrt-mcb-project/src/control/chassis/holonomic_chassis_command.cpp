@@ -5,10 +5,10 @@ namespace control::chassis
 
 HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                                                  turret::TurretSubsystem& turret,
-                                                 ControlOperatorInterface& operatorInterface)
-    : _M_chassis(chassis),
-      _M_turret(turret),
-      _M_operatorInterface(operatorInterface)
+                                                 ControlOperatorInterface& m_operatorInterface)
+    : m_chassis(chassis),
+      m_turret(turret),
+      m_operatorInterface(m_operatorInterface)
 {
     addSubsystemRequirement(&chassis);
 }
@@ -19,26 +19,29 @@ void HolonomicChassisCommand::initialize()
 
 void HolonomicChassisCommand::execute()
 {
-    float xInp = _M_operatorInterface.getChassisXInput();
-    float zInp = _M_operatorInterface.getChassisZInput();
-    float yawAngle = _M_turret.getAzimuth();
-    
-    float x = xInp * std::cos(yawAngle) - zInp * std::sin(yawAngle);
-    float z = xInp * std::sin(yawAngle) + zInp * std::cos(yawAngle);
-    float r = _M_operatorInterface.getTurretPitchInput();
-    
-    float denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
-    float leftFront  = (z + x + r) / denominator;
-    float leftBack   = (z - x + r) / denominator;
-    float rightFront = (z - x - r) / denominator;
-    float rightBack  = (z + x - r) / denominator;
+    m_operatorInterface.pollInputDevices();
 
-    _M_chassis.setWheelVelocities(leftFront, leftBack, rightBack, rightFront);
+    float xInp = m_operatorInterface.getChassisXInput();
+    float yInp = m_operatorInterface.getChassisYInput();
+    float yawAngle = m_turret.getAzimuth();
+    
+    //compute rotation transformation
+    float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);
+    float v_x = yInp * std::sin(-yawAngle) + xInp * std::cos(-yawAngle);
+    float w = m_operatorInterface.getChassisWInput();       
+    
+    float denominator = std::max(std::abs(v_y) + std::abs(v_x) + std::abs(w), 1.0f);
+    float leftFront  = (v_x + v_y + w) / denominator;
+    float leftBack   = (v_x - v_y + w) / denominator;
+    float rightFront = (v_x - v_y - w) / denominator;
+    float rightBack  = (v_x + v_y - w) / denominator;
+
+    m_chassis.setWheelVelocities(leftFront, leftBack, rightBack, rightFront);
 }
 
 void HolonomicChassisCommand::end(bool /* interrupted */)
 {
-    _M_chassis.setWheelVelocities(0.0f, 0.0f, 0.0f, 0.0f);
+    m_chassis.setWheelVelocities(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 }  // namespace control::chassis

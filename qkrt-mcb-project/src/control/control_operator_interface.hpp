@@ -12,40 +12,44 @@ public:
     DISALLOW_COPY_AND_ASSIGN(ControlOperatorInterface)
     ~ControlOperatorInterface() = default;
 
-    /**
-     * @return The normalized value used for left and right chassis movement.
-     */
-    float getChassisXInput() const;
+    void pollInputDevices ();
 
-    /**
-     * @return The normalized value used for forward and backward chassis movement.
-     */
-    float getChassisZInput() const;
+    float getChassisXInput() const { return m_chassisXInput; };
 
-    /**
-     * @return The normalized value used for turret pitch adjustments.
-     */
-    float getTurretPitchInput() const;
+    float getChassisYInput() const { return m_chassisYInput; };
 
-    /**
-     * @return The normalized value used for turret yaw adjustments.
-     */
-    float getTurretYawInput() const;
+    float getChassisWInput() const { return m_chassisWInput; }; 
 
-    /**
-    * @return True if the flywheel input is active.
-    */
-    bool getFlyWheelInput();
+    float getTurretPitchInput() const { return m_turretPitchInput; };
 
-    /**
-    * @return True if the Agitator input is active.
-    */
-    bool getAgitatorInput();
+    float getTurretYawInput() const { return m_turretYawInput; };
+
+    bool getFlywheelInput() const { return m_flywheelInput; };
+
+    bool getAgitatorInput() const { return m_agitatorInput; };
 
 
     
 private:
-    tap::communication::serial::Remote& _M_remote;
+    tap::communication::serial::Remote& m_remote;
+
+    enum class DeviceType{
+        CONTROLLER,
+        KEYBOARD_MOUSE,
+    } m_activeDevice;
+
+    float m_chassisXInput = 0.0f;
+    float m_chassisYInput = 0.0f;
+    float m_chassisWInput = 0.0f;
+
+    float m_turretPitchInput = 0.0f;
+    float m_turretYawInput = 0.0f;
+
+    bool m_flywheelInput = false;
+    bool m_agitatorInput = false;
+
+    static constexpr float WHEEL_DEADZONE = 100.0f;
+
 };
 
 }  // control
