@@ -32,8 +32,19 @@ void TurretCommand::execute()
     // dt = curr - prev;
     // acc += static_cast<float>(dt * Speed) * 1e-6;
     // prev = curr;
+    if (_M_operatorInterface.getEmergencyStopInput()) {
+        
+        float desiredElevation = 0.0f;
+        float desiredAzimuth = 0.0f;
 
-    if (_M_target == nullptr)
+        _M_turret.setElevation(desiredElevation);
+        _M_turret.setAzimuth(desiredAzimuth);
+
+        // Should this be empty?
+
+
+    }
+    else if (_M_target == nullptr)
     {
         _M_turret.lock();
 

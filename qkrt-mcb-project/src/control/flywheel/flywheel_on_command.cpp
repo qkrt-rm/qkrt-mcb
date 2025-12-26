@@ -39,7 +39,7 @@ void FlywheelOnCommand::initialize() {}
 
 void FlywheelOnCommand::execute() 
 {    
-    if (operatorInterface.getFlyWheelInput())
+    if (operatorInterface.getFlyWheelInput() && !operatorInterface.getEmergencyStopInput())
         flywheel->setDesiredOutput(spinning_pwm);
     else
         flywheel->setDesiredOutput(flags::OFF_PWM); 

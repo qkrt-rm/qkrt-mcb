@@ -43,11 +43,12 @@ bool ControlOperatorInterface::getAgitatorInput() {
     return _M_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
 }
 
-// Adding Emergency Stop Input
+/**
+ * @brief Returns True of the Emergency Stop switch is turned on.
+ * Note: It does not cut power to the motors.
+ */
 bool ControlOperatorInterface::getEmergencyStopInput() {
-    return false;
-    // Find a button on the remote for it.
-    //return _M_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
+    return _M_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::DOWN;
 }
 
 }  // control

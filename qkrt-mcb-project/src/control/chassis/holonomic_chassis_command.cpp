@@ -19,21 +19,29 @@ void HolonomicChassisCommand::initialize()
 
 void HolonomicChassisCommand::execute()
 {
-    float xInp = _M_operatorInterface.getChassisXInput();
-    float zInp = _M_operatorInterface.getChassisZInput();
-    float yawAngle = _M_turret.getAzimuth();
-    
-    float x = xInp * std::cos(yawAngle) - zInp * std::sin(yawAngle);
-    float z = xInp * std::sin(yawAngle) + zInp * std::cos(yawAngle);
-    float r = _M_operatorInterface.getTurretPitchInput();
-    
-    float denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
-    float leftFront  = (z + x + r) / denominator;
-    float leftBack   = (z - x + r) / denominator;
-    float rightFront = (z - x - r) / denominator;
-    float rightBack  = (z + x - r) / denominator;
 
-    _M_chassis.setWheelVelocities(leftFront, leftBack, rightBack, rightFront);
+    if (!_M_operatorInterface.getEmergencyStopInput()) {
+
+        float xInp = _M_operatorInterface.getChassisXInput();
+        float zInp = _M_operatorInterface.getChassisZInput();
+        float yawAngle = _M_turret.getAzimuth();
+
+        float x = xInp * std::cos(yawAngle) - zInp * std::sin(yawAngle);
+        float z = xInp * std::sin(yawAngle) + zInp * std::cos(yawAngle);
+        float r = _M_operatorInterface.getTurretPitchInput();
+
+        float denominator = std::max(std::abs(x) + std::abs(z) + std::abs(r), 1.0f);
+        float leftFront  = (z + x + r) / denominator;
+        float leftBack   = (z - x + r) / denominator;
+        float rightFront = (z - x - r) / denominator;
+        float rightBack  = (z + x - r) / denominator;
+        
+        _M_chassis.setWheelVelocities(leftFront, leftBack, rightBack, rightFront);
+
+    }
+    else {
+        _M_chassis.setWheelVelocities(0.0f, 0.0f, 0.0f, 0.0f);
+    }
 }
 
 void HolonomicChassisCommand::end(bool /* interrupted */)
