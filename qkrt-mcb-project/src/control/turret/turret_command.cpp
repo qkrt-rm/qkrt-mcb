@@ -30,14 +30,33 @@ void TurretCommand::execute()
         float desiredElevation = 0.0f;
         float desiredAzimuth = 0.0f;
 
+<<<<<<< HEAD
         m_turret.setElevation(desiredElevation);
         m_turret.setAzimuth(desiredAzimuth);
 
+=======
+    // curr = clock::getTimeMicroseconds();
+    // dt = curr - prev;
+    // acc += static_cast<float>(dt * Speed) * 1e-6;
+    // prev = curr;
+    if (_M_operatorInterface.getEmergencyStopInput()) {
+        
+        float desiredElevation = 0.0f;
+        float desiredAzimuth = 0.0f;
+
+        _M_turret.setElevation(desiredElevation);
+        _M_turret.setAzimuth(desiredAzimuth);
+
+>>>>>>> c1c2d20 (Added Emergency stop function.)
         // Should this be empty?
 
 
     }
+<<<<<<< HEAD
     else if (m_target != nullptr)
+=======
+    else if (_M_target == nullptr)
+>>>>>>> c1c2d20 (Added Emergency stop function.)
     {
         //AIM Command once target is found 
 

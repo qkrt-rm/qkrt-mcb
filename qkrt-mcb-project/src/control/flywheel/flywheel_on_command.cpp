@@ -37,10 +37,15 @@ void FlywheelOnCommand::initialize() {}
 
 void FlywheelOnCommand::execute() 
 {    
+<<<<<<< HEAD
     m_operatorInterface.pollInputDevices();
 
     if (m_operatorInterface.getFlywheelInput() && !m_operatorInterface.getEmergencyStopInput())
         m_flywheel.setDesiredOutput(m_flywheelPWM);
+=======
+    if (operatorInterface.getFlyWheelInput() && !operatorInterface.getEmergencyStopInput())
+        flywheel->setDesiredOutput(spinning_pwm);
+>>>>>>> c1c2d20 (Added Emergency stop function.)
     else
         m_flywheel.setDesiredOutput(OFF_PWM); 
 }

@@ -41,6 +41,7 @@ void AgitatorCommand::execute()
 <<<<<<< HEAD
     m_operatorInterface.pollInputDevices();
 
+<<<<<<< HEAD
     float newIndexerSpeed = internal::indexerBoost ? m_indexerSpeed  + 20.0f : m_indexerSpeed;
 =======
     float newIndexerSpeed = internal::indexerBoost ? indexerSpeed  + 20.0f : indexerSpeed;
@@ -48,6 +49,10 @@ void AgitatorCommand::execute()
 
     if (m_operatorInterface.getAgitatorInput() && !m_operatorInterface.getEmergencyStopInput()) 
         m_agitator.setSetpoint(newIndexerSpeed);
+=======
+    if (operatorInterface.getAgitatorInput() && !operatorInterface.getEmergencyStopInput()) 
+        agitator.setSetpoint(newIndexerSpeed);
+>>>>>>> c1c2d20 (Added Emergency stop function.)
     else 
         m_agitator.setSetpoint(0);
 }
