@@ -60,6 +60,10 @@ void HolonomicChassisSubsystem::refresh()
     /// @param motor the wheel's motor
     /// @param desiredOutput the wheel's desired output in Rpm
     ///
+
+    // Verify the motors
+    // Power Level
+    // M3508 motor and C620 driver
     auto runPid = [](Pid& pid, Motor& motor, float desiredOutput) -> void
     {
         pid.update(desiredOutput - motor.getShaftRPM());
