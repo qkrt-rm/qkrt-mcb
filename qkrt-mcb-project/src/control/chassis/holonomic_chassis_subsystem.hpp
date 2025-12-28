@@ -78,9 +78,9 @@ private:
         return (mps / WHEEL_CIRCUMFERENCE_M) * SEC_PER_MIN * GEAR_RATIO;
     }
 
-    std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> _M_desiredOutput;
-    std::array<Pid,   static_cast<uint8_t>(MotorId::NUM_MOTORS)> _M_pidControllers;
-    std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> _M_motors;
+    std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_desiredOutput;
+    std::array<Pid,   static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_pidControllers;
+    std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_motors;
 };
 
 }  // namespace control::chassis

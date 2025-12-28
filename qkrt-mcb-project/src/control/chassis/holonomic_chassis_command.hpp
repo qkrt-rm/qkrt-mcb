@@ -17,7 +17,7 @@ private:
 public:
     HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                             turret::TurretSubsystem& turret,
-                            ControlOperatorInterface& operatorInterface);
+                            ControlOperatorInterface& m_operatorInterface);
 
     void initialize() override;
 
@@ -29,9 +29,9 @@ public:
 
     const char* getName() const override { return "Chassis Omni Drive Command"; }
 private:
-    HolonomicChassisSubsystem& _M_chassis;
-    turret::TurretSubsystem& _M_turret;
-    ControlOperatorInterface& _M_operatorInterface;
+    HolonomicChassisSubsystem& m_chassis;
+    turret::TurretSubsystem& m_turret;
+    ControlOperatorInterface& m_operatorInterface;
 };
 
 }  // namespace control::chassis

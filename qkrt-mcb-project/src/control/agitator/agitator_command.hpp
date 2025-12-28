@@ -53,10 +53,10 @@ public:
     bool isFinished() const { return false; }
 
 private:
-    VelocityAgitatorSubsystem &agitator;
+    VelocityAgitatorSubsystem &m_agitator;
 
-    ControlOperatorInterface &operatorInterface;
-    float indexerSpeed;
+    ControlOperatorInterface &m_operatorInterface;
+    float m_indexerSpeed;
 };
 
 }  // namespace control::chassis

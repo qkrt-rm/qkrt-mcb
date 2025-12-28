@@ -4,13 +4,13 @@ namespace control::turret
 {
 
 TurretCommand::TurretCommand(TurretSubsystem& turret,
-                             ControlOperatorInterface& operatorInterface,
+                             ControlOperatorInterface& m_operatorInterface,
                              Uart& uart)
-    : _M_turret(turret),
-      _M_operatorInterface(operatorInterface),
-      _M_uart(uart),
-      _M_pitchSensitivity(1.0f), _M_yawSensitivity(1.0f),
-      _M_target(nullptr)
+    : m_turret(turret),
+      m_operatorInterface(m_operatorInterface),
+      m_uart(uart),
+      m_pitchSensitivity(1.0f), m_yawSensitivity(1.0f),
+      m_target(nullptr)
 {
     addSubsystemRequirement(&turret);
 }
@@ -22,36 +22,32 @@ void TurretCommand::initialize()
 
 void TurretCommand::execute()
 {
-    // using namespace tap::arch;
-    
-    // static uint32_t prev = clock::getTimeMicroseconds(), curr, dt;
-    // static float acc = 0.0f;
-    // static const float Speed = 1.0f;
+    m_operatorInterface.pollInputDevices();
 
-    // curr = clock::getTimeMicroseconds();
-    // dt = curr - prev;
-    // acc += static_cast<float>(dt * Speed) * 1e-6;
-    // prev = curr;
-
-    if (_M_target == nullptr)
+    if (m_target != nullptr)
     {
-        _M_turret.lock();
+        //AIM Command once target is found 
+
+        m_turret.lock();
 
         float desiredElevation = 0.0f;
         float desiredAzimuth = 0.0f;
 
-        _M_turret.setElevation(desiredElevation);
-        _M_turret.setAzimuth(desiredAzimuth);
+        m_turret.setElevation(desiredElevation);
+        m_turret.setAzimuth(desiredAzimuth);
     }
     else
     {
-        _M_turret.unlock();
+        //Manual Velocity Control 
 
-        float pitchInp = _M_operatorInterface.getTurretPitchInput();
-        float yawInp = _M_operatorInterface.getTurretYawInput();
-    
-        _M_turret.setPitchRps(pitchInp);
-        _M_turret.setYawRps(yawInp);
+        m_turret.unlock();
+
+        float pitchInp = m_operatorInterface.getTurretPitchInput();
+        float yawInp = m_operatorInterface.getTurretYawInput();
+        
+        //update setpoint to operator input
+        m_turret.setPitchRps(pitchInp);
+        m_turret.setYawRps(yawInp);
     }
 }
 

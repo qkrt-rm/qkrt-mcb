@@ -10,8 +10,8 @@ namespace control
 {
 
 Robot::Robot(Drivers& drivers)
-    : _M_drivers(drivers),
-      _M_chassis(drivers,
+    : m_drivers(drivers),
+      m_chassis(drivers,
                  chassis::ChassisConfig {
                      .leftFrontId  = MotorId::MOTOR1,
                      .leftBackId   = MotorId::MOTOR2,
@@ -20,8 +20,8 @@ Robot::Robot(Drivers& drivers)
                      .canBus       = CanBus::CAN_BUS1,
                      .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
                  }),
-      _M_chassisCommand(_M_chassis, _M_turret, drivers.controlOperatorInterface),
-      _M_turret(drivers,
+      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface),
+      m_turret(drivers,
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
                     .yawId   = MotorId::MOTOR5,
@@ -31,10 +31,10 @@ Robot::Robot(Drivers& drivers)
                     .yawForwardOffset = 5455u,
                     .pitchHorizontalOffset = 0u,  // TODO: get this number when pitch motor is mounted
                 }),
-      _M_turretCommand(_M_turret, drivers.controlOperatorInterface, drivers.uart),
-      _M_flywheels(drivers),
-      _M_flywheelsCommand(&_M_flywheels, drivers.controlOperatorInterface, 0.39f),
-      _M_agitator(&drivers, MotorId::MOTOR7, CanBus::CAN_BUS1, true, "e"),
+      m_turretCommand(m_turret, drivers.controlOperatorInterface, drivers.uart),
+      m_flywheels(drivers),
+      m_flywheelsCommand(m_flywheels, drivers.controlOperatorInterface, 0.39f),
+      m_agitator(&drivers, MotorId::MOTOR7, CanBus::CAN_BUS1, true, "e"),
         eduPidConfig{
             .kp = 1000,
             .ki = 0,
@@ -47,9 +47,10 @@ Robot::Robot(Drivers& drivers)
             .desiredSetpoint = M_TWOPI,
             .integralSetpointTolerance = 0
         },
-        _M_velocityAgitatorSubsystem(drivers, eduPidConfig, _M_agitator), // FIX LATER
-        moveIntegralCommand(_M_velocityAgitatorSubsystem, moveIntegralConfig),
-        _M_agitatorCommand(_M_velocityAgitatorSubsystem, drivers.controlOperatorInterface, 38)
+        m_velocityAgitatorSubsystem(drivers, eduPidConfig, m_agitator), 
+        moveIntegralCommand(m_velocityAgitatorSubsystem, moveIntegralConfig),
+        m_agitatorCommand(m_velocityAgitatorSubsystem, drivers.controlOperatorInterface, 38)
+
         // rightSwitchUp(&drivers, {&moveIntegralCommand}, RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP), false),
         // HCM(&drivers, {&moveIntegralCommand}, RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP)),
          
@@ -72,26 +73,26 @@ void Robot::initialize()
 
 void Robot::initializeSubsystems()
 {
-    _M_chassis.initialize();
-    _M_turret.initialize();
-    _M_flywheels.initialize();
-    _M_agitator.initialize();
+    m_chassis.initialize();
+    m_turret.initialize();
+    m_flywheels.initialize();
+    m_agitator.initialize();
 }
 
 void Robot::registerSubsystems()
 {
-    _M_drivers.commandScheduler.registerSubsystem(&_M_chassis);
-    _M_drivers.commandScheduler.registerSubsystem(&_M_turret);
-    _M_drivers.commandScheduler.registerSubsystem(&_M_flywheels);
-    _M_drivers.commandScheduler.registerSubsystem(&_M_velocityAgitatorSubsystem);
+    m_drivers.commandScheduler.registerSubsystem(&m_chassis);
+    m_drivers.commandScheduler.registerSubsystem(&m_turret);
+    m_drivers.commandScheduler.registerSubsystem(&m_flywheels);
+    m_drivers.commandScheduler.registerSubsystem(&m_velocityAgitatorSubsystem);
 }
 
 void Robot::setDefaultCommands()
 {
-    _M_chassis.setDefaultCommand(&_M_chassisCommand);
-    _M_turret.setDefaultCommand(&_M_turretCommand);
-    _M_flywheels.setDefaultCommand(&_M_flywheelsCommand);
-    _M_velocityAgitatorSubsystem.setDefaultCommand(&_M_agitatorCommand);
+    m_chassis.setDefaultCommand(&m_chassisCommand);
+    m_turret.setDefaultCommand(&m_turretCommand);
+    m_flywheels.setDefaultCommand(&m_flywheelsCommand);
+    m_velocityAgitatorSubsystem.setDefaultCommand(&m_agitatorCommand);
 }
 
 void Robot::startCommands()

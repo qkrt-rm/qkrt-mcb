@@ -5,16 +5,16 @@ namespace control::chassis
 
 HolonomicChassisSubsystem::HolonomicChassisSubsystem(Drivers& drivers, const ChassisConfig& config)
     : tap::control::Subsystem(&drivers),
-      _M_desiredOutput(),
-      _M_pidControllers(),
-      _M_motors({
+      m_desiredOutput(),
+      m_pidControllers(),
+      m_motors({
           Motor(&drivers, config.leftFrontId,  config.canBus, false, "LF"),
           Motor(&drivers, config.leftBackId,   config.canBus, false, "LB"),
           Motor(&drivers, config.rightBackId,  config.canBus, true,  "RB"),
           Motor(&drivers, config.rightFrontId, config.canBus, true,  "RF")
       })
 {
-    for (auto& controller : _M_pidControllers)
+    for (auto& controller : m_pidControllers)
     {
         controller.setParameter(config.wheelVelocityPidConfig);
     }
@@ -22,7 +22,7 @@ HolonomicChassisSubsystem::HolonomicChassisSubsystem(Drivers& drivers, const Cha
 
 void HolonomicChassisSubsystem::initialize()
 {
-    for (auto& motor : _M_motors)
+    for (auto& motor : m_motors)
     {
         motor.initialize();
     }
@@ -43,10 +43,10 @@ void HolonomicChassisSubsystem::setWheelVelocities(float leftFront,
     rightBack  = std::clamp(rightBack,  -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
     rightFront = std::clamp(rightFront, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
 
-    _M_desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftFront;
-    _M_desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftBack;
-    _M_desiredOutput[static_cast<uint8_t>(MotorId::RB)] = rightBack;
-    _M_desiredOutput[static_cast<uint8_t>(MotorId::RF)] = rightFront;
+    m_desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftFront;
+    m_desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftBack;
+    m_desiredOutput[static_cast<uint8_t>(MotorId::RB)] = rightBack;
+    m_desiredOutput[static_cast<uint8_t>(MotorId::RF)] = rightFront;
 }
 
 void HolonomicChassisSubsystem::refresh()
@@ -60,15 +60,20 @@ void HolonomicChassisSubsystem::refresh()
     /// @param motor the wheel's motor
     /// @param desiredOutput the wheel's desired output in Rpm
     ///
+
     auto runPid = [](Pid& pid, Motor& motor, float desiredOutput) -> void
     {
         pid.update(desiredOutput - motor.getShaftRPM());
         motor.setDesiredOutput(pid.getValue());
     };
 
-    for (size_t ii = 0; ii < _M_motors.size(); ii++)
+    /**
+    * TODO: Power Limiting Logic
+    */
+
+    for (size_t ii = 0; ii < m_motors.size(); ii++)
     {
-        runPid(_M_pidControllers[ii], _M_motors[ii], _M_desiredOutput[ii]);
+        runPid(m_pidControllers[ii], m_motors[ii], m_desiredOutput[ii]);
     }
 }
 

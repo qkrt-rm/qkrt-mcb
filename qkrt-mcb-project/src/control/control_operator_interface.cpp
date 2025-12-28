@@ -6,42 +6,33 @@ namespace control
 {
 
 ControlOperatorInterface::ControlOperatorInterface(tap::communication::serial::Remote& remote)
-    : _M_remote(remote)
+    : m_remote(remote), m_activeDevice(DeviceType::CONTROLLER)
 {
 }
 
-float ControlOperatorInterface::getChassisXInput() const
+//TODO poll for toggle switch between keyboard and remote
+
+void ControlOperatorInterface::pollInputDevices()
 {
-    return std::clamp(_M_remote.getChannel(Remote::Channel::LEFT_HORIZONTAL), -1.0f, 1.0f);
-}
+    switch (m_activeDevice)
+    {
+        case DeviceType::CONTROLLER:
+        
+            m_chassisXInput = std::clamp(m_remote.getChannel(Remote::Channel::LEFT_VERTICAL), -1.0f, 1.0f);
+            m_chassisYInput = std::clamp(m_remote.getChannel(Remote::Channel::LEFT_HORIZONTAL), -1.0f, 1.0f);
+            m_chassisWInput = 
+                m_remote.getWheel() > WHEEL_DEADZONE ? 0.25f :
+                m_remote.getWheel() < -WHEEL_DEADZONE ? 0.0f :
+                m_chassisWInput;
 
-float ControlOperatorInterface::getChassisZInput() const
-{
-    return std::clamp(_M_remote.getChannel(Remote::Channel::LEFT_VERTICAL), -1.0f, 1.0f);
-}
+            m_turretPitchInput = std::clamp(m_remote.getChannel(Remote::Channel::RIGHT_VERTICAL), -1.0f, 1.0f);
+            m_turretYawInput = std::clamp(m_remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f);
 
-float ControlOperatorInterface::getTurretPitchInput() const
-{
-    return std::clamp(_M_remote.getChannel(Remote::Channel::RIGHT_VERTICAL), -1.0f, 1.0f);
-}
-
-float ControlOperatorInterface::getTurretYawInput() const
-{
-    return std::clamp(_M_remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f);
-}
-
+            m_flywheelInput = m_remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::UP;
+            m_agitatorInput = m_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
 
 
-
-/// Adding Flywheel Input
-bool ControlOperatorInterface::getFlyWheelInput() {
-    return _M_remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::UP;
-}
-
-// Adding Agitator Input
-bool ControlOperatorInterface::getAgitatorInput() {
-    return _M_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
-
+    }
 }
 
 }  // control

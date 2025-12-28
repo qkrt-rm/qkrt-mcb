@@ -35,11 +35,11 @@ namespace flywheel
 class FlywheelOnCommand : public tap::control::Command
 {
 public:
-    FlywheelOnCommand(FlywheelSubsystem *sub, ControlOperatorInterface &operatorInterface, float flywheel_speed)
-        : flywheel(sub), operatorInterface(operatorInterface)
+    FlywheelOnCommand(FlywheelSubsystem &flywheel, ControlOperatorInterface &operatorInterface, float flywheel_speed)
+        : m_flywheel(flywheel), m_operatorInterface(operatorInterface)
     {
-        addSubsystemRequirement(sub);
-        spinning_pwm = flywheel_speed;
+        addSubsystemRequirement(&flywheel);
+        m_flywheelPWM = flywheel_speed;
     }
 
     void initialize() override;
@@ -53,9 +53,10 @@ public:
     const char *getName() const override { return "flywheel on command"; }
 
 private:
-    FlywheelSubsystem *flywheel;
-    ControlOperatorInterface& operatorInterface;
-    float spinning_pwm;
+    FlywheelSubsystem &m_flywheel;
+    ControlOperatorInterface& m_operatorInterface;
+
+    float m_flywheelPWM;
     static constexpr float OFF_PWM = 0.25f;
 
 };  // class FlywheelOnCommand

@@ -29,25 +29,25 @@ namespace control::agitator
 AgitatorCommand::AgitatorCommand(
     VelocityAgitatorSubsystem &agitator,
     ControlOperatorInterface &operatorInterface, float indexerSpeed)
-    : agitator(agitator),
-      operatorInterface(operatorInterface),
-      indexerSpeed(indexerSpeed)
+    : m_agitator(agitator),
+      m_operatorInterface(operatorInterface),
+      m_indexerSpeed(indexerSpeed)
 {
     addSubsystemRequirement(&agitator);
 }
 
 void AgitatorCommand::execute()
 {
-    //operatorInterface.pollInputDevices();
+    m_operatorInterface.pollInputDevices();
 
-    float newIndexerSpeed = internal::indexerBoost ? indexerSpeed  + 20.0f : indexerSpeed;
+    float newIndexerSpeed = internal::indexerBoost ? m_indexerSpeed  + 20.0f : m_indexerSpeed;
 
-    if (operatorInterface.getAgitatorInput()) 
-        agitator.setSetpoint(newIndexerSpeed);
+    if (m_operatorInterface.getAgitatorInput()) 
+        m_agitator.setSetpoint(newIndexerSpeed);
     else 
-        agitator.setSetpoint(0);
+        m_agitator.setSetpoint(0);
 }
 
-void AgitatorCommand::end(bool) { agitator.setSetpoint(0); }
+void AgitatorCommand::end(bool) { m_agitator.setSetpoint(0); }
 
 };  // namespace control::chassis

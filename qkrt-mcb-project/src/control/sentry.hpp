@@ -44,35 +44,35 @@ private:
     void registerIoMappings();
 private:
 
-    Drivers& _M_drivers;
+    Drivers& m_drivers;
 
 
     /**
     * @brief Chassis subsystem for the sentry robot
     */
-    chassis::HolonomicChassisSubsystem _M_chassis;
-    chassis::HolonomicChassisCommand _M_chassisCommand;
+    chassis::HolonomicChassisSubsystem m_chassis;
+    chassis::HolonomicChassisCommand m_chassisCommand;
 
     /**
      * @brief Turret subsystem for the sentry robot
      */
-    turret::TurretSubsystem _M_turret;
-    turret::TurretCommand _M_turretCommand;
+    turret::TurretSubsystem m_turret;
+    turret::TurretCommand m_turretCommand;
 
 
     /**
      * @brief Flywheel subsystem for the sentry robot
      */
-    flywheel::FlywheelSubsystem _M_flywheels;
-    flywheel::FlywheelOnCommand _M_flywheelsCommand;
+    flywheel::FlywheelSubsystem m_flywheels;
+    flywheel::FlywheelOnCommand m_flywheelsCommand;
 
 
     /**
      * @brief Agiator subsystem for the sentry robot
      */
-    tap::motor::DjiMotor _M_agitator;
-    agitator::VelocityAgitatorSubsystem _M_velocityAgitatorSubsystem;
-    agitator::AgitatorCommand _M_agitatorCommand;
+    tap::motor::DjiMotor m_agitator;
+    agitator::VelocityAgitatorSubsystem m_velocityAgitatorSubsystem;
+    agitator::AgitatorCommand m_agitatorCommand;
 
     algorithms::EduPidConfig eduPidConfig; 
     tap::control::setpoint::MoveIntegralCommand::Config moveIntegralConfig;

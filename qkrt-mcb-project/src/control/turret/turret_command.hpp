@@ -15,7 +15,7 @@ private:
 
 public:
     TurretCommand(TurretSubsystem& chassis,
-                  ControlOperatorInterface& operatorInterface,
+                  ControlOperatorInterface& m_operatorInterface,
                   Uart& uart);
 
     void initialize() override;
@@ -29,14 +29,14 @@ public:
     const char* getName() const override { return "Turret Command"; }
 
 private:
-    TurretSubsystem& _M_turret;
-    ControlOperatorInterface& _M_operatorInterface;
-    Uart& _M_uart;
+    TurretSubsystem& m_turret;
+    ControlOperatorInterface& m_operatorInterface;
+    Uart& m_uart;
 
-    float _M_pitchSensitivity, _M_yawSensitivity;
+    float m_pitchSensitivity, m_yawSensitivity;
 
     // TODO: change to some target data structure when it exists
-    void* _M_target;
+    void* m_target;
 };
 
 }  // namespace control::turret

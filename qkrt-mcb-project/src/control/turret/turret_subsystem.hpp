@@ -52,7 +52,7 @@ public:
      */
     inline void setElevation(float desiredElevation)
     {
-        _M_desiredElevation = std::clamp(desiredElevation, -MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION);
+        m_desiredElevation = std::clamp(desiredElevation, -MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION);
     }
     
     /**
@@ -62,8 +62,8 @@ public:
      */
     inline float getElevation() const
     {
-        uint16_t encoderRaw = _M_pitchMotor.getEncoderWrapped();
-        return encoderToRad(encoderRaw) - _M_pitchHorizontalOffset;
+        uint16_t encoderRaw = m_pitchMotor.getEncoderWrapped();
+        return encoderToRad(encoderRaw) - m_pitchHorizontalOffset;
     }
 
     /**
@@ -71,7 +71,7 @@ public:
      */
     inline void setAzimuth(float desiredAzimuth)
     {   
-        _M_desiredAzimuth = desiredAzimuth;
+        m_desiredAzimuth = desiredAzimuth;
     }
 
     /**
@@ -81,8 +81,8 @@ public:
      */
     inline float getAzimuth() const
     {
-        uint16_t encoderRaw = _M_yawMotor.getEncoderWrapped();
-        return encoderToRad(encoderRaw) - _M_yawForwardOffset;
+        uint16_t encoderRaw = m_yawMotor.getEncoderWrapped();
+        return encoderToRad(encoderRaw) - m_yawForwardOffset;
     }
 
     /**
@@ -99,9 +99,9 @@ public:
      */
     void setYawRps(float yawRps);
 
-    void lock() { _M_aimLock = true; }
+    void lock() { m_aimLock = true; }
 
-    void unlock() { _M_aimLock = false; }
+    void unlock() { m_aimLock = false; }
 
 private:
     inline float encoderToRad(uint16_t encoder) const
@@ -120,19 +120,23 @@ private:
         return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
 
-    Motor _M_pitchMotor, _M_yawMotor;
-    float _M_desiredPitchVoltage, _M_desiredYawVoltage;
+    inline float dpsToRpm(float dps) const { return (dps / 360.0f) * 60.0f; }
 
-    float _M_desiredElevation, _M_desiredAzimuth;
-    Pid _M_elevationPid, _M_azimuthPid;
+    Motor m_pitchMotor, m_yawMotor;
+    float m_desiredPitchVoltage, m_desiredYawVoltage;
 
-    float _M_desiredPitchRpm, _M_desiredYawRpm;
-    Pid _M_pitchRpmPid, _M_yawRpmPid;
+    float m_desiredElevation, m_desiredAzimuth;
+    Pid m_elevationPid, m_azimuthPid;
 
-    bool _M_aimLock;
-    float _M_sensitivity;
-    uint16_t _M_yawForwardOffset;
-    uint16_t _M_pitchHorizontalOffset;
+    float m_desiredPitchRpm, m_desiredYawRpm;
+    Pid m_pitchRpmPid, m_yawRpmPid;
+
+    bool m_aimLock;
+    float m_sensitivity;
+    uint16_t m_yawForwardOffset;
+    uint16_t m_pitchHorizontalOffset;
+
+    tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
 };
 
 };  // namespace control::turret
