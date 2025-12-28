@@ -5,7 +5,7 @@
 #include <tap/architecture/timeout.hpp>
 
 #include "aim_message.hpp"
-#include "communication/serial/logger.hpp"
+#include "communication/logger/logger.hpp"
 
 class Drivers;
 
@@ -37,7 +37,7 @@ namespace communication
 
             tap::arch::MilliTimeout offlineTimeout;
 
-            serial::Logger& _M_logger;         //member that references logger object
+            logger::Logger& m_logger;         //member that references logger object
 
             TurretData lastTurretData;          //struct with turret data from jetson
 

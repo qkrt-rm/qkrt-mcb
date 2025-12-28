@@ -4,7 +4,7 @@
 
 #include "control/control_operator_interface.hpp"
 #include "control/turret/turret_subsystem.hpp"
-#include "communication/serial/logger.hpp"
+#include "communication/logger/logger.hpp"
 #include "communication/vision_coprocessor.hpp"
 
 namespace control::turret
@@ -34,7 +34,7 @@ private:
     ControlOperatorInterface& m_operatorInterface;
 
     communication::VisionCoprocessor& m_visionCoprocessor;
-    communication::serial::Logger& m_logger;
+    communication::logger::Logger& m_logger;
 
     float m_pitchSensitivity, m_yawSensitivity;
 

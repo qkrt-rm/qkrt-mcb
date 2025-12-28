@@ -22,7 +22,7 @@ void TurretCommand::initialize()
 
 void TurretCommand::execute()
 {
-    volatile TurretData data = m_visionCoprocessor.getTurretData();
+    volatile communication::TurretData data = m_visionCoprocessor.getTurretData();
     
     m_operatorInterface.pollInputDevices();
 

@@ -8,7 +8,7 @@ namespace tap
 class Drivers;
 }  // namespace tap
 
-namespace communication::serial
+namespace communication::logger
 {
 
 class Logger

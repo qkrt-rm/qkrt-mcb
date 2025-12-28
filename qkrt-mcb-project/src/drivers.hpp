@@ -24,7 +24,7 @@
 
 #include "control/control_operator_interface.hpp"
 #include "communication/vision_coprocessor.hpp"
-#include "communication/serial/logger.hpp"
+#include "communication/logger/logger.hpp"
 
 class Drivers : public tap::Drivers
 {
@@ -40,7 +40,7 @@ class Drivers : public tap::Drivers
     friend class DriversSingleton;
 public:
     control::ControlOperatorInterface controlOperatorInterface;
-    communication::serial::Logger logger;
+    communication::logger::Logger logger;
     communication::VisionCoprocessor visionCoprocessor;
 };
 

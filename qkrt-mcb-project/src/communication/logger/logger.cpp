@@ -1,6 +1,6 @@
 #include "logger.hpp"
 
-namespace communication::serial
+namespace communication::logger
 {
 
 Logger::Logger(tap::Drivers* drivers)

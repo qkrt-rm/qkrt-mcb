@@ -6,7 +6,7 @@ namespace communication {
 
     VisionCoprocessor::VisionCoprocessor(Drivers* drivers)
     : DJISerial(drivers, VISION_COPROCESSOR_UART_PORT)
-    , _M_logger(drivers->logger) {}
+    , m_logger(drivers->logger) {}
 
     void VisionCoprocessor::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
     {
@@ -21,8 +21,8 @@ namespace communication {
             float y = lastTurretData.yPos;
             float z = lastTurretData.zPos;
 
-            _M_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
-            _M_logger.delay(200);
+            m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
+            m_logger.delay(200);
         }
     }
 
