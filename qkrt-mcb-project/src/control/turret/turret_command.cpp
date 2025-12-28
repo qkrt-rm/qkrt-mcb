@@ -36,12 +36,12 @@ void TurretCommand::execute()
 
     volatile TurretData data = _M_visionCoprocessor.getTurretData();
 
-    if (false)
+    if (true)
     {
         _M_turret.lock();
 
         float desiredElevation = 0.0f;
-        float desiredAzimuth = 0.0f;
+        static float desiredAzimuth = 0.0f;
 
         _M_turret.setElevation(desiredElevation);
         _M_turret.setAzimuth(desiredAzimuth);
@@ -53,8 +53,6 @@ void TurretCommand::execute()
         float pitchInp = _M_operatorInterface.getTurretPitchInput();
         float yawInp = _M_operatorInterface.getTurretYawInput();
         
-        // bool is_CV_online = _M_visionCoprocessor.isOnline();
-
         _M_turret.setPitchRps(pitchInp);
         _M_turret.setYawRps(yawInp);
     }

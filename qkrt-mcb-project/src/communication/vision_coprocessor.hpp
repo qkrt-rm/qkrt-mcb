@@ -29,7 +29,7 @@ namespace communication
 
 
         private:
-            static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart6;
+            static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart1;
 
             static constexpr uint32_t BAUD_RATE = 115200;
 

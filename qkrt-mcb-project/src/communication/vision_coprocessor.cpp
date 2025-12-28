@@ -33,8 +33,6 @@ namespace communication {
 
     bool VisionCoprocessor::isOnline() const { return !offlineTimeout.isExpired(); }
 
-    const TurretData& VisionCoprocessor::getTurretData() const {
-        return lastTurretData;
-    }
+    const TurretData& VisionCoprocessor::getTurretData() const { return lastTurretData; }
     
 }

@@ -39,7 +39,7 @@ void TurretSubsystem::refresh()
      * - simplify implementation of `void TurretSubsystem::setPitchRps(float pitchRps)`
      */
 
-    if (_M_aimLock)
+    if (true)
     {
         /**
          * Use angle PID to point turret at target elevation/azimuth.
