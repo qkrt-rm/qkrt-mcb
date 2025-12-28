@@ -60,7 +60,6 @@ void HolonomicChassisSubsystem::refresh()
     /// @param motor the wheel's motor
     /// @param desiredOutput the wheel's desired output in Rpm
     ///
-
     auto runPid = [](Pid& pid, Motor& motor, float desiredOutput) -> void
     {
         pid.update(desiredOutput - motor.getShaftRPM());
