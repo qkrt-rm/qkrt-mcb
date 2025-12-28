@@ -3,12 +3,12 @@
 namespace control::turret
 {
 
-TurretCommand::TurretCommand(TurretSubsystem& turret,
-                             ControlOperatorInterface& m_operatorInterface,
-                             Uart& uart)
+TurretCommand::TurretCommand(Drivers & drivers, TurretSubsystem& turret,
+                             ControlOperatorInterface& m_operatorInterface)
     : m_turret(turret),
       m_operatorInterface(m_operatorInterface),
-      m_uart(uart),
+      m_visionCoprocessor(drivers.visionCoprocessor),
+      m_logger(drivers.logger),
       m_pitchSensitivity(1.0f), m_yawSensitivity(1.0f),
       m_target(nullptr)
 {
@@ -22,6 +22,8 @@ void TurretCommand::initialize()
 
 void TurretCommand::execute()
 {
+    volatile TurretData data = m_visionCoprocessor.getTurretData();
+    
     m_operatorInterface.pollInputDevices();
 
     if (m_target != nullptr)

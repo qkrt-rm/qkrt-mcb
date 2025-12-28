@@ -4,6 +4,8 @@
 
 #include "control/control_operator_interface.hpp"
 #include "control/turret/turret_subsystem.hpp"
+#include "communication/serial/logger.hpp"
+#include "communication/vision_coprocessor.hpp"
 
 namespace control::turret
 {
@@ -14,9 +16,8 @@ private:
     using Uart = tap::communication::serial::Uart;
 
 public:
-    TurretCommand(TurretSubsystem& chassis,
-                  ControlOperatorInterface& m_operatorInterface,
-                  Uart& uart);
+    TurretCommand(Drivers& drivers, TurretSubsystem& turret,
+                  ControlOperatorInterface& m_operatorInterface);
 
     void initialize() override;
 
@@ -31,7 +32,9 @@ public:
 private:
     TurretSubsystem& m_turret;
     ControlOperatorInterface& m_operatorInterface;
-    Uart& m_uart;
+
+    communication::VisionCoprocessor& m_visionCoprocessor;
+    communication::serial::Logger& m_logger;
 
     float m_pitchSensitivity, m_yawSensitivity;
 

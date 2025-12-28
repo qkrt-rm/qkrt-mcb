@@ -93,7 +93,6 @@ int main()
     {
         // do this as fast as you can
         PROFILE(drivers->profiler, updateIo, (drivers));
-
         if (sendMotorTimeout.execute())
         {
             PROFILE(drivers->profiler, drivers->bmi088.periodicIMUUpdate, ());
@@ -117,13 +116,11 @@ static void initializeIo(Drivers *drivers)
     drivers->remote.initialize();
     drivers->bmi088.initialize(IMU_SAMPLE_FREQUENCY, MAHONY_KP, MAHONY_KI);
     drivers->bmi088.requestRecalibration();
-    drivers->refSerial.initialize();
+    //drivers->refSerial.initialize();              //enable when cv comm switched to another port
     drivers->terminalSerial.initialize();
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();
-
-    using Uart = tap::communication::serial::Uart;
-    drivers->uart.init<Uart::UartPort::Uart1, 115200>();
+    drivers->visionCoprocessor.initialize();
 }
 
 static void updateIo(Drivers *drivers)
@@ -132,7 +129,8 @@ static void updateIo(Drivers *drivers)
     tap::motorsim::SimHandler::updateSims();
 #endif
     drivers->canRxHandler.pollCanData();
-    drivers->refSerial.updateSerial();
+   // drivers->refSerial.updateSerial();
     drivers->remote.read();
     drivers->bmi088.periodicIMUUpdate();
+    drivers->visionCoprocessor.updateSerial();
 }
