@@ -27,6 +27,8 @@
 
 #include "control/control_operator_interface.hpp"
 
+using namespace control;
+
 namespace control
 {
 namespace flywheel
@@ -37,7 +39,7 @@ void FlywheelOnCommand::execute()
 {    
     m_operatorInterface.pollInputDevices();
 
-    if (m_operatorInterface.getFlywheelInput())
+    if (m_operatorInterface.getFlywheelInput() && !m_operatorInterface.getEmergencyStopInput())
         m_flywheel.setDesiredOutput(m_flywheelPWM);
     else
         m_flywheel.setDesiredOutput(OFF_PWM); 

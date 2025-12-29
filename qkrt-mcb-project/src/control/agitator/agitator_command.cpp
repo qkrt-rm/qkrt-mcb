@@ -42,7 +42,7 @@ void AgitatorCommand::execute()
 
     float newIndexerSpeed = internal::indexerBoost ? m_indexerSpeed  + 20.0f : m_indexerSpeed;
 
-    if (m_operatorInterface.getAgitatorInput()) 
+    if (m_operatorInterface.getAgitatorInput() && !m_operatorInterface.getEmergencyStopInput()) 
         m_agitator.setSetpoint(newIndexerSpeed);
     else 
         m_agitator.setSetpoint(0);
