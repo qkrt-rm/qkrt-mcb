@@ -32,15 +32,6 @@ public:
     /** @brief Returns true if emergency stop input is active.
     */ 
     bool getEmergencyStopInput() const { return m_emergencystopInput; };
-
-
-    /**
-     * @return True if the emergency stop button is pushed.
-     */
-    bool getEmergencyStopInput();
-
-
-
     
 private:
     tap::communication::serial::Remote& m_remote;
