@@ -22,6 +22,8 @@
 #include "tap/communication/serial/remote.hpp"
 #include "drivers.hpp"
 
+using namespace control;
+
 namespace control::flywheel
 {
 FlywheelSubsystem::FlywheelSubsystem(Drivers& drivers)
@@ -30,10 +32,10 @@ FlywheelSubsystem::FlywheelSubsystem(Drivers& drivers)
 }
         
 void FlywheelSubsystem::initialize() { 
-    drivers->pwm.write(0.25f, FLYWHEEL_MOTOR_PIN1);
-    drivers->pwm.write(0.25f, FLYWHEEL_MOTOR_PIN2);
-    drivers->pwm.write(0.25f, FLYWHEEL_MOTOR_PIN3);
-    drivers->pwm.write(0.25f, FLYWHEEL_MOTOR_PIN4);
+    drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN1);
+    drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN2);
+    drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN3);
+    drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN4);
 }
 
 void FlywheelSubsystem::refresh() {}

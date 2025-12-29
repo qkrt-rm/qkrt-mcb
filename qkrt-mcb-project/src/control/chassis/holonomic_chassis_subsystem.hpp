@@ -83,4 +83,5 @@ private:
     std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_motors;
 };
 
+
 }  // namespace control::chassis

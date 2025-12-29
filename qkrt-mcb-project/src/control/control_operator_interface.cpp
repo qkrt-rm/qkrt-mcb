@@ -30,6 +30,7 @@ void ControlOperatorInterface::pollInputDevices()
 
             m_flywheelInput = m_remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::UP;
             m_agitatorInput = m_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
+            m_emergencystopInput = m_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::DOWN;
 
 
     }
