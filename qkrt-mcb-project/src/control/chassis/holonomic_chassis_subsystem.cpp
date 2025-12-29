@@ -13,7 +13,7 @@ HolonomicChassisSubsystem::HolonomicChassisSubsystem(Drivers& drivers, const Cha
           Motor(&drivers, config.rightBackId,  config.canBus, true,  "RB"),
           Motor(&drivers, config.rightFrontId, config.canBus, true,  "RF")
       }),
-      m_refdata(&drivers)
+      m_drivers(&drivers)
 {
     for (auto& controller : m_pidControllers)
     {
@@ -42,7 +42,7 @@ void HolonomicChassisSubsystem::setWheelVelocities(float leftFront,
     // Idea for getting power leveling
     // Not sure if it should be in setWheelVelocities or refresh
     // tap::communication::sensors ???
-    auto m_robotdata = m_refdata->refSerial.getRobotData();
+    auto m_robotdata = m_drivers->refSerial.getRobotData();
     float m_chassis_power = m_robotdata.chassis.power;
     u_int16_t m_chassis_volt = m_robotdata.chassis.volt;
     u_int16_t m_chassis_current = m_robotdata.chassis.current;
@@ -51,6 +51,11 @@ void HolonomicChassisSubsystem::setWheelVelocities(float leftFront,
     float scale = 1.0f;
     if (m_chassis_power > m_chassis_powerlimit) {
         scale = m_chassis_powerlimit/m_chassis_power;
+    }
+    // Motor Temperatures
+    int8_t m_motor_temps[4];
+    for (int i=0; i < 4; i++) {
+        m_motor_temps[i] = m_motors[i].getTemperature();
     }
 
 

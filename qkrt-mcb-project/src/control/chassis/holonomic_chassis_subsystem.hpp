@@ -91,7 +91,7 @@ private:
     std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_desiredOutput;
     std::array<Pid,   static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_pidControllers;
     std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_motors;
-    Drivers *m_refdata;
+    Drivers *m_drivers;
 };
 
 
