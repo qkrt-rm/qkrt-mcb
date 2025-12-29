@@ -12,7 +12,8 @@ HolonomicChassisSubsystem::HolonomicChassisSubsystem(Drivers& drivers, const Cha
           Motor(&drivers, config.leftBackId,   config.canBus, false, "LB"),
           Motor(&drivers, config.rightBackId,  config.canBus, true,  "RB"),
           Motor(&drivers, config.rightFrontId, config.canBus, true,  "RF")
-      })
+      }),
+      m_refdata(&drivers)
 {
     for (auto& controller : m_pidControllers)
     {
@@ -33,10 +34,32 @@ void HolonomicChassisSubsystem::setWheelVelocities(float leftFront,
                                                    float rightBack,
                                                    float rightFront)
 {
-    leftFront  = mpsToRpm(leftFront);
-    leftBack   = mpsToRpm(leftBack);
-    rightBack  = mpsToRpm(rightBack);
-    rightFront = mpsToRpm(rightFront);
+
+
+    // Verify the motors
+    // Power Level
+    // M3508 motor and C620 driver
+    // Idea for getting power leveling
+    // Not sure if it should be in setWheelVelocities or refresh
+    // tap::communication::sensors ???
+    auto m_robotdata = m_refdata->refSerial.getRobotData();
+    float m_chassis_power = m_robotdata.chassis.power;
+    u_int16_t m_chassis_volt = m_robotdata.chassis.volt;
+    u_int16_t m_chassis_current = m_robotdata.chassis.current;
+    u_int16_t m_chassis_powerbuffer = m_robotdata.chassis.powerBuffer;
+    u_int16_t m_chassis_powerlimit = m_robotdata.chassis.powerConsumptionLimit;
+    float scale = 1.0f;
+    if (m_chassis_power > m_chassis_powerlimit) {
+        scale = m_chassis_powerlimit/m_chassis_power;
+    }
+
+
+    leftFront  = mpsToRpm(leftFront) * scale;
+    leftBack   = mpsToRpm(leftBack) * scale;
+    rightBack  = mpsToRpm(rightBack) * scale;
+    rightFront = mpsToRpm(rightFront) * scale;
+    // End of changes
+
 
     leftFront  = std::clamp(leftFront,  -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
     leftBack   = std::clamp(leftBack,   -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
@@ -61,9 +84,7 @@ void HolonomicChassisSubsystem::refresh()
     /// @param desiredOutput the wheel's desired output in Rpm
     ///
 
-    // Verify the motors
-    // Power Level
-    // M3508 motor and C620 driver
+
     auto runPid = [](Pid& pid, Motor& motor, float desiredOutput) -> void
     {
         pid.update(desiredOutput - motor.getShaftRPM());
