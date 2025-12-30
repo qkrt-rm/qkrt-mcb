@@ -22,7 +22,9 @@
 // Agitator Includes
 #include "control/agitator/velocity_agitator_subsystem.hpp"
 #include "control/agitator/agitator_command.hpp"
+
 // currently unknown:
+#include "tap/communication/serial/remote.hpp"
 #include "tap/control/hold_command_mapping.hpp"
 #include "tap/control/hold_repeat_command_mapping.hpp"
 #include "tap/control/setpoint/commands/move_integral_command.hpp"
@@ -70,13 +72,19 @@ private:
     /**
      * @brief Agiator subsystem for the sentry robot
      */
-    tap::motor::DjiMotor m_agitator;
-    agitator::VelocityAgitatorSubsystem m_velocityAgitatorSubsystem;
+    agitator::VelocityAgitatorSubsystem m_agitator;
     agitator::AgitatorCommand m_agitatorCommand;
 
-    algorithms::EduPidConfig eduPidConfig; 
-    tap::control::setpoint::MoveIntegralCommand::Config moveIntegralConfig;
-    tap::control::setpoint::MoveIntegralCommand moveIntegralCommand;
+    //Mappings
+    tap::control::HoldCommandMapping m_leftSwitchUP{
+        &m_drivers,
+        {&m_agitatorCommand, &m_flywheelsCommand},
+        tap::control::RemoteMapState(tap::communication::serial::Remote::Switch::LEFT_SWITCH, 
+            tap::communication::serial::Remote::SwitchState::UP
+        )
+    };
+
+    //TODO: Add keyboard mapping
 };
   
 }  // namespace control

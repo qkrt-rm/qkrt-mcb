@@ -27,24 +27,24 @@
 
 #include "control/control_operator_interface.hpp"
 
-namespace control
+namespace control::flywheel
 {
-namespace flywheel
+
+FlywheelOnCommand::FlywheelOnCommand(FlywheelSubsystem &flywheel, float flywheel_speed)
+    : m_flywheel(flywheel), m_flywheelPWM(flywheel_speed)
 {
+    addSubsystemRequirement(&flywheel);
+}
+
 void FlywheelOnCommand::initialize() {}
 
 void FlywheelOnCommand::execute() 
 {    
-    m_operatorInterface.pollInputDevices();
-
-    if (m_operatorInterface.getFlywheelInput())
-        m_flywheel.setDesiredOutput(m_flywheelPWM);
-    else
-        m_flywheel.setDesiredOutput(OFF_PWM); 
+    m_flywheel.setDesiredOutput(m_flywheelPWM);
 }
 
 void FlywheelOnCommand::end(bool) { m_flywheel.setDesiredOutput(OFF_PWM); }
 
 bool FlywheelOnCommand::isFinished() const { return false; }
-}  // namespace flywheel
-}  // namespace control
+}  // namespace control::flywheel
+

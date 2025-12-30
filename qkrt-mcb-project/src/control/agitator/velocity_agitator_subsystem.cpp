@@ -26,19 +26,16 @@
 #include "drivers.hpp"
 
 using tap::arch::clock::getTimeMilliseconds;
-using tap::motor::DjiMotor;
+using Motor = tap::motor::DjiMotor;
 
 namespace control::agitator
 {
-VelocityAgitatorSubsystem::VelocityAgitatorSubsystem(
-    Drivers& drivers,
-    const control::algorithms::EduPidConfig& pidConfig,
-    tap::motor::DjiMotor& agitator)
+VelocityAgitatorSubsystem::VelocityAgitatorSubsystem(Drivers& drivers, const agitatorConfig &config)
     : Subsystem(&drivers),
-      m_agitator(agitator),
-      m_velocityPid(pidConfig)
-{
-}
+      m_agitator(&drivers, config.agitatorId, config.canBus, false, "VA")
+    {
+        m_velocityPid.setParameter(config.agitatorVelocityPidConfig);
+    }
 
 void VelocityAgitatorSubsystem::initialize() { m_agitator.initialize(); }
 
@@ -47,10 +44,10 @@ void VelocityAgitatorSubsystem::refresh() {
         calibrated = false;
     }
     if(calibrated){
-        m_velocityPid.runControllerDerivateError(getSetpoint() - getCurrentValue(), tap::arch::clock::getTimeMilliseconds() - prevTime);
-        prevTime = tap::arch::clock::getTimeMilliseconds();
-        m_agitator.setDesiredOutput(m_velocityPid.getOutput());
-    }else{
+        m_velocityPid.update(getSetpoint() - getCurrentValue());
+        m_agitator.setDesiredOutput(m_velocityPid.getValue());
+    }else
+    {
         calibrateHere();
     }
 }
@@ -84,7 +81,7 @@ float VelocityAgitatorSubsystem::getCurrentValueIntegral() const {
 
 float VelocityAgitatorSubsystem::getUncalibratedAgitatorAngle() const
 {
-    return (2.0f * M_PI / static_cast<float>(DjiMotor::ENC_RESOLUTION)) *
+    return (2.0f * M_PI / static_cast<float>(Motor::ENC_RESOLUTION)) *
            m_agitator.getEncoderUnwrapped() / AGITATOR_GEAR_RATIO_M2006;
 }
 }  // namespace control::agitator
