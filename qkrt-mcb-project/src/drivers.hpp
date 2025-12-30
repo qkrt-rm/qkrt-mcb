@@ -42,6 +42,10 @@ public:
     control::ControlOperatorInterface controlOperatorInterface;
     communication::logger::Logger logger;
     communication::VisionCoprocessor visionCoprocessor;
+
+    bool m_kill_switch() {
+        return true;
+    } 
 };
 
 #endif  // DRIVERS_HPP_
