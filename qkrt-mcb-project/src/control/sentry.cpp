@@ -1,7 +1,4 @@
 #include "sentry.hpp"
-#include "flywheel/flywheel_subsystem.hpp"
-#include "flywheel/flywheel_on_command.hpp"
-
 
 using tap::can::CanBus;
 using tap::motor::MotorId;
@@ -33,31 +30,14 @@ Robot::Robot(Drivers& drivers)
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
       m_flywheels(drivers),
-      m_flywheelsCommand(m_flywheels, drivers.controlOperatorInterface, 0.39f),
-      m_agitator(&drivers, MotorId::MOTOR7, CanBus::CAN_BUS1, true, "e"),
-        eduPidConfig{
-            .kp = 1000,
-            .ki = 0,
-            .kd = 0,
-            .maxICumulative = 0,
-            .maxOutput = 16000
-        },
-        moveIntegralConfig{
-            .targetIntegralChange = M_TWOPI / 10.0f, 
-            .desiredSetpoint = M_TWOPI,
-            .integralSetpointTolerance = 0
-        },
-        m_velocityAgitatorSubsystem(drivers, eduPidConfig, m_agitator), 
-        moveIntegralCommand(m_velocityAgitatorSubsystem, moveIntegralConfig),
-        m_agitatorCommand(m_velocityAgitatorSubsystem, drivers.controlOperatorInterface, 38)
-
-        // rightSwitchUp(&drivers, {&moveIntegralCommand}, RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP), false),
-        // HCM(&drivers, {&moveIntegralCommand}, RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP)),
-         
-
-
-
-
+      m_flywheelsCommand(m_flywheels, 0.39f),
+      m_agitator(drivers,
+                agitator::agitatorConfig{
+                    .agitatorId = MotorId::MOTOR7,
+                    .canBus = CanBus::CAN_BUS1,
+                    .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
+                }),
+     m_agitatorCommand(m_agitator, 38)
 {
 }
 
@@ -84,15 +64,17 @@ void Robot::registerSubsystems()
     m_drivers.commandScheduler.registerSubsystem(&m_chassis);
     m_drivers.commandScheduler.registerSubsystem(&m_turret);
     m_drivers.commandScheduler.registerSubsystem(&m_flywheels);
-    m_drivers.commandScheduler.registerSubsystem(&m_velocityAgitatorSubsystem);
+    m_drivers.commandScheduler.registerSubsystem(&m_agitator);
 }
 
 void Robot::setDefaultCommands()
 {
     m_chassis.setDefaultCommand(&m_chassisCommand);
     m_turret.setDefaultCommand(&m_turretCommand);
-    m_flywheels.setDefaultCommand(&m_flywheelsCommand);
-    m_velocityAgitatorSubsystem.setDefaultCommand(&m_agitatorCommand);
+
+    //don't continously run these commands
+    //m_flywheels.setDefaultCommand(&m_flywheelsCommand);
+    //m_velocityAgitatorSubsystem.setDefaultCommand(&m_agitatorCommand);
 }
 
 void Robot::startCommands()
@@ -101,6 +83,11 @@ void Robot::startCommands()
 
 void Robot::registerIoMappings()
 {
+    //Flywheel and Agitator Mapping
+    m_drivers.commandMapper.addMap(& m_leftSwitchUP);
+
 }
+
+
 
 }  // namespace control

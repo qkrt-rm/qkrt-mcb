@@ -21,18 +21,6 @@
 
 #include "tap/control/command.hpp"
 
-
-struct internal {
-    static inline float turretYaw = 0.0f;
-    static inline float turretPitch = 0.0f;
-    static inline bool  indexerBoost = false;
-};
-
-namespace control
-{
-class ControlOperatorInterface;
-}
-
 namespace control::agitator
 {
 class VelocityAgitatorSubsystem;
@@ -40,7 +28,7 @@ class VelocityAgitatorSubsystem;
 class AgitatorCommand : public tap::control::Command
 {
 public:
-    AgitatorCommand(VelocityAgitatorSubsystem &agitator, ControlOperatorInterface &operatorInterface, float indexerSpeed);
+    AgitatorCommand(VelocityAgitatorSubsystem &agitator, float indexerSpeed);
 
     const char *getName() const override { return "Chassis omni drive"; }
 
@@ -53,9 +41,11 @@ public:
     bool isFinished() const { return false; }
 
 private:
+    
+    static inline bool isBOOST = false;
+
     VelocityAgitatorSubsystem &m_agitator;
 
-    ControlOperatorInterface &m_operatorInterface;
     float m_indexerSpeed;
 };
 

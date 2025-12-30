@@ -23,24 +23,13 @@
 
 #include "flywheel_subsystem.hpp"
 
-namespace control
-{
-class ControlOperatorInterface;
-}
 
-namespace control
-{
-namespace flywheel
+namespace control::flywheel
 {
 class FlywheelOnCommand : public tap::control::Command
 {
 public:
-    FlywheelOnCommand(FlywheelSubsystem &flywheel, ControlOperatorInterface &operatorInterface, float flywheel_speed)
-        : m_flywheel(flywheel), m_operatorInterface(operatorInterface)
-    {
-        addSubsystemRequirement(&flywheel);
-        m_flywheelPWM = flywheel_speed;
-    }
+    FlywheelOnCommand(FlywheelSubsystem &flywheel, float flywheel_speed);
 
     void initialize() override;
 
@@ -54,11 +43,9 @@ public:
 
 private:
     FlywheelSubsystem &m_flywheel;
-    ControlOperatorInterface& m_operatorInterface;
 
     float m_flywheelPWM;
     static constexpr float OFF_PWM = 0.25f;
 
 };  // class FlywheelOnCommand
-}  // namespace flywheel
-}  // namespace control
+}  // namespace control::flywheel

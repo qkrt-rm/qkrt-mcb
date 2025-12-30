@@ -23,7 +23,7 @@
 #include "tap/control/setpoint/interfaces/integrable_setpoint_subsystem.hpp"
 #include "tap/motor/dji_motor.hpp"
 
-#include "control/algorithms/edu_pid.hpp"
+#include "modm/math/filter/pid.hpp"
 
 class Drivers;
 
@@ -34,6 +34,19 @@ namespace control::agitator
  * velocity controller. Also keeps track of absolute position to allow commands to rotate the
  * agitator some specific displacement.
  */
+
+
+struct agitatorConfig
+{
+    tap::motor::MotorId agitatorId;
+    tap::can::CanBus canBus;
+    modm::Pid<float>::Parameter agitatorVelocityPidConfig;
+
+
+};
+
+
+
 class VelocityAgitatorSubsystem : public tap::control::setpoint::IntegrableSetpointSubsystem
 {
 public:
@@ -50,10 +63,7 @@ public:
      * @param[in] pidConfig PID configuration struct for the agitator motor controller.
      * @param[in] agitator The base motor that this agitator subsystem is is going to control.
      */ 
-    VelocityAgitatorSubsystem(
-        Drivers& drivers,
-        const control::algorithms::EduPidConfig& pidConfig,
-        tap::motor::DjiMotor& agitator);
+    VelocityAgitatorSubsystem(Drivers& drivers, const agitatorConfig &config);
 
     void initialize() override;
 
@@ -131,9 +141,9 @@ private:
     /// @return Uncalibrated agitator angle.
     float getUncalibratedAgitatorAngle() const;
 
-    tap::motor::DjiMotor& m_agitator;
+    tap::motor::DjiMotor m_agitator;
 
-    control::algorithms::EduPid m_velocityPid;
+    modm::Pid<float> m_velocityPid;
 
     float velocitySetpoint{0};
 

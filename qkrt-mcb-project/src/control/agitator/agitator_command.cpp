@@ -27,10 +27,8 @@ using tap::algorithms::limitVal;
 namespace control::agitator
 {
 AgitatorCommand::AgitatorCommand(
-    VelocityAgitatorSubsystem &agitator,
-    ControlOperatorInterface &operatorInterface, float indexerSpeed)
+    VelocityAgitatorSubsystem &agitator, float indexerSpeed)
     : m_agitator(agitator),
-      m_operatorInterface(operatorInterface),
       m_indexerSpeed(indexerSpeed)
 {
     addSubsystemRequirement(&agitator);
@@ -38,14 +36,15 @@ AgitatorCommand::AgitatorCommand(
 
 void AgitatorCommand::execute()
 {
-    m_operatorInterface.pollInputDevices();
+    /**
+     * TODO:
+     * - Jammed Timer
+     * - Barrel Overheat Limiting
+     * - Use Balls Per Second instead of rpm
+     */
 
-    float newIndexerSpeed = internal::indexerBoost ? m_indexerSpeed  + 20.0f : m_indexerSpeed;
-
-    if (m_operatorInterface.getAgitatorInput()) 
-        m_agitator.setSetpoint(newIndexerSpeed);
-    else 
-        m_agitator.setSetpoint(0);
+    float newIndexerSpeed = isBOOST ? m_indexerSpeed  + 20.0f : m_indexerSpeed;
+    m_agitator.setSetpoint(newIndexerSpeed);
 }
 
 void AgitatorCommand::end(bool) { m_agitator.setSetpoint(0); }
