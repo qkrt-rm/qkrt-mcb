@@ -36,7 +36,6 @@ class Drivers : public tap::Drivers
        
     {
     }
-    
     friend class DriversSingleton;
 public:
     control::ControlOperatorInterface controlOperatorInterface;

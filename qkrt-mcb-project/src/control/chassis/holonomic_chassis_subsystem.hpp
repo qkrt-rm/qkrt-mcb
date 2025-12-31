@@ -18,7 +18,6 @@
 
 namespace control::chassis
 {
-
 struct ChassisConfig
 {
     tap::motor::MotorId leftFrontId;

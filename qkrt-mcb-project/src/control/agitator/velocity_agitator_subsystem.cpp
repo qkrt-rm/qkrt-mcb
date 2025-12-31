@@ -62,6 +62,9 @@ float VelocityAgitatorSubsystem::getCurrentValue() const {
 }
 
 bool VelocityAgitatorSubsystem::calibrateHere() {
+
+    // drivers->isEmergencyStopActive() is not showing up.
+
     if(isOnline()){
         agitatorCalibratedZeroAngle = getUncalibratedAgitatorAngle();
         calibrated = true;
