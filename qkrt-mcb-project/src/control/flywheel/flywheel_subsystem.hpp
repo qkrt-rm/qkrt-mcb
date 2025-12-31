@@ -51,6 +51,7 @@ private:
     static constexpr float MAX_SNAIL_OUTPUT = 0.50f;    
     static constexpr float MIN_SNAIL_OUTPUT = 0.25f;
     static constexpr float OFF_PWM = 0.25f;    
+    Drivers* m_drivers;
 
 };
 

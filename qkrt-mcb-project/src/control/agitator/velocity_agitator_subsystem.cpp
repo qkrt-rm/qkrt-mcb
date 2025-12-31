@@ -31,7 +31,7 @@ using Motor = tap::motor::DjiMotor;
 namespace control::agitator
 {
 VelocityAgitatorSubsystem::VelocityAgitatorSubsystem(Drivers& drivers, const agitatorConfig &config)
-    : Subsystem(&drivers),
+    : Subsystem(&drivers), m_drivers(&drivers),
       m_agitator(&drivers, config.agitatorId, config.canBus, false, "VA")
     {
         m_velocityPid.setParameter(config.agitatorVelocityPidConfig);
@@ -44,7 +44,13 @@ void VelocityAgitatorSubsystem::refresh() {
         calibrated = false;
     }
     if(calibrated){
-        m_velocityPid.update(getSetpoint() - getCurrentValue());
+        if (m_drivers->isEmergencyStopActive()) {
+            m_velocityPid.reset();
+            m_velocityPid.update(0.0f);
+        }
+        else {
+            m_velocityPid.update(getSetpoint() - getCurrentValue());
+        }
         m_agitator.setDesiredOutput(m_velocityPid.getValue());
     }else
     {

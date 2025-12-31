@@ -152,6 +152,8 @@ private:
     float agitatorCalibratedZeroAngle{0};
 
     uint32_t prevTime{0};
+
+    Drivers* m_drivers;
 };
 
 }  // namespace control::agitator
