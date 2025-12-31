@@ -18,9 +18,7 @@ void HolonomicChassisCommand::initialize()
 }
 
 void HolonomicChassisCommand::execute()
-{
-    if (!m_operatorInterface.getEmergencyStopInput()) {
-        
+{       
         m_operatorInterface.pollInputDevices();
 
         float xInp = m_operatorInterface.getChassisXInput();
@@ -39,10 +37,6 @@ void HolonomicChassisCommand::execute()
         float rightBack  = (v_x + v_y - w) / denominator;
 
         m_chassis.setWheelVelocities(leftFront, leftBack, rightBack, rightFront);
-    }
-    else {
-        m_chassis.setWheelVelocities(0.0f, 0.0f, 0.0f, 0.0f);
-    }
 }
 
 void HolonomicChassisCommand::end(bool /* interrupted */)

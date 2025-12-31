@@ -25,19 +25,7 @@ void TurretCommand::execute()
     volatile communication::TurretData data = m_visionCoprocessor.getTurretData();
     
     m_operatorInterface.pollInputDevices();
-    if (m_operatorInterface.getEmergencyStopInput()) {
-        
-        float desiredElevation = 0.0f;
-        float desiredAzimuth = 0.0f;
-
-        m_turret.setElevation(desiredElevation);
-        m_turret.setAzimuth(desiredAzimuth);
-
-        // Should this be empty?
-
-
-    }
-    else if (m_target != nullptr)
+    if (m_target != nullptr)
     {
         //AIM Command once target is found 
 

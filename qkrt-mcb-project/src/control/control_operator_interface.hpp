@@ -29,10 +29,6 @@ public:
     bool getAgitatorInput() const { return m_agitatorInput; };
 
 
-    /** @brief Returns true if emergency stop input is active.
-    */ 
-    bool getEmergencyStopInput() const { return m_emergencystopInput; };
-
 
 
     
@@ -53,7 +49,6 @@ private:
 
     bool m_flywheelInput = false;
     bool m_agitatorInput = false;
-    bool m_emergencystopInput = false;
 
     static constexpr float WHEEL_DEADZONE = 100.0f;
 

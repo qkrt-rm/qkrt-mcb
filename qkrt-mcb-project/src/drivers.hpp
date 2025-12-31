@@ -43,8 +43,17 @@ public:
     communication::logger::Logger logger;
     communication::VisionCoprocessor visionCoprocessor;
 
-    bool m_kill_switch() {
-        return true;
+    /**
+     * @brief Checks whether the emergency stop condition is active.
+     *
+     * Returns true if either:
+     * - the remote is not connected or
+     * - the emergency stop switch (left switch) is in the DOWN position.
+     *
+     * @return true emergency stop is active.
+     */
+    bool isEmergencyStopActive() {
+        return !remote.isConnected() || remote.getSwitch(tap::communication::serial::Remote::Switch::LEFT_SWITCH) == tap::communication::serial::Remote::SwitchState::DOWN;
     } 
 };
 
