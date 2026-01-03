@@ -50,8 +50,6 @@ private:
     bool m_flywheelInput = false;
     bool m_agitatorInput = false;
 
-    static constexpr float WHEEL_DEADZONE = 100.0f;
-
 };
 
 }  // control
