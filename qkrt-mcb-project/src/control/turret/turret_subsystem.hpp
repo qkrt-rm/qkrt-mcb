@@ -5,9 +5,15 @@
 #include <tap/control/subsystem.hpp>
 #include <tap/motor/dji_motor.hpp>
 #include <tap/util_macros.hpp>
+#include <tap/algorithms/extended_kalman.hpp>
+#include <tap/algorithms/filter/butterworth.hpp>
+#include <tap/algorithms/filter/discrete_filter.hpp>
+#include "communication/logger/logger.hpp"
+
 
 #include <array>
 
+#include <numbers>
 #include "math/vector.hpp"
 #include "math/filter/pid.hpp"
 
@@ -35,16 +41,19 @@ private:
     static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
     
     static constexpr float DEAD_ZONE_ANGLE = 0.01f;
-    static constexpr float DEAD_ZONE_RPM = 0.9f;
+    static constexpr float DEAD_ZONE_RPM = 0.5f;
         
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
+
+    static constexpr double LPF_SAMPLE_TIME = 0.002;
+    static constexpr double LPF_CUTOFF_HZ = 40.0;
 
 public:
     TurretSubsystem(Drivers& drivers, const TurretConfig& config);
 
     void initialize() override;
     void refresh() override;
-    const char* getName() override { return "Turret"; }
+    const char* getName() const override { return "Turret"; }
 
 public:
     /**
@@ -62,8 +71,8 @@ public:
      */
     inline float getElevation() const
     {
-        uint16_t encoderRaw = m_pitchMotor.getEncoderWrapped();
-        return encoderToRad(encoderRaw) - m_pitchHorizontalOffset;
+        auto currentAngle = m_pitchMotor.getEncoder()->getPosition();
+        return (currentAngle - m_pitchHorizontalOffset).getWrappedValue();
     }
 
     /**
@@ -81,8 +90,8 @@ public:
      */
     inline float getAzimuth() const
     {
-        uint16_t encoderRaw = m_yawMotor.getEncoderWrapped();
-        return encoderToRad(encoderRaw) - m_yawForwardOffset;
+        auto currentAngle = m_yawMotor.getEncoder()->getPosition();
+        return (currentAngle - m_yawForwardOffset).getWrappedValue();
     }
 
     /**
@@ -107,7 +116,7 @@ private:
     inline float encoderToRad(uint16_t encoder) const
     {
         static constexpr float INV_ENC_RESOLUTION
-            = 1.0f / static_cast<float>(Motor::ENC_RESOLUTION);
+            = 1.0f / static_cast<float>(tap::motor::DjiMotorEncoder::ENC_RESOLUTION);
 
         return static_cast<float>(encoder) * INV_ENC_RESOLUTION * M_TWOPI;
     }
@@ -120,8 +129,6 @@ private:
         return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
 
-    inline float dpsToRpm(float dps) const { return (dps / 360.0f) * 60.0f; }
-
     Motor m_pitchMotor, m_yawMotor;
     float m_desiredPitchVoltage, m_desiredYawVoltage;
 
@@ -133,11 +140,17 @@ private:
 
     bool m_aimLock;
     float m_sensitivity;
-    uint16_t m_yawForwardOffset;
-    uint16_t m_pitchHorizontalOffset;
+    float m_yawForwardOffset;
+    float m_pitchHorizontalOffset;
+
+    tap::algorithms::ExtendedKalman m_ImuKalman;
+    tap::algorithms::filter::DiscreteFilter<3, float> m_ImuLpf;
 
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
     Drivers* m_drivers;
+
+    communication::logger::Logger& m_logger;
+
 };
 
 };  // namespace control::turret

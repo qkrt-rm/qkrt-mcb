@@ -21,8 +21,8 @@ void ControlOperatorInterface::pollInputDevices()
             m_chassisXInput = std::clamp(m_remote.getChannel(Remote::Channel::LEFT_VERTICAL), -1.0f, 1.0f);
             m_chassisYInput = std::clamp(m_remote.getChannel(Remote::Channel::LEFT_HORIZONTAL), -1.0f, 1.0f);
             m_chassisWInput = 
-                m_remote.getWheel() > WHEEL_DEADZONE ? 0.25f :
-                m_remote.getWheel() < -WHEEL_DEADZONE ? 0.0f :
+                m_remote.getChannel(tap::communication::serial::Remote::Channel::WHEEL) > 0 ? 0.25f :
+                m_remote.getChannel(tap::communication::serial::Remote::Channel::WHEEL) < 0 ? 0.0f :
                 m_chassisWInput;
 
             m_turretPitchInput = std::clamp(m_remote.getChannel(Remote::Channel::RIGHT_VERTICAL), -1.0f, 1.0f);

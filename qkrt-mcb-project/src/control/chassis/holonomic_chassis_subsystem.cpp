@@ -34,15 +34,15 @@ void HolonomicChassisSubsystem::setWheelVelocities(float leftFront,
                                                    float rightBack,
                                                    float rightFront)
 {
-    leftFront  = mpsToRpm(leftFront);
-    leftBack   = mpsToRpm(leftBack);
-    rightBack  = mpsToRpm(rightBack);
-    rightFront = mpsToRpm(rightFront);
+    leftFront  = mpsToRps(leftFront);
+    leftBack   = mpsToRps(leftBack);
+    rightBack  = mpsToRps(rightBack);
+    rightFront = mpsToRps(rightFront);
 
-    leftFront  = std::clamp(leftFront,  -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-    leftBack   = std::clamp(leftBack,   -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-    rightBack  = std::clamp(rightBack,  -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-    rightFront = std::clamp(rightFront, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+    leftFront  = std::clamp(leftFront,  -MAX_CURRENT, MAX_CURRENT);
+    leftBack   = std::clamp(leftBack,   -MAX_CURRENT, MAX_CURRENT);
+    rightBack  = std::clamp(rightBack,  -MAX_CURRENT, MAX_CURRENT);
+    rightFront = std::clamp(rightFront, -MAX_CURRENT, MAX_CURRENT);
 
     m_desiredOutput[static_cast<uint8_t>(MotorId::LF)] = leftFront;
     m_desiredOutput[static_cast<uint8_t>(MotorId::LB)] = leftBack;
@@ -59,7 +59,7 @@ void HolonomicChassisSubsystem::refresh()
     ///
     /// @param pid the wheel's proportional-integral-derivative controller
     /// @param motor the wheel's motor
-    /// @param desiredOutput the wheel's desired output in Rpm
+    /// @param desiredOutput the wheel's desired output in Rps
     ///
     auto runPid = [](Pid& pid, Motor& motor, float desiredOutput, Drivers *m_drivers_lf) -> void
     { 
@@ -68,13 +68,13 @@ void HolonomicChassisSubsystem::refresh()
             pid.update(0.0f);
         }
         else {
-            pid.update(desiredOutput - motor.getShaftRPM());
+            pid.update(desiredOutput - motor.getEncoder()->getVelocity());
         }
         motor.setDesiredOutput(pid.getValue());
     };
 
     /**
-    * TODO: Power Limiting Logic
+    * TODO: Power Limiting Logics
     */
 
     for (size_t ii = 0; ii < m_motors.size(); ii++)

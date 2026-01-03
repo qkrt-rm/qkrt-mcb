@@ -37,7 +37,7 @@ Robot::Robot(Drivers& drivers)
                     .canBus = CanBus::CAN_BUS1,
                     .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
                 }),
-     m_agitatorCommand(m_agitator, -38.0)
+     m_agitatorCommand(m_agitator, -15.0)
 {
 }
 

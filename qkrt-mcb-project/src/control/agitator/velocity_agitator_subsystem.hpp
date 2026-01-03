@@ -72,7 +72,7 @@ public:
      */
     void refresh() override;
 
-    const char* getName() override { return "velocity agitator"; }
+    const char* getName() const override { return "velocity agitator"; }
 
     /// @return The velocity setpoint that some command has requested, in radians / second
     float getSetpoint() const override;
