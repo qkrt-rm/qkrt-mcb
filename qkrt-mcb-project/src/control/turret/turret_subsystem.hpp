@@ -8,12 +8,12 @@
 #include <tap/algorithms/extended_kalman.hpp>
 #include <tap/algorithms/filter/butterworth.hpp>
 #include <tap/algorithms/filter/discrete_filter.hpp>
-#include <tap/algorithms/smooth_pid.hpp>
 #include "communication/logger/logger.hpp"
 
 
 #include <array>
 
+#include <numbers>
 #include <numbers>
 #include "math/vector.hpp"
 // #include "math/filter/pid.hpp"
@@ -43,10 +43,11 @@ private:
     
     static constexpr float DEAD_ZONE_ANGLE = 0.01f;
     static constexpr float DEAD_ZONE_RPM = 0.5f;
+    static constexpr float DEAD_ZONE_RPM = 0.5f;
         
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
 
-    static constexpr float DT = 0.002f;
+    static constexpr double LPF_SAMPLE_TIME = 0.002;
     static constexpr double LPF_CUTOFF_HZ = 40.0;
 
 public:
@@ -54,6 +55,7 @@ public:
 
     void initialize() override;
     void refresh() override;
+    const char* getName() const override { return "Turret"; }
     const char* getName() const override { return "Turret"; }
 
 public:
@@ -72,8 +74,8 @@ public:
      */
     inline float getPitch() const
     {
-        auto relativeAngle = m_pitchMotor.getEncoder()->getPosition() - 0.19021f;
-        return (relativeAngle).getWrappedValue();
+        auto currentAngle = m_pitchMotor.getEncoder()->getPosition();
+        return (currentAngle - m_pitchHorizontalOffset).getWrappedValue();
     }
 
     /**
@@ -91,6 +93,8 @@ public:
      */
     inline float getYaw() const
     {
+        auto currentAngle = m_yawMotor.getEncoder()->getPosition();
+        return (currentAngle - m_yawForwardOffset).getWrappedValue();
         auto currentAngle = m_yawMotor.getEncoder()->getPosition();
         return (currentAngle - m_yawForwardOffset).getWrappedValue();
     }
@@ -118,6 +122,7 @@ private:
     {
         static constexpr float INV_ENC_RESOLUTION
             = 1.0f / static_cast<float>(tap::motor::DjiMotorEncoder::ENC_RESOLUTION);
+            = 1.0f / static_cast<float>(tap::motor::DjiMotorEncoder::ENC_RESOLUTION);
 
         return static_cast<float>(encoder) * INV_ENC_RESOLUTION * M_TWOPI;
     }
@@ -129,24 +134,6 @@ private:
 
         return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
-
-    /**
-     * @brief Computes the shortest angular error between two angles.
-     *
-     * This function calculates the smallest difference between a desired angle 
-     * and the current angle, ensuring the result is within the range [-π, π]. 
-     * This prevents issues where an angle error of, for example, 350° would be 
-     * treated as -350° instead of 10°.
-     *
-     * @param desiredAngle The target angle in radians.
-     * @param currentAngle The current angle in radians.
-     * @return The shortest angular difference in radians, constrained to [-π, π].
-     */
-    static constexpr auto getOptimalError = [](float desiredAngle, float currentAngle) -> float
-        {
-            float error = desiredAngle - currentAngle;
-            return std::atan2(std::sin(error), std::cos(error));
-        };
 
     Motor m_pitchMotor, m_yawMotor;
     float m_desiredPitchVoltage, m_desiredYawVoltage;
@@ -170,9 +157,17 @@ private:
 
     tap::algorithms::ExtendedKalman m_ImuKalman;
     tap::algorithms::filter::DiscreteFilter<3, float> m_ImuLpf;
+    float m_yawForwardOffset;
+    float m_pitchHorizontalOffset;
+
+    tap::algorithms::ExtendedKalman m_ImuKalman;
+    tap::algorithms::filter::DiscreteFilter<3, float> m_ImuLpf;
 
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
     Drivers* m_drivers;
+
+    communication::logger::Logger& m_logger;
+
 
     communication::logger::Logger& m_logger;
 

@@ -57,11 +57,13 @@ public:
      * \f$\frac{\mbox{m}}{\mbox{second}^2}\f$.
      */
     virtual inline float getAx() const = 0;
+    virtual inline float getAx() const = 0;
 
     /**
      * Returns the linear acceleration in the y direction, in
      * \f$\frac{\mbox{m}}{\mbox{second}^2}\f$.
      */
+    virtual inline float getAy() const = 0;
     virtual inline float getAy() const = 0;
 
     /**
@@ -69,21 +71,27 @@ public:
      * \f$\frac{\mbox{m}}{\mbox{second}^2}\f$.
      */
     virtual inline float getAz() const = 0;
+    virtual inline float getAz() const = 0;
 
     /**
      * Returns the gyroscope reading (rotational speed) in the x direction, in
      * \f$\frac{\mbox{radians}}{\mbox{second}}\f$.
+     * \f$\frac{\mbox{radians}}{\mbox{second}}\f$.
      */
+    virtual inline float getGx() const = 0;
     virtual inline float getGx() const = 0;
 
     /**
      * Returns the gyroscope reading (rotational speed) in the y direction, in
      * \f$\frac{\mbox{radians}}{\mbox{second}}\f$.
+     * \f$\frac{\mbox{radians}}{\mbox{second}}\f$.
      */
+    virtual inline float getGy() const = 0;
     virtual inline float getGy() const = 0;
 
     /**
      * Returns the gyroscope reading (rotational speed) in the z direction, in
+     * \f$\frac{\mbox{radians}}{\mbox{second}}\f$.
      * \f$\frac{\mbox{radians}}{\mbox{second}}\f$.
      */
     virtual inline float getGz() const = 0;
@@ -102,6 +110,13 @@ public:
      * Returns roll angle in radians.
      */
     virtual inline float getRoll() const = 0;
+
+    /**
+     * When this function is called, the IMU enters a calibration state during which time,
+     * gyro/accel calibration offsets will be computed and the mahony algorithm reset. When
+     * calibrating, angle, accelerometer, and gyroscope values will return 0.
+     */
+    virtual void requestCalibration() = 0;
 };
 }  // namespace tap::communication::sensors::imu
 

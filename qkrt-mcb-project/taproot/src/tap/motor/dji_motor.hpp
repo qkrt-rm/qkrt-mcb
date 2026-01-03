@@ -31,7 +31,12 @@
 #include "tap/communication/sensors/encoder/multi_encoder.hpp"
 
 #include "modm/math/geometry/angle.hpp"
+#include "tap/communication/sensors/encoder/multi_encoder.hpp"
 
+#include "modm/math/geometry/angle.hpp"
+
+#include "dji_motor_encoder.hpp"
+#include "dji_motor_ids.hpp"
 #include "dji_motor_encoder.hpp"
 #include "dji_motor_ids.hpp"
 #include "motor_interface.hpp"
@@ -42,8 +47,19 @@
 #include "tap/mock/dji_motor_encoder_mock.hpp"
 #endif
 
+#if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
+#include <gmock/gmock.h>
+
+#include "tap/mock/dji_motor_encoder_mock.hpp"
+#endif
+
 namespace tap::motor
 {
+#if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
+using Encoder = tap::mock::DjiMotorEncoderMock;
+#else
+using Encoder = DjiMotorEncoder;
+#endif
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
 using Encoder = tap::mock::DjiMotorEncoderMock;
 #else
@@ -59,6 +75,7 @@ using Encoder = DjiMotorEncoder;
  *      == false`) is counter clockwise when looking at the shaft from the side opposite
  *      the motor. This is specified in the C620 user manual (page 18).
  *
+ * @see DjiMotorEncoder
  * @see DjiMotorEncoder
  *
  * Extends the CanRxListener class to attach a message handler for feedback data from the
@@ -77,8 +94,9 @@ public:
     static constexpr uint16_t MAX_OUTPUT_C620 = 16384;
     // Controller for the M3510, in mA output (Not known if mapped to 20A range)
     static constexpr uint16_t MAX_OUTPUT_820R = 32767;
-
-    // Output is in mV
+    // Output is in mA, for use with current control mode
+    static constexpr uint16_t MAX_OUTPUT_GM6020_mA = 16384;
+    // Output is in mV, for use with voltage control mode
     static constexpr uint16_t MAX_OUTPUT_GM6020 = 25000;
     // Output is in mV
     static constexpr uint16_t MAX_OUTPUT_GM3510 = 29000;
@@ -94,6 +112,9 @@ public:
      * @param gearRatio the ratio of input revolutions to output revolutions of this encoder.
      * @param encoderHomePosition the zero position for the encoder in encoder ticks.
      * @param externalEncoder a pointer to an external encoder to average with the internal encoder.
+     * @param gearRatio the ratio of input revolutions to output revolutions of this encoder.
+     * @param encoderHomePosition the zero position for the encoder in encoder ticks.
+     * @param externalEncoder a pointer to an external encoder to average with the internal encoder.
      */
     DjiMotor(
         Drivers* drivers,
@@ -105,6 +126,10 @@ public:
         float gearRatio = 1,
         uint32_t encoderHomePosition = 0,
         tap::encoder::EncoderInterface* externalEncoder = nullptr);
+        bool currentControl = false,
+        float gearRatio = 1,
+        uint32_t encoderHomePosition = 0,
+        tap::encoder::EncoderInterface* externalEncoder = nullptr);
 
     mockable ~DjiMotor();
 
@@ -112,9 +137,13 @@ public:
 
     tap::encoder::EncoderInterface* getEncoder() const override
     {
-        return const_cast<tap::encoder::MultiEncoder<2>*>(&this->encoder);
+        return const_cast<tap::encoder::EncoderInterface*>(this->encoder);
     }
 
+    /**
+     * Returns the builtin encoder associated with the motor.
+     */
+    mockable const Encoder& getInternalEncoder() const { return this->internalEncoder; }
     /**
      * Returns the builtin encoder associated with the motor.
      */
@@ -176,6 +205,7 @@ public:
     mockable const char* getName() const;
 
     mockable bool isInCurrentControl() const;
+    mockable bool isInCurrentControl() const;
 
 private:
     // wait time before the motor is considered disconnected, in milliseconds
@@ -210,8 +240,7 @@ private:
     Encoder internalEncoder;
 #endif
 
-    tap::encoder::MultiEncoder<2> encoder;
-
+    tap::encoder::EncoderInterface* encoder;
     tap::arch::MilliTimeout motorDisconnectTimeout;
 };
 

@@ -51,6 +51,10 @@ DjiMotor::DjiMotor(
     float gearRatio,
     uint32_t encoderHomePosition,
     tap::encoder::EncoderInterface* externalEncoder)
+    bool currentControl,
+    float gearRatio,
+    uint32_t encoderHomePosition,
+    tap::encoder::EncoderInterface* externalEncoder)
     : CanRxListener(drivers, static_cast<uint32_t>(desMotorIdentifier), motorCanBus),
       motorName(name),
       drivers(drivers),
@@ -62,11 +66,8 @@ DjiMotor::DjiMotor(
       motorInverted(isInverted),
       currentControl(currentControl),
       internalEncoder(isInverted, gearRatio, encoderHomePosition),
-      encoder(
-          {externalEncoder != nullptr ? externalEncoder
-                                      : const_cast<Encoder*>(&this->getInternalEncoder()),
-           externalEncoder != nullptr ? const_cast<Encoder*>(&this->getInternalEncoder())
-                                      : nullptr})
+      encoder(externalEncoder != nullptr ? externalEncoder 
+                                         : const_cast<Encoder*>(&this->getInternalEncoder()))
 {
     motorDisconnectTimeout.stop();
 }
@@ -75,7 +76,7 @@ void DjiMotor::initialize()
 {
     drivers->djiMotorTxHandler.addMotorToManager(this);
     attachSelfToRxHandler();
-    this->encoder.initialize();
+    this->encoder->initialize();
 }
 
 void DjiMotor::processMessage(const modm::can::Message& message)
@@ -91,6 +92,7 @@ void DjiMotor::processMessage(const modm::can::Message& message)
     // restart disconnect timer, since you just received a message from the motor
     motorDisconnectTimeout.restart(MOTOR_DISCONNECT_TIME);
 
+    this->internalEncoder.processMessage(message);
     this->internalEncoder.processMessage(message);
 }
 
@@ -136,6 +138,8 @@ bool DjiMotor::isMotorInverted() const { return motorInverted; }
 tap::can::CanBus DjiMotor::getCanBus() const { return motorCanBus; }
 
 const char* DjiMotor::getName() const { return motorName; }
+
+bool DjiMotor::isInCurrentControl() const { return currentControl; }
 
 bool DjiMotor::isInCurrentControl() const { return currentControl; }
 

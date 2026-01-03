@@ -58,11 +58,15 @@ public:
         float gearRatio = 1,
         uint32_t encoderHomePositionOne = 0,
         tap::encoder::EncoderInterface* externalEncoder = nullptr);
+        bool currentControl = false,
+        float gearRatio = 1,
+        uint32_t encoderHomePositionOne = 0,
+        tap::encoder::EncoderInterface* externalEncoder = nullptr);
 
     void initialize() override;
     tap::encoder::EncoderInterface* getEncoder() const override
     {
-        return const_cast<tap::encoder::MultiEncoder<3>*>(&this->encoder);
+        return const_cast<tap::encoder::EncoderInterface*>(this->encoder);
     }
     void setDesiredOutput(int32_t desiredOutput) override;
     bool isMotorOnline() const override;
@@ -71,17 +75,19 @@ public:
     int16_t getTorque() const override;
 
 protected:
+protected:
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
 public:
     testing::NiceMock<mock::DjiMotorMock> motorOne;
     testing::NiceMock<mock::DjiMotorMock> motorTwo;
 
 protected:
+protected:
 #else
     DjiMotor motorOne;
     DjiMotor motorTwo;
 #endif
-    tap::encoder::MultiEncoder<3> encoder;
+    tap::encoder::EncoderInterface* encoder;
 };
 }  // namespace tap::motor
 

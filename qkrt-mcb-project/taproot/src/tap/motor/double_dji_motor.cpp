@@ -27,6 +27,10 @@
     const_cast<tap::encoder::EncoderInterface*>( \
         static_cast<const tap::encoder::EncoderInterface*>(&x))
 
+#define CAST_ENC(x)                              \
+    const_cast<tap::encoder::EncoderInterface*>( \
+        static_cast<const tap::encoder::EncoderInterface*>(&x))
+
 namespace tap::motor
 {
 DoubleDjiMotor::DoubleDjiMotor(
@@ -43,12 +47,19 @@ DoubleDjiMotor::DoubleDjiMotor(
     float gearRatio,
     uint32_t encoderHomePositionOne,
     tap::encoder::EncoderInterface* externalEncoder)
+    bool currentControl,
+    float gearRatio,
+    uint32_t encoderHomePositionOne,
+    tap::encoder::EncoderInterface* externalEncoder)
     : motorOne(
           drivers,
           desMotorIdentifierOne,
           motorCanBusOne,
           isInvertedOne,
           nameOne,
+          currentControl,
+          gearRatio,
+          encoderHomePositionOne),
           currentControl,
           gearRatio,
           encoderHomePositionOne),
@@ -60,11 +71,7 @@ DoubleDjiMotor::DoubleDjiMotor(
           nameTwo,
           currentControl,
           gearRatio),
-      encoder(
-          {externalEncoder != nullptr ? externalEncoder : CAST_ENC(motorOne.getInternalEncoder()),
-           externalEncoder != nullptr ? CAST_ENC(motorOne.getInternalEncoder())
-                                      : CAST_ENC(motorTwo.getInternalEncoder()),
-           externalEncoder != nullptr ? CAST_ENC(motorTwo.getInternalEncoder()) : nullptr})
+      encoder(externalEncoder != nullptr ? externalEncoder : CAST_ENC(motorOne.getInternalEncoder()))
 {
 }
 
@@ -74,7 +81,7 @@ void DoubleDjiMotor::initialize()
     motorTwo.initialize();
     // This is weird because the initialize is called twice for the internal encoders. This is
     // fine because the internal encoders have no initialize logic.
-    encoder.initialize();
+    this->encoder->initialize();
 }
 
 void DoubleDjiMotor::setDesiredOutput(int32_t desiredOutput)
@@ -103,8 +110,14 @@ int8_t DoubleDjiMotor::getTemperature() const
     return std::max(motorOne.getTemperature(), motorTwo.getTemperature());
 }
 
+
 int16_t DoubleDjiMotor::getTorque() const
 {
+    int32_t m1Torque = motorOne.getTorque();
+    int32_t m2Torque = motorTwo.getTorque();
+    int num_online = motorOne.isMotorOnline() + motorTwo.isMotorOnline();
+
+    return num_online == 0 ? 0 : (m1Torque + m2Torque) / num_online;
     int32_t m1Torque = motorOne.getTorque();
     int32_t m2Torque = motorTwo.getTorque();
     int num_online = motorOne.isMotorOnline() + motorTwo.isMotorOnline();

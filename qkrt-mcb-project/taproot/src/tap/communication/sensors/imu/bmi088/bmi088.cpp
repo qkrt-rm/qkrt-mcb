@@ -51,6 +51,7 @@ namespace tap::communication::sensors::imu::bmi088
 void Bmi088::initialize(float sampleFrequency, float mahonyKp, float mahonyKi)
 {
     AbstractIMU::initialize(sampleFrequency, mahonyKp, mahonyKi);
+    AbstractIMU::initialize(sampleFrequency, mahonyKp, mahonyKi);
 #if !defined(PLATFORM_HOSTED)
     ImuCS1Accel::GpioOutput();
     ImuCS1Gyro::GpioOutput();
@@ -113,6 +114,7 @@ void Bmi088::initializeAcc()
     setAndCheckAccRegister(
         Acc::ACC_CONF,
         Acc::AccBandwidth_t(accOversampling) | Acc::AccOutputRate_t(accOutputRate));
+        Acc::AccBandwidth_t(accOversampling) | Acc::AccOutputRate_t(accOutputRate));
 
     setAndCheckAccRegister(Acc::ACC_RANGE, ACC_RANGE);
 }
@@ -140,12 +142,22 @@ void Bmi088::initializeGyro()
     // extra 0x80 is because the bandwidth register will always have 0x80 masked
     // so when checking, we want to mask as well to avoid an error
     setAndCheckGyroRegister(Gyro::GYRO_BANDWIDTH, gyroOutputRate | Gyro::GyroBandwidth_t(0x80));
+    setAndCheckGyroRegister(Gyro::GYRO_BANDWIDTH, gyroOutputRate | Gyro::GyroBandwidth_t(0x80));
 
     setAndCheckGyroRegister(Gyro::GYRO_LPM1, Gyro::GyroLpm1::PWRMODE_NORMAL);
 }
 
 void Bmi088::periodicIMUUpdate()
 {
+    AbstractIMU::periodicIMUUpdate();
+    imuHeater.runTemperatureController(imuData.temperature);
+}
+
+bool Bmi088::read()
+{
+    if (!readTimeout.execute())
+    {
+        return false;
     AbstractIMU::periodicIMUUpdate();
     imuHeater.runTemperatureController(imuData.temperature);
 }
@@ -167,6 +179,10 @@ bool Bmi088::read()
     float rawAccY = bigEndianInt16ToFloat(rxBuff + 2);
     float rawAccZ = bigEndianInt16ToFloat(rxBuff + 4);
     imuData.accRaw = tap::algorithms::transforms::Vector(rawAccX, rawAccY, rawAccZ);
+    float rawAccX = bigEndianInt16ToFloat(rxBuff);
+    float rawAccY = bigEndianInt16ToFloat(rxBuff + 2);
+    float rawAccZ = bigEndianInt16ToFloat(rxBuff + 4);
+    imuData.accRaw = tap::algorithms::transforms::Vector(rawAccX, rawAccY, rawAccZ);
 
     Bmi088Hal::bmi088GyroReadMultiReg(Gyro::RATE_X_LSB, rxBuff, 6);
 
@@ -175,15 +191,15 @@ bool Bmi088::read()
     float rawGyroZ = bigEndianInt16ToFloat(rxBuff + 4);
     imuData.gyroRaw = tap::algorithms::transforms::Vector(rawGyroX, rawGyroY, rawGyroZ);
 
+    applyMountingTransformToRaw(imuData);
+
     Bmi088Hal::bmi088AccReadMultiReg(Acc::TEMP_MSB, rxBuff, 2);
+    imuData.temperature = parseTemp(rxBuff[0], rxBuff[1]);
     imuData.temperature = parseTemp(rxBuff[0], rxBuff[1]);
 
     imuData.gyroRadPerSec =
         (imuData.gyroRaw - imuData.gyroOffsetRaw) * GYRO_RAD_PER_S_PER_GYRO_COUNT;
     imuData.accG = (imuData.accRaw - imuData.accOffsetRaw) * ACC_G_PER_ACC_COUNT;
-
-    applyTransform(imuData);
-
     return true;
 }
 

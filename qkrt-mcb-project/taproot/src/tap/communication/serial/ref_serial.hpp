@@ -25,6 +25,7 @@
 #define TAPROOT_REF_SERIAL_HPP_
 
 #include <cmath>
+#include <cmath>
 #include <cstdint>
 #include <unordered_map>
 
@@ -83,6 +84,9 @@ public:
      *
      * Current Ref Serial Version: 1.7.0
      * Updated March 2025.
+     *
+     * Current Ref Serial Version: 1.7.0
+     * Updated March 2025.
      */
     enum MessageType
     {
@@ -91,7 +95,11 @@ public:
         REF_MESSAGE_TYPE_ALL_ROBOT_HP = 0x3,
 
         REF_MESSAGE_TYPE_SITE_EVENT_DATA = 0x101,
+
+        REF_MESSAGE_TYPE_SITE_EVENT_DATA = 0x101,
         REF_MESSAGE_TYPE_WARNING_DATA = 0x104,
+        REF_MESSAGE_TYPE_DART_INFO = 0x105,
+
         REF_MESSAGE_TYPE_DART_INFO = 0x105,
 
         REF_MESSAGE_TYPE_ROBOT_STATUS = 0x201,
@@ -108,7 +116,21 @@ public:
         REF_MESSAGE_TYPE_SENTRY_INFO = 0x20D,
         REF_MESSAGE_TYPE_RADAR_INFO = 0x20E,
 
+        REF_MESSAGE_TYPE_DART_STATION_INFO = 0x20A,
+        REF_MESSAGE_TYPE_GROUND_ROBOT_POSITION = 0x20B,
+        REF_MESSAGE_TYPE_RADAR_PROGRESS = 0x20C,
+        REF_MESSAGE_TYPE_SENTRY_INFO = 0x20D,
+        REF_MESSAGE_TYPE_RADAR_INFO = 0x20E,
+
         REF_MESSAGE_TYPE_CUSTOM_DATA = 0x301,
+        // REF_MESSAGE_TYPE_CUSTOM_CONTROLLER_DATA_RECEIVE = 0x302,
+        // REF_MESSAGE_TYPE_SMALL_MAP_INTERACTION = 0x303,
+        // REF_MESSAGE_TYPE_VTM_INPUT_DATA = 0x304,
+        // REF_MESSAGE_TYPE_RADAR_MINIMAP = 0x305,
+        // REF_MESSAGE_TYPE_CUSTOM_CONTROLLER_DATA_SEND = 0x306,
+        // REF_MESSAGE_TYPE_SENTRY_SMALL_MAP = 0x307,
+        // REF_MESSAGE_TYPE_ROBOT_SMALL_MAP = 0x308,
+        // REF_MESSAGE_TYPE_ROBOT_CUSTOM_CONTROLLER_FEEDBACK = 0x309
         // REF_MESSAGE_TYPE_CUSTOM_CONTROLLER_DATA_RECEIVE = 0x302,
         // REF_MESSAGE_TYPE_SMALL_MAP_INTERACTION = 0x303,
         // REF_MESSAGE_TYPE_VTM_INPUT_DATA = 0x304,
@@ -162,6 +184,9 @@ public:
      * Used by `RefSerialTransmitter`. Attempts to acquire transmission semaphore.
      *
      * @note should be called only using RF_WAIT_UNTIL to block until acquiring semaphore.
+     * Used by `RefSerialTransmitter`. Attempts to acquire transmission semaphore.
+     *
+     * @note should be called only using RF_WAIT_UNTIL to block until acquiring semaphore.
      */
     mockable bool acquireTransmissionSemaphore()
     {
@@ -171,12 +196,20 @@ public:
         }
         return false;
     }
+    mockable bool acquireTransmissionSemaphore()
+    {
+        if (transmissionDelayTimer.isExpired() || transmissionDelayTimer.isStopped())
+        {
+            return transmissionSemaphore.acquire();
+        }
+        return false;
+    }
 
-    mockable void releaseTransmissionSemaphore(uint32_t sentMsgLen)
+    mockable void releaseTransmissionSemaphore()
     {
         transmissionSemaphore.release();
         transmissionDelayTimer.restart(
-            std::ceil(sentMsgLen * 1000.0f / Tx::MAX_TRANSMIT_SPEED_BYTES_PER_S));
+            std::ceil(1.0f / RefSerialData::Tx::ROBOT_INTERACTION_DATA_RATE * 1000.0f));
     }
 
     /**
@@ -194,6 +227,15 @@ public:
         return heat != 0xffff && heatLimit != 0xffff && heatLimit != 0;
     }
 
+    /**
+     * @return True if the specified heat and heatLimit values are "valid". These values are valid
+     * if they aren't 0xffff and if the heatLimit is not 0.
+     */
+    static inline bool heatAndLimitValid(uint16_t heat, uint16_t heatLimit)
+    {
+        return heat != 0xffff && heatLimit != 0xffff && heatLimit != 0;
+    }
+
 private:
     Rx::RobotData robotData;
     Rx::GameData gameData;
@@ -201,6 +243,7 @@ private:
     arch::MilliTimeout refSerialOfflineTimeout;
     std::unordered_map<uint16_t, RobotToRobotMessageHandler*> msgIdToRobotToRobotHandlerMap;
     modm::pt::Semaphore transmissionSemaphore;
+    tap::arch::MilliTimeout transmissionDelayTimer;
     tap::arch::MilliTimeout transmissionDelayTimer;
 
     /**
@@ -225,10 +268,18 @@ private:
      */
     bool decodeToProjectileSupplierAction(const ReceivedSerialMessage& message);
     /**
+     * Decodes ref serial message containing projectile supplier information.
+     */
+    bool decodeToProjectileSupplierAction(const ReceivedSerialMessage& message);
+    /**
      * Decodes ref serial message containing warning information (if a robot on your team received a
      * yellow or red card).
      */
     bool decodeToWarningData(const ReceivedSerialMessage& message);
+    /**
+     * Decodes ref serial message containing information about own dart system.
+     */
+    bool decodeToDartInfo(const ReceivedSerialMessage& message);
     /**
      * Decodes ref serial message containing information about own dart system.
      */
@@ -276,6 +327,27 @@ private:
      * Decodes ref serial message containing which RFID buff zones are currently activated.
      */
     bool decodeToRFIDStatus(const ReceivedSerialMessage& message);
+    /**
+     * Decodes ref serial message containing information about the dart station.
+     */
+    bool decodeToDartStation(const ReceivedSerialMessage& message);
+    /**
+     * Decodes ref serial message containing warning information about the ground robot locations.
+     */
+    bool decodeToGroundPositions(const ReceivedSerialMessage& message);
+    /**
+     * Decodes ref serial message containing information about the radar station progress.
+     */
+    bool decodeToRadarProgress(const ReceivedSerialMessage& message);
+    /**
+     * Decodes ref serial message containing information about the sentry's actions.
+     */
+    bool decodeToSentryInfo(const ReceivedSerialMessage& message);
+    /**
+     * Decodes ref serial message containing information about the radar station's actions.
+     */
+    bool decodeToRadarInfo(const ReceivedSerialMessage& message);
+
     /**
      * Decodes ref serial message containing information about the dart station.
      */
