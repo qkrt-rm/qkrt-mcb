@@ -35,7 +35,7 @@ private:
     static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
     
     static constexpr float DEAD_ZONE_ANGLE = 0.01f;
-    static constexpr float DEAD_ZONE_RPM = 0.9f;
+    static constexpr float DEAD_ZONE_RPM = 0.5f;
         
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
 
@@ -44,7 +44,7 @@ public:
 
     void initialize() override;
     void refresh() override;
-    const char* getName() override { return "Turret"; }
+    const char* getName() const override { return "Turret"; }
 
 public:
     /**
@@ -62,8 +62,8 @@ public:
      */
     inline float getElevation() const
     {
-        uint16_t encoderRaw = m_pitchMotor.getEncoderWrapped();
-        return encoderToRad(encoderRaw) - m_pitchHorizontalOffset;
+        auto currentAngle = m_pitchMotor.getEncoder()->getPosition();
+        return (currentAngle - m_pitchHorizontalOffset).getWrappedValue();
     }
 
     /**
@@ -81,8 +81,8 @@ public:
      */
     inline float getAzimuth() const
     {
-        uint16_t encoderRaw = m_yawMotor.getEncoderWrapped();
-        return encoderToRad(encoderRaw) - m_yawForwardOffset;
+        auto currentAngle = m_yawMotor.getEncoder()->getPosition();
+        return (currentAngle - m_yawForwardOffset).getWrappedValue();
     }
 
     /**
@@ -107,7 +107,7 @@ private:
     inline float encoderToRad(uint16_t encoder) const
     {
         static constexpr float INV_ENC_RESOLUTION
-            = 1.0f / static_cast<float>(Motor::ENC_RESOLUTION);
+            = 1.0f / static_cast<float>(tap::motor::DjiMotorEncoder::ENC_RESOLUTION);
 
         return static_cast<float>(encoder) * INV_ENC_RESOLUTION * M_TWOPI;
     }
@@ -120,8 +120,6 @@ private:
         return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
 
-    inline float dpsToRpm(float dps) const { return (dps / 360.0f) * 60.0f; }
-
     Motor m_pitchMotor, m_yawMotor;
     float m_desiredPitchVoltage, m_desiredYawVoltage;
 
@@ -133,8 +131,8 @@ private:
 
     bool m_aimLock;
     float m_sensitivity;
-    uint16_t m_yawForwardOffset;
-    uint16_t m_pitchHorizontalOffset;
+    float m_yawForwardOffset;
+    float m_pitchHorizontalOffset;
 
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
     Drivers* m_drivers;

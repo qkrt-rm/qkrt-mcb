@@ -32,6 +32,7 @@ private:
     HolonomicChassisSubsystem& m_chassis;
     turret::TurretSubsystem& m_turret;
     ControlOperatorInterface& m_operatorInterface;
+    float static constexpr REMOTE_SENSITIVITY = 0.5f;
 };
 
 }  // namespace control::chassis

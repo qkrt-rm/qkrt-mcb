@@ -21,8 +21,8 @@ void HolonomicChassisCommand::execute()
 {       
         m_operatorInterface.pollInputDevices();
 
-        float xInp = m_operatorInterface.getChassisXInput();
-        float yInp = m_operatorInterface.getChassisYInput();
+        float xInp = m_operatorInterface.getChassisXInput() * REMOTE_SENSITIVITY;
+        float yInp = m_operatorInterface.getChassisYInput() * REMOTE_SENSITIVITY;
         float yawAngle = m_turret.getAzimuth();
         
         //compute rotation transformation

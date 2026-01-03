@@ -14,8 +14,8 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_azimuthPid  (4500.0f, 10.0f, 120.0f, MAX_TURRET_MOTOR_VOLTAGE),
 
       m_desiredPitchRpm(0.0f), m_desiredYawRpm(0.0f),
-      m_pitchRpmPid(2.5f, 0.2f, 1.0f, MAX_TURRET_MOTOR_VOLTAGE),
-      m_yawRpmPid  (350.0f, 2.5f, 0.0f, MAX_TURRET_MOTOR_VOLTAGE),
+      m_pitchRpmPid(80.5f, 0.2f, 1.0f, MAX_TURRET_MOTOR_VOLTAGE),
+      m_yawRpmPid  (450.0f, 2.5f, 0.0f, MAX_TURRET_MOTOR_VOLTAGE),
 
       m_aimLock(false),  
       m_sensitivity(1.0f),
@@ -110,22 +110,29 @@ void TurretSubsystem::refresh()
          * - TUNE params PID, Deadzone etc.
          */
         
-        float currentPitchRpm = m_pitchMotor.getShaftRPM();
-        float currentYawRpm = dpsToRpm(m_imu.getGz()) * -1;  
+        float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity() *10.0f;
+        float currentYawRpm = modm::toRadian(m_imu.getGz()) * -1 *10.0f;  
     
         float pitchRpmError = m_desiredPitchRpm - currentPitchRpm;
-        if (std::abs(pitchRpmError) > DEAD_ZONE_RPM)
-        {
-            m_pitchRpmPid.update(pitchRpmError);
-            m_desiredPitchVoltage = m_pitchRpmPid.getValue();
-        }
-    
+        m_pitchRpmPid.update(pitchRpmError);
+        m_desiredPitchVoltage = m_pitchRpmPid.getValue();
+        
         float yawRpmError = m_desiredYawRpm - currentYawRpm;
-        if (std::abs(yawRpmError) > DEAD_ZONE_RPM)
-        {
-            m_yawRpmPid.update(yawRpmError);
-            m_desiredYawVoltage = m_yawRpmPid.getValue();
-        }
+        m_yawRpmPid.update(yawRpmError);
+        m_desiredYawVoltage = m_yawRpmPid.getValue();
+  
+        // //deadzone creates issues when beyblading
+        // if (std::abs(yawRpmError) > DEAD_ZONE_RPM)
+        // {
+        //     m_yawRpmPid.update(yawRpmError);
+        //     m_desiredYawVoltage = m_yawRpmPid.getValue();
+        // }
+        // else
+        // {
+        //     m_desiredYawVoltage = 0.0f;
+        //     m_yawRpmPid.reset();
+        // }
+
     }
 
     m_pitchMotor.setDesiredOutput(m_desiredPitchVoltage);

@@ -115,7 +115,7 @@ static void initializeIo(Drivers *drivers)
     drivers->errorController.init();
     drivers->remote.initialize();
     drivers->bmi088.initialize(IMU_SAMPLE_FREQUENCY, MAHONY_KP, MAHONY_KI);
-    drivers->bmi088.requestRecalibration();
+    drivers->bmi088.requestCalibration();
     //drivers->refSerial.initialize();              //enable when cv comm switched to another port
     drivers->terminalSerial.initialize();
     drivers->schedulerTerminalHandler.init();

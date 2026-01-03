@@ -31,8 +31,9 @@ using Motor = tap::motor::DjiMotor;
 namespace control::agitator
 {
 VelocityAgitatorSubsystem::VelocityAgitatorSubsystem(Drivers& drivers, const agitatorConfig &config)
-    : Subsystem(&drivers), m_drivers(&drivers),
-      m_agitator(&drivers, config.agitatorId, config.canBus, false, "VA")
+    : Subsystem(&drivers), 
+      m_agitator(&drivers, config.agitatorId, config.canBus, false, "VA"),
+      m_drivers(&drivers)
     {
         m_velocityPid.setParameter(config.agitatorVelocityPidConfig);
     }
@@ -64,7 +65,7 @@ float VelocityAgitatorSubsystem::getSetpoint() const {
 
 float VelocityAgitatorSubsystem::getCurrentValue() const {
     
-    return m_agitator.getShaftRPM() / AGITATOR_GEAR_RATIO_M2006 * (M_TWOPI / 60);
+    return m_agitator.getEncoder()->getVelocity() / AGITATOR_GEAR_RATIO_M2006 * (M_TWOPI / 60);
 }
 
 bool VelocityAgitatorSubsystem::calibrateHere() {
@@ -90,7 +91,7 @@ float VelocityAgitatorSubsystem::getCurrentValueIntegral() const {
 
 float VelocityAgitatorSubsystem::getUncalibratedAgitatorAngle() const
 {
-    return (2.0f * M_PI / static_cast<float>(Motor::ENC_RESOLUTION)) *
-           m_agitator.getEncoderUnwrapped() / AGITATOR_GEAR_RATIO_M2006;
+    return (2.0f * M_PI / static_cast<float>(tap::motor::DjiMotorEncoder::ENC_RESOLUTION)) *
+           m_agitator.getEncoder()->getPosition().getUnwrappedValue()/ AGITATOR_GEAR_RATIO_M2006;
 }
 }  // namespace control::agitator
