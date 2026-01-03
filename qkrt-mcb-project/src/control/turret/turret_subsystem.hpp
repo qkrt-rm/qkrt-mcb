@@ -137,6 +137,7 @@ private:
     uint16_t m_pitchHorizontalOffset;
 
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
+    Drivers* m_drivers;
 };
 
 };  // namespace control::turret

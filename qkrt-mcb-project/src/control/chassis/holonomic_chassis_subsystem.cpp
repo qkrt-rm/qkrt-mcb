@@ -12,7 +12,8 @@ HolonomicChassisSubsystem::HolonomicChassisSubsystem(Drivers& drivers, const Cha
           Motor(&drivers, config.leftBackId,   config.canBus, false, "LB"),
           Motor(&drivers, config.rightBackId,  config.canBus, true,  "RB"),
           Motor(&drivers, config.rightFrontId, config.canBus, true,  "RF")
-      })
+      }),
+      m_drivers(&drivers)
 {
     for (auto& controller : m_pidControllers)
     {
@@ -60,9 +61,15 @@ void HolonomicChassisSubsystem::refresh()
     /// @param motor the wheel's motor
     /// @param desiredOutput the wheel's desired output in Rpm
     ///
-    auto runPid = [](Pid& pid, Motor& motor, float desiredOutput) -> void
-    {
-        pid.update(desiredOutput - motor.getShaftRPM());
+    auto runPid = [](Pid& pid, Motor& motor, float desiredOutput, Drivers *m_drivers_lf) -> void
+    { 
+        if (m_drivers_lf->isEmergencyStopActive()) {
+            pid.reset();
+            pid.update(0.0f);
+        }
+        else {
+            pid.update(desiredOutput - motor.getShaftRPM());
+        }
         motor.setDesiredOutput(pid.getValue());
     };
 
@@ -72,7 +79,7 @@ void HolonomicChassisSubsystem::refresh()
 
     for (size_t ii = 0; ii < m_motors.size(); ii++)
     {
-        runPid(m_pidControllers[ii], m_motors[ii], m_desiredOutput[ii]);
+        runPid(m_pidControllers[ii], m_motors[ii], m_desiredOutput[ii],m_drivers);
     }
 }
 

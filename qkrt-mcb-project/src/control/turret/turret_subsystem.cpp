@@ -19,7 +19,8 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
 
       m_aimLock(false),  
       m_sensitivity(1.0f),
-      m_imu(drivers.bmi088)
+      m_imu(drivers.bmi088),
+      m_drivers(&drivers)
 {
     m_pitchHorizontalOffset = encoderToRad(config.pitchHorizontalOffset);
     m_yawForwardOffset = encoderToRad(config.yawForwardOffset);
@@ -118,6 +119,13 @@ void TurretSubsystem::refresh()
             m_yawRpmPid.update(yawRpmError);
             m_desiredYawVoltage = m_yawRpmPid.getValue();
         }
+    }
+
+    if(m_drivers->isEmergencyStopActive()) {
+        m_elevationPid.reset();
+        m_azimuthPid.reset();
+        m_desiredPitchVoltage = 0.0f;
+        m_desiredYawVoltage = 0.0f;
     }
 
     m_pitchMotor.setDesiredOutput(m_desiredPitchVoltage);

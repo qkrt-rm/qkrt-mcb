@@ -70,7 +70,7 @@ private:
 
 
     /**
-     * @brief Agiator subsystem for the sentry robot
+     * @brief Agitator subsystem for the sentry robot
      */
     agitator::VelocityAgitatorSubsystem m_agitator;
     agitator::AgitatorCommand m_agitatorCommand;

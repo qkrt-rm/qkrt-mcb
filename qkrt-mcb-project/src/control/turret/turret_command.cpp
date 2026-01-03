@@ -25,7 +25,6 @@ void TurretCommand::execute()
     volatile communication::TurretData data = m_visionCoprocessor.getTurretData();
     
     m_operatorInterface.pollInputDevices();
-
     if (m_target != nullptr)
     {
         //AIM Command once target is found 

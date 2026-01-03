@@ -29,6 +29,8 @@ public:
     bool getAgitatorInput() const { return m_agitatorInput; };
 
 
+
+
     
 private:
     tap::communication::serial::Remote& m_remote;
