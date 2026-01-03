@@ -39,8 +39,15 @@ void TurretSubsystem::refresh()
      * - Move some params to config 
      * - pitch angle must always be in range [-MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION]
      */
-    
-    if (m_aimLock)      //set to false in contructor
+
+    if(m_drivers->isEmergencyStopActive()) 
+    {
+        m_elevationPid.reset();
+        m_azimuthPid.reset();
+        m_desiredPitchVoltage = 0.0f;
+        m_desiredYawVoltage = 0.0f;
+    }
+    else if (m_aimLock)      //set to false in contructor
     {
         /**
          * AUTO AIM Position Control
@@ -93,7 +100,7 @@ void TurretSubsystem::refresh()
             m_desiredYawVoltage = 0.0f;
         }
     }
-    else
+    else 
     {
         /**
          * Manual Velocity Control
@@ -119,13 +126,6 @@ void TurretSubsystem::refresh()
             m_yawRpmPid.update(yawRpmError);
             m_desiredYawVoltage = m_yawRpmPid.getValue();
         }
-    }
-
-    if(m_drivers->isEmergencyStopActive()) {
-        m_elevationPid.reset();
-        m_azimuthPid.reset();
-        m_desiredPitchVoltage = 0.0f;
-        m_desiredYawVoltage = 0.0f;
     }
 
     m_pitchMotor.setDesiredOutput(m_desiredPitchVoltage);
