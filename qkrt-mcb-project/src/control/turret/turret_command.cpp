@@ -23,9 +23,21 @@ void TurretCommand::initialize()
 void TurretCommand::execute()
 {
     volatile communication::TurretData data = m_visionCoprocessor.getTurretData();
+
+    const float xConst = 0.0f;
+    const float yConst = 0.0f;
+    const float zConst = 0.0f;
+
+    float xPos = data.xPos + xConst;
+    float yPos = data.yPos + yConst;
+    float zPos = data.zPos + zConst;
+
+    float aimAzimuth = std::atan2(zPos, xPos);
+    float groundDist = std::hypot(zPos, xPos);
+    float aimElevation = std::atan2(groundDist,yPos);
     
     m_operatorInterface.pollInputDevices();
-    if (m_target != nullptr)
+    if (true)
     {
         //AIM Command once target is found 
 
@@ -33,9 +45,9 @@ void TurretCommand::execute()
 
         float desiredElevation = 0.0f;
         float desiredAzimuth = 0.0f;
-
+        
         m_turret.setElevation(desiredElevation);
-        m_turret.setAzimuth(desiredAzimuth);
+        m_turret.setAzimuth(aimAzimuth * 4);
     }
     else
     {

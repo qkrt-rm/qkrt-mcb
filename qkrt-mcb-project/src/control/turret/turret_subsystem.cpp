@@ -17,7 +17,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_pitchRpmPid(80.5f, 0.2f, 1.0f, MAX_TURRET_MOTOR_VOLTAGE),
       m_yawRpmPid(350.0f, 2.5f, 0.0f, MAX_TURRET_MOTOR_VOLTAGE),
 
-      m_aimLock(false),  
+      m_aimLock(true),  
       m_sensitivity(1.0f),
       m_imu(drivers.bmi088),
       m_drivers(&drivers),
@@ -52,7 +52,7 @@ void TurretSubsystem::refresh()
         m_desiredPitchVoltage = 0.0f;
         m_desiredYawVoltage = 0.0f;
     }
-    else if (m_aimLock)      //set to false in contructor
+    else if (true)      //set to false in contructor
     {
         /**
          * AUTO AIM Position Control
@@ -80,6 +80,9 @@ void TurretSubsystem::refresh()
         
         float currentElevation = getElevation();
         float currentAzimuth = getAzimuth();
+
+        m_logger.printf("%.3f\n", static_cast<double>(m_desiredAzimuth));
+        m_logger.delay(200);
         
         float elevationError = getOptimalError(m_desiredElevation, currentElevation);
         if (std::abs(elevationError) > DEAD_ZONE_ANGLE)
