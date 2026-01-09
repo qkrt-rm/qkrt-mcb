@@ -13,7 +13,9 @@ HolonomicChassisSubsystem::HolonomicChassisSubsystem(Drivers& drivers, const Cha
           Motor(&drivers, config.rightBackId,  config.canBus, true,  "RB"),
           Motor(&drivers, config.rightFrontId, config.canBus, true,  "RF")
       }),
-      m_drivers(&drivers)
+      m_current_sensor(UNKOWN_WHAT_TO_INITIALIZE_WITH),
+      m_power_limiter(&drivers, m_current_sensor, m_power_limiter_startingEnergyBuffer, m_power_limiter_energyBufferCritThreshold, m_power_limiter_energyBufferLimitThreshold),
+      m_drivers(&drivers),
 {
     for (auto& controller : m_pidControllers)
     {

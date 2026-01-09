@@ -16,6 +16,8 @@
 
 #include <array>
 
+#include "tap/control/chassis/power_limiter.hpp"
+
 namespace control::chassis
 {
 struct ChassisConfig
@@ -81,6 +83,14 @@ private:
     std::array<Pid,   static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_pidControllers;
     std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_motors;
     Drivers* m_drivers;
+    tap::control::chassis::PowerLimiter m_power_limiter;
+    
+    float m_power_limiter_startingEnergyBuffer = 0.0f;
+    float m_power_limiter_energyBufferLimitThreshold = 30.0f;
+    float m_power_limiter_energyBufferCritThreshold = 10.0f;
+
+    tap::communication::sensors::current::CurrentSensorInterface *m_current_sensor;
+
 };
 
 
