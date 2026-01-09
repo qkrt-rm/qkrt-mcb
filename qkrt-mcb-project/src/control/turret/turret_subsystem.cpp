@@ -81,9 +81,6 @@ void TurretSubsystem::refresh()
         float currentElevation = getElevation();
         float currentAzimuth = getAzimuth();
 
-        m_logger.printf("%.3f\n", static_cast<double>(m_desiredAzimuth));
-        m_logger.delay(200);
-        
         float elevationError = getOptimalError(m_desiredElevation, currentElevation);
         if (std::abs(elevationError) > DEAD_ZONE_ANGLE)
         {

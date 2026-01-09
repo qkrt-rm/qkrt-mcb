@@ -21,8 +21,9 @@ namespace communication {
             float y = lastTurretData.yPos;
             float z = lastTurretData.zPos;
 
-            m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
-            m_logger.delay(200);
+            //m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
+            //m_logger.printf("Message Recieved: Y=%.3f\n", static_cast<double>(y));
+            //m_logger.delay(400);
         }
     }
 
