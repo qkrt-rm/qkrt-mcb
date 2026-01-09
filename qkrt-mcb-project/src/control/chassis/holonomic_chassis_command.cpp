@@ -23,7 +23,7 @@ void HolonomicChassisCommand::execute()
 
         float xInp = m_operatorInterface.getChassisXInput() * REMOTE_SENSITIVITY;
         float yInp = m_operatorInterface.getChassisYInput() * REMOTE_SENSITIVITY;
-        float yawAngle = m_turret.getAzimuth();
+        float yawAngle = m_turret.getYaw();
         
         //compute rotation transformation
         float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);

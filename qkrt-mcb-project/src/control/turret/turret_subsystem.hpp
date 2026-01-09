@@ -8,6 +8,7 @@
 #include <tap/algorithms/extended_kalman.hpp>
 #include <tap/algorithms/filter/butterworth.hpp>
 #include <tap/algorithms/filter/discrete_filter.hpp>
+#include <tap/algorithms/smooth_pid.hpp>
 #include "communication/logger/logger.hpp"
 
 
@@ -15,7 +16,7 @@
 
 #include <numbers>
 #include "math/vector.hpp"
-#include "math/filter/pid.hpp"
+// #include "math/filter/pid.hpp"
 
 namespace control::turret
 {
@@ -35,7 +36,7 @@ class TurretSubsystem : public tap::control::Subsystem
 {
 private:
     using Motor = tap::motor::DjiMotor;
-    using Pid = qkrt::Pid<float>;
+    //using Pid = qkrt::Pid<float>;
 
     static constexpr float MAX_TURRET_MOTOR_RPM = 300.0f;
     static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
@@ -45,7 +46,7 @@ private:
         
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
 
-    static constexpr double LPF_SAMPLE_TIME = 0.002;
+    static constexpr float DT = 0.002f;
     static constexpr double LPF_CUTOFF_HZ = 40.0;
 
 public:
@@ -59,9 +60,9 @@ public:
     /**
      * @brief Adjusts the pitch motor to a desired elevation angle
      */
-    inline void setElevation(float desiredElevation)
+    inline void setPitch(float desiredElevation)
     {
-        m_desiredElevation = std::clamp(desiredElevation, -MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION);
+        m_desiredElevation = desiredElevation;
     }
     
     /**
@@ -69,18 +70,18 @@ public:
      * 
      * @return The pitch angle of the turret (elevation).
      */
-    inline float getElevation() const
+    inline float getPitch() const
     {
-        auto currentAngle = m_pitchMotor.getEncoder()->getPosition();
-        return (currentAngle - m_pitchHorizontalOffset).getWrappedValue();
+        auto relativeAngle = m_pitchMotor.getEncoder()->getPosition() - 0.19021f;
+        return (relativeAngle).getWrappedValue();
     }
 
     /**
      * @brief Adjusts the yaw motor to a desired azimuth angle
      */
-    inline void setAzimuth(float desiredAzimuth)
+    inline void setYaw(float desiredAzimuth)
     {   
-        m_desiredAzimuth = desiredAzimuth;
+        m_desiredYaw = desiredAzimuth;
     }
 
     /**
@@ -88,7 +89,7 @@ public:
      * 
      * @return The yaw angle of the turret (azimuth).
      */
-    inline float getAzimuth() const
+    inline float getYaw() const
     {
         auto currentAngle = m_yawMotor.getEncoder()->getPosition();
         return (currentAngle - m_yawForwardOffset).getWrappedValue();
@@ -129,14 +130,38 @@ private:
         return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
 
+    /**
+     * @brief Computes the shortest angular error between two angles.
+     *
+     * This function calculates the smallest difference between a desired angle 
+     * and the current angle, ensuring the result is within the range [-π, π]. 
+     * This prevents issues where an angle error of, for example, 350° would be 
+     * treated as -350° instead of 10°.
+     *
+     * @param desiredAngle The target angle in radians.
+     * @param currentAngle The current angle in radians.
+     * @return The shortest angular difference in radians, constrained to [-π, π].
+     */
+    static constexpr auto getOptimalError = [](float desiredAngle, float currentAngle) -> float
+        {
+            float error = desiredAngle - currentAngle;
+            return std::atan2(std::sin(error), std::cos(error));
+        };
+
     Motor m_pitchMotor, m_yawMotor;
     float m_desiredPitchVoltage, m_desiredYawVoltage;
 
-    float m_desiredElevation, m_desiredAzimuth;
-    Pid m_elevationPid, m_azimuthPid;
+    float m_desiredElevation, m_desiredYaw;
+    // Pid m_pitchPid, m_yawPid;
+
+    tap::algorithms::SmoothPid m_pitchPid;
+    tap::algorithms::SmoothPid m_yawPid;
 
     float m_desiredPitchRpm, m_desiredYawRpm;
-    Pid m_pitchRpmPid, m_yawRpmPid;
+    // Pid m_pitchRpmPid, m_yawRpmPid;
+
+    tap::algorithms::SmoothPid m_pitchRpmPid;
+    tap::algorithms::SmoothPid m_yawRpmPid;
 
     bool m_aimLock;
     float m_sensitivity;

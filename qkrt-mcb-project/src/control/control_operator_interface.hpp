@@ -28,9 +28,7 @@ public:
 
     bool getAgitatorInput() const { return m_agitatorInput; };
 
-
-
-
+    bool isAutoAim () const { return m_autoAimInput; };
     
 private:
     tap::communication::serial::Remote& m_remote;
@@ -50,6 +48,7 @@ private:
     bool m_flywheelInput = false;
     bool m_agitatorInput = false;
 
+    bool m_autoAimInput = false;
 };
 
 }  // control
