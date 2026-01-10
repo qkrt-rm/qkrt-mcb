@@ -131,6 +131,21 @@ void TurretSubsystem::refresh()
         m_yawRpmPid.update(yawRpmError);
         m_desiredYawVoltage = m_yawRpmPid.getValue();
   
+
+        if (drivers->refSerial.getRefSerialReceivingData())
+        {
+            m_logger.printf("REF DATA\n");
+        }
+        else {
+            m_logger.printf("NO DATA\n");
+        }
+        // auto id = drivers->refSerial.getRobotData().robotId;
+        // uint16_t id_num = static_cast<uint16_t>(id);
+        // m_logger.printf("%d",static_cast<int>(id_num));
+
+        m_logger.delay(400);
+
+        
         // //deadzone creates issues when beyblading
         // if (std::abs(yawRpmError) > DEAD_ZONE_RPM)
         // {

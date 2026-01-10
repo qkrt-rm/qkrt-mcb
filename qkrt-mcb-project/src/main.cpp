@@ -116,11 +116,11 @@ static void initializeIo(Drivers *drivers)
     drivers->remote.initialize();
     drivers->bmi088.initialize(IMU_SAMPLE_FREQUENCY, MAHONY_KP, MAHONY_KI);
     drivers->bmi088.requestCalibration();
-    //drivers->refSerial.initialize();              //enable when cv comm switched to another port
+    drivers->refSerial.initialize();              //enable when cv comm switched to another port
     drivers->terminalSerial.initialize();
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();
-    drivers->visionCoprocessor.initialize();
+    //drivers->visionCoprocessor.initialize();
 }
 
 static void updateIo(Drivers *drivers)
@@ -129,9 +129,9 @@ static void updateIo(Drivers *drivers)
     tap::motorsim::SimHandler::updateSims();
 #endif
     drivers->canRxHandler.pollCanData();
-   // drivers->refSerial.updateSerial();
+    drivers->refSerial.updateSerial();
     drivers->remote.read();
     drivers->bmi088.periodicIMUUpdate();
     drivers->bmi088.read();
-    drivers->visionCoprocessor.updateSerial();
+    //drivers->visionCoprocessor.updateSerial();
 }
