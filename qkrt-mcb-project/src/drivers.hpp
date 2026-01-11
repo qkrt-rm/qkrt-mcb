@@ -52,7 +52,7 @@ public:
      * @return true emergency stop is active.
      */
     bool isEmergencyStopActive() {
-        return !remote.isConnected() || remote.getSwitch(tap::communication::serial::Remote::Switch::LEFT_SWITCH) == tap::communication::serial::Remote::SwitchState::DOWN;
+        return !remote.isConnected();
     } 
 };
 
