@@ -3,7 +3,7 @@
 /*****************************************************************************/
 
 /*
- * Copyright (c) 2022 Advanced Robotics at the University of Washington <robomstr@uw.edu>
+ * Copyright (c) 2022-2023 Advanced Robotics at the University of Washington <robomstr@uw.edu>
  *
  * This file is part of Taproot.
  *
@@ -21,28 +21,14 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TAPROOT_ODOMETRY_2D_INTERFACE_MOCK_HPP_
-#define TAPROOT_ODOMETRY_2D_INTERFACE_MOCK_HPP_
+#include "vector.hpp"
 
-#include <gmock/gmock.h>
+#include "position.hpp"
 
-#include "tap/algorithms/odometry/odometry_2d_interface.hpp"
-
-namespace tap::mock
+namespace tap::algorithms::transforms
 {
-class Odometry2DInterfaceMock : public algorithms::odometry::Odometry2DInterface
+inline Vector Vector::operator+(const Position& other) const
 {
-public:
-    MOCK_METHOD(modm::Location2D<float>, getCurrentLocation2D, (), (const override));
-    MOCK_METHOD(modm::Vector2f, getCurrentVelocity2D, (), (const override));
-    MOCK_METHOD(uint32_t, getLastComputedOdometryTime, (), (const override));
-    MOCK_METHOD(float, getYaw, (), (const override));
-    MOCK_METHOD(
-        void,
-        overrideOdometryPosition,
-        (const float positionX, const float positionY),
-        (override));
-};
-}  // namespace tap::mock
-
-#endif  // TAPROOT_ODOMETRY_2D_INTERFACE_MOCK_HPP_
+    return Vector(this->coordinates_ + other.coordinates());
+}
+}  // namespace tap::algorithms::transforms
