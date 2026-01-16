@@ -4,7 +4,7 @@
 #include <tap/communication/serial/uart.hpp>
 #include <tap/architecture/timeout.hpp>
 
-#include "aim_message.hpp"
+#include "jetson_message.hpp"
 #include "communication/logger/logger.hpp"
 
 class Drivers;
@@ -23,8 +23,14 @@ namespace communication
 
             void initialize();
 
+            bool decodeTurretData(const ReceivedSerialMessage& completeMessage);
+
+            bool decodeNavData(const ReceivedSerialMessage& completeMessage);
+
             const TurretData& getTurretData() const;
-            
+
+            const NavData& getNavData() const;
+
             bool isOnline() const;  
 
 
@@ -40,6 +46,8 @@ namespace communication
             logger::Logger& m_logger;         //member that references logger object
 
             TurretData lastTurretData;          //struct with turret data from jetson
+
+            NavData lastNavData;
 
     };
 }

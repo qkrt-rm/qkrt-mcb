@@ -13,17 +13,20 @@ namespace communication {
         //TODO: Switchcase based on message type, seperate decode func
         offlineTimeout.restart(OFFLINE_TIMEOUT_MS);
 
-        if (completeMessage.header.dataLength == sizeof(lastTurretData))
+        switch (completeMessage.messageType)
         {
-            memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
-
-            float x = lastTurretData.xPos;
-            float y = lastTurretData.yPos;
-            float z = lastTurretData.zPos;
-
-            m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(x), static_cast<double>(y), static_cast<double>(z));
-            m_logger.delay(200);
+        case JETSON_MESSAGE_TYPE_AIM:
+            decodeTurretData(completeMessage);
+            break;
+        
+        case JETSON_MESSAGE_TYPE_NAV:
+            
+            break;
+            
+        default:
+            break;
         }
+
     }
 
     void VisionCoprocessor::initialize()
@@ -33,6 +36,36 @@ namespace communication {
 
     bool VisionCoprocessor::isOnline() const { return !offlineTimeout.isExpired(); }
 
+    bool VisionCoprocessor::decodeTurretData(const ReceivedSerialMessage& completeMessage)
+    {
+        if (completeMessage.header.dataLength == sizeof(lastTurretData))
+        {
+            memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
+
+            m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(lastTurretData.xPos), static_cast<double>(lastTurretData.yPos), static_cast<double>(lastTurretData.zPos));
+            m_logger.delay(200);
+
+            return true;
+        }
+        return false;
+    }
+
+    bool VisionCoprocessor::decodeNavData(const ReceivedSerialMessage& completeMessage)
+    {
+        if (completeMessage.header.dataLength == sizeof(lastNavData))
+        {
+            memcpy(&lastNavData, &completeMessage.data, sizeof(lastNavData));
+
+            m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(lastNavData.xVel), static_cast<double>(lastNavData.yVel), static_cast<double>(lastNavData.wVel));
+            m_logger.delay(200);
+
+            return true;
+        }
+        return false;
+    }
+
     const TurretData& VisionCoprocessor::getTurretData() const { return lastTurretData; }
+
+    const NavData& VisionCoprocessor::getNavData() const { return lastNavData; }
     
 }
