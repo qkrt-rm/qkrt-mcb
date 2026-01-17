@@ -81,6 +81,12 @@ bool VelocityAgitatorSubsystem::calibrateHere() {
     }
 }
 
+void VelocityAgitatorSubsystem::clearJam() {
+    // No jam functionality for this subsystem
+
+    
+}
+
 bool VelocityAgitatorSubsystem::isOnline() {
     return m_agitator.isMotorOnline();
 }
