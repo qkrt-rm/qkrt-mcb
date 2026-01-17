@@ -31,6 +31,10 @@ namespace communication
 
             const NavData& getNavData() const;
 
+            void sendData();
+
+            void sendOdomData();
+
             bool isOnline() const;  
 
 
@@ -48,6 +52,8 @@ namespace communication
             TurretData lastTurretData;          //struct with turret data from jetson
 
             NavData lastNavData;
+
+            tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
 
     };
 }

@@ -95,7 +95,7 @@ int main()
         PROFILE(drivers->profiler, updateIo, (drivers));
         if (sendMotorTimeout.execute())
         {
-            PROFILE(drivers->profiler, drivers->bmi088.periodicIMUUpdate, ());
+            PROFILE(drivers->profiler, updateImu, (drivers));
             PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
             PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
             PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
@@ -131,7 +131,12 @@ static void updateIo(Drivers *drivers)
     drivers->canRxHandler.pollCanData();
    // drivers->refSerial.updateSerial();
     drivers->remote.read();
+    drivers->visionCoprocessor.updateSerial();
+    drivers->visionCoprocessor.sendData();
+}
+
+static void updateImu(Drivers *drivers)
+{
     drivers->bmi088.periodicIMUUpdate();
     drivers->bmi088.read();
-    drivers->visionCoprocessor.updateSerial();
 }

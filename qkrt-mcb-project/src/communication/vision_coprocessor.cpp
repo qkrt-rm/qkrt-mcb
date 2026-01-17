@@ -6,7 +6,8 @@ namespace communication {
 
     VisionCoprocessor::VisionCoprocessor(Drivers* drivers)
     : DJISerial(drivers, VISION_COPROCESSOR_UART_PORT)
-    , m_logger(drivers->logger) {}
+    , m_logger(drivers->logger)
+    , m_imu(drivers->bmi088) {}
 
     void VisionCoprocessor::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
     {
@@ -20,7 +21,7 @@ namespace communication {
             break;
         
         case JETSON_MESSAGE_TYPE_NAV:
-            
+            decodeNavData(completeMessage);
             break;
             
         default:
@@ -67,5 +68,29 @@ namespace communication {
     const TurretData& VisionCoprocessor::getTurretData() const { return lastTurretData; }
 
     const NavData& VisionCoprocessor::getNavData() const { return lastNavData; }
+
+    void VisionCoprocessor::sendData()
+    {
+        sendOdomData();
+    }
+
+    void VisionCoprocessor::sendOdomData()
+    {
+        DJISerial::SerialMessage<sizeof(ImuData)>message;
+        message.messageType = MCB_MESSAGE_TYPE_ODOM;
+
+        ImuData* data = reinterpret_cast<ImuData*>(message.data);
+        data->xAcl = m_imu.getAx();
+        data->yAcl = m_imu.getAy();
+        data->zGyro = m_imu.getGz();
+
+        m_logger.printf("Sent xAcl = %.3f", static_cast<double>(data->xAcl));
+        m_logger.delay(100);
+
+        message.setCRC16();
+        drivers->uart.write(VISION_COPROCESSOR_UART_PORT, reinterpret_cast<uint8_t*>(&message), sizeof(message));
+    }
     
+    //TOD0: SEND COLOUR DATA
+
 }
