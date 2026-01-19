@@ -5,17 +5,17 @@ namespace control::turret
 
 TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
     : tap::control::Subsystem(&drivers),
-      m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
-      m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW"),
+      m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH", config.isCurrentControl),
+      m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW", config.isCurrentControl),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
 
       m_desiredElevation(0.0f), m_desiredAzimuth(0.0f),
-      m_elevationPid(4500.0f, 10.0f, 90.0f, MAX_TURRET_MOTOR_VOLTAGE),
-      m_azimuthPid  (4500.0f, 10.0f, 120.0f, MAX_TURRET_MOTOR_VOLTAGE),
+      m_elevationPid(4500.0f, 10.0f, 90.0f, MAX_GM6020_CURRENT),
+      m_azimuthPid  (4500.0f, 10.0f, 120.0f, MAX_GM6020_CURRENT),
 
       m_desiredPitchRpm(0.0f), m_desiredYawRpm(0.0f),
-      m_pitchRpmPid(80.5f, 0.2f, 1.0f, MAX_TURRET_MOTOR_VOLTAGE),
-      m_yawRpmPid(350.0f, 2.5f, 0.0f, MAX_TURRET_MOTOR_VOLTAGE),
+      m_pitchRpmPid(30.5f, 0.2f, 0.0f, MAX_GM6020_CURRENT),
+      m_yawRpmPid(350.0f, 2.5f, 0.0f, MAX_GM6020_CURRENT),
 
       m_aimLock(false),  
       m_sensitivity(1.0f),
