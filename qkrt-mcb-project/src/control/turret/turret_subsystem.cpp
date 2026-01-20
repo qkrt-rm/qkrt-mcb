@@ -14,7 +14,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_azimuthPid  (4500.0f, 10.0f, 120.0f, MAX_GM6020_CURRENT),
 
       m_desiredPitchRpm(0.0f), m_desiredYawRpm(0.0f),
-      m_pitchRpmPid(30.5f, 0.2f, 0.0f, MAX_GM6020_CURRENT),
+      m_pitchRpmPid(30.5f, 0.0f, 0.0f, MAX_GM6020_CURRENT),
       m_yawRpmPid(350.0f, 2.5f, 0.0f, MAX_GM6020_CURRENT),
 
       m_aimLock(false),  
@@ -122,8 +122,12 @@ void TurretSubsystem::refresh()
         float lpfImu = m_ImuLpf.filterData(rawImu);
 
         float currentYawRpm = lpfImu * -1 * 9.55f;  
+
+        float filtered_rps = m_ImuLpf.filterData(currentPitchRpm);
     
-        float pitchRpmError = m_desiredPitchRpm - currentPitchRpm;
+        float pitchRpmError = m_desiredPitchRpm - filtered_rps;
+
+
         m_pitchRpmPid.update(pitchRpmError);
         m_desiredPitchVoltage = m_pitchRpmPid.getValue();
         
