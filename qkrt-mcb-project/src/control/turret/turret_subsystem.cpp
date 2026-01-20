@@ -10,12 +10,38 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
 
       m_desiredElevation(0.0f), m_desiredAzimuth(0.0f),
-      m_elevationPid(4500.0f, 10.0f, 90.0f, MAX_TURRET_MOTOR_VOLTAGE),
-      m_azimuthPid  (4500.0f, 10.0f, 120.0f, MAX_TURRET_MOTOR_VOLTAGE),
+
+      m_elevationPid({
+          .kp = 6000.0f,
+          .ki = 0.0f,
+          .kd = 200.0f,
+          .maxICumulative = MAX_TURRET_MOTOR_VOLTAGE,
+          .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
+      }),
+      m_azimuthPid({
+          .kp = 6000.0f,
+          .ki = 0.0f,
+          .kd = 200.0f,
+          .maxICumulative = MAX_TURRET_MOTOR_VOLTAGE,
+          .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
+      }),
 
       m_desiredPitchRpm(0.0f), m_desiredYawRpm(0.0f),
-      m_pitchRpmPid(80.5f, 0.2f, 1.0f, MAX_TURRET_MOTOR_VOLTAGE),
-      m_yawRpmPid(350.0f, 2.5f, 0.0f, MAX_TURRET_MOTOR_VOLTAGE),
+
+      m_pitchRpmPid({
+          .kp = 80.5f,
+          .ki = 100.0f,
+          .kd = 0.002f,
+          .maxICumulative = MAX_TURRET_MOTOR_VOLTAGE,
+          .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
+      }),
+      m_yawRpmPid({
+          .kp = 350.0f,
+          .ki = 1250.0f,
+          .kd = 0.0f,
+          .maxICumulative = MAX_TURRET_MOTOR_VOLTAGE,
+          .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
+      }),
 
       m_aimLock(true),  
       m_sensitivity(1.0f),
@@ -80,24 +106,34 @@ void TurretSubsystem::refresh()
         
         float currentElevation = getElevation();
         float currentAzimuth = getAzimuth();
+        
+        float dt = LPF_SAMPLE_TIME;
 
         float elevationError = getOptimalError(m_desiredElevation, currentElevation);
-        if (std::abs(elevationError) > DEAD_ZONE_ANGLE)
+        //if (std::abs(elevationError) > DEAD_ZONE_ANGLE)
         {
-            m_elevationPid.update(elevationError);
-            m_desiredPitchVoltage = m_elevationPid.getValue();
+            // m_elevationPid.update(elevationError);
+            // m_desiredPitchVoltage = m_elevationPid.getValue();
+            
+            // runControllerDerivateError calculates the derivative using (error - prev) / dt
+            m_logger.printf("Elevation Error: %.4f | DESIRED %.3f | MEASURE: %.3f \n", static_cast<double>(elevationError), static_cast<double>(m_desiredElevation), static_cast<double>(currentElevation));
+            m_logger.delay(100);
+            m_desiredPitchVoltage = m_elevationPid.runControllerDerivateError(elevationError, dt);
         }
-        else
+        //else
         {
-            m_elevationPid.reset();
-            m_desiredPitchVoltage = 0.0f;
+           // m_elevationPid.reset();
+           // m_desiredPitchVoltage = 0.0f;
         }
         
         float azimuthError = getOptimalError(m_desiredAzimuth, currentAzimuth);
         if (std::abs(azimuthError) > DEAD_ZONE_ANGLE)
         {
-            m_azimuthPid.update(azimuthError);
-            m_desiredYawVoltage = m_azimuthPid.getValue();
+            // m_azimuthPid.update(azimuthError);
+            // m_desiredYawVoltage = m_azimuthPid.getValue();
+            
+
+            m_desiredYawVoltage = m_azimuthPid.runControllerDerivateError(azimuthError, dt);
         }
         else
         {
@@ -116,20 +152,20 @@ void TurretSubsystem::refresh()
          * - CONVERT To Using rad/s not rev/min
          */
         
-        float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity() * 9.55f;  //TODO:REMOVE scaling to use rps
+        // float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity() * 9.55f;  //TODO:REMOVE scaling to use rps
 
-        float rawImu = m_imu.getGz();
-        float lpfImu = m_ImuLpf.filterData(rawImu);
+        // float rawImu = m_imu.getGz();
+        // float lpfImu = m_ImuLpf.filterData(rawImu);
 
-        float currentYawRpm = lpfImu * -1 * 9.55f;  
+        // float currentYawRpm = lpfImu * -1 * 9.55f;  
     
-        float pitchRpmError = m_desiredPitchRpm - currentPitchRpm;
-        m_pitchRpmPid.update(pitchRpmError);
-        m_desiredPitchVoltage = m_pitchRpmPid.getValue();
+        // float pitchRpmError = m_desiredPitchRpm - currentPitchRpm;
+        // m_pitchRpmPid.update(pitchRpmError);
+        // m_desiredPitchVoltage = m_pitchRpmPid.getValue();
         
-        float yawRpmError = m_desiredYawRpm - currentYawRpm;
-        m_yawRpmPid.update(yawRpmError);
-        m_desiredYawVoltage = m_yawRpmPid.getValue();
+        // float yawRpmError = m_desiredYawRpm - currentYawRpm;
+        // m_yawRpmPid.update(yawRpmError);
+        // m_desiredYawVoltage = m_yawRpmPid.getValue();
   
         // //deadzone creates issues when beyblading
         // if (std::abs(yawRpmError) > DEAD_ZONE_RPM)

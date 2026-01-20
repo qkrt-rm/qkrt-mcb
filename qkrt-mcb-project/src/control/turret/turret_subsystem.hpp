@@ -8,6 +8,7 @@
 #include <tap/algorithms/extended_kalman.hpp>
 #include <tap/algorithms/filter/butterworth.hpp>
 #include <tap/algorithms/filter/discrete_filter.hpp>
+#include <tap/algorithms/smooth_pid.hpp>
 #include "communication/logger/logger.hpp"
 
 
@@ -15,7 +16,7 @@
 
 #include <numbers>
 #include "math/vector.hpp"
-#include "math/filter/pid.hpp"
+// #include "math/filter/pid.hpp"
 
 namespace control::turret
 {
@@ -35,7 +36,7 @@ class TurretSubsystem : public tap::control::Subsystem
 {
 private:
     using Motor = tap::motor::DjiMotor;
-    using Pid = qkrt::Pid<float>;
+    // using Pid = qkrt::Pid<float>;
 
     static constexpr float MAX_TURRET_MOTOR_RPM = 300.0f;
     static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
@@ -45,7 +46,7 @@ private:
         
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
 
-    static constexpr double LPF_SAMPLE_TIME = 0.002;
+    static constexpr float LPF_SAMPLE_TIME = 0.002f;
     static constexpr double LPF_CUTOFF_HZ = 40.0;
 
 public:
@@ -133,10 +134,16 @@ private:
     float m_desiredPitchVoltage, m_desiredYawVoltage;
 
     float m_desiredElevation, m_desiredAzimuth;
-    Pid m_elevationPid, m_azimuthPid;
+    // Pid m_elevationPid, m_azimuthPid;
+
+    tap::algorithms::SmoothPid m_elevationPid;
+    tap::algorithms::SmoothPid m_azimuthPid;
 
     float m_desiredPitchRpm, m_desiredYawRpm;
-    Pid m_pitchRpmPid, m_yawRpmPid;
+    // Pid m_pitchRpmPid, m_yawRpmPid;
+
+    tap::algorithms::SmoothPid m_pitchRpmPid;
+    tap::algorithms::SmoothPid m_yawRpmPid;
 
     bool m_aimLock;
     float m_sensitivity;
