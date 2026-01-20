@@ -33,9 +33,9 @@ void TurretCommand::execute()
     float zPos = data.zPos + zConst;
 
     float aimAzimuth = std::atan2(yPos, xPos);
-    float groundDist = std::hypot(zPos, xPos);   //FIX
-    float aimElevation = std::atan2(groundDist,yPos); //FIX
-    
+    float groundDist = std::hypot(yPos, xPos);
+    float aimElevation = std::atan2(groundDist, zPos); 
+
     m_operatorInterface.pollInputDevices();
     if (true)
     {
@@ -46,10 +46,10 @@ void TurretCommand::execute()
         float desiredElevation = 0.0f;
         float desiredAzimuth = 0.0f;
 
-        m_logger.printf("Angle: %.3f | X= %.3f | Y=%.3f\n", static_cast<double>(aimAzimuth * 180.0 / M_PI), static_cast<double>(xPos), static_cast<double>(zPos));
+        m_logger.printf("Angle: %.3f | X= %.3f | Y=%.3f\n", static_cast<double>(aimElevation * 180.0 / M_PI), static_cast<double>(groundDist), static_cast<double>(zPos));
         m_logger.delay(400);
 
-        m_turret.setElevation(desiredElevation);
+        m_turret.setElevation(aimElevation);
         m_turret.setAzimuth(aimAzimuth * -1);
     }
     else

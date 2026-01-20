@@ -61,7 +61,7 @@ public:
      */
     inline void setElevation(float desiredElevation)
     {
-        m_desiredElevation = std::clamp(desiredElevation, -MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION);
+        m_desiredElevation = desiredElevation;
     }
     
     /**
