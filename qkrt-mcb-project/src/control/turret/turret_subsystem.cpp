@@ -12,34 +12,34 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_desiredElevation(0.0f), m_desiredAzimuth(0.0f),
 
       m_elevationPid({
-          .kp = 6000.0f,
-          .ki = 0.0f,
-          .kd = 200.0f,
-          .maxICumulative = MAX_TURRET_MOTOR_VOLTAGE,
+          .kp = 4000.0f,
+          .ki = 100.0f,
+          .kd = 0.0f,
+          .maxICumulative = 500.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
       m_azimuthPid({
-          .kp = 6000.0f,
-          .ki = 0.0f,
-          .kd = 200.0f,
-          .maxICumulative = MAX_TURRET_MOTOR_VOLTAGE,
+          .kp = 4000.0f,
+          .ki = 200.0f,
+          .kd = 0.0f,
+          .maxICumulative = 5000.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
 
       m_desiredPitchRpm(0.0f), m_desiredYawRpm(0.0f),
 
       m_pitchRpmPid({
-          .kp = 80.5f,
-          .ki = 100.0f,
-          .kd = 0.002f,
-          .maxICumulative = MAX_TURRET_MOTOR_VOLTAGE,
+          .kp = 400.5f,
+          .ki = 80.0f,
+          .kd = 0.0f,
+          .maxICumulative = 5000.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
       m_yawRpmPid({
-          .kp = 350.0f,
-          .ki = 1250.0f,
+          .kp = 1000.0f,
+          .ki = 0.0f,
           .kd = 0.0f,
-          .maxICumulative = MAX_TURRET_MOTOR_VOLTAGE,
+          .maxICumulative = 5000.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
 
@@ -50,7 +50,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_ImuKalman(0.0f,1.0f),
       m_ImuLpf(tap::algorithms::filter::butterworth<2, tap::algorithms::filter::LOWPASS>(
         LPF_CUTOFF_HZ * 2.0 * std::numbers::pi,
-        LPF_SAMPLE_TIME)),
+        DT)),
       m_logger(drivers.logger)
 {
     m_pitchHorizontalOffset = encoderToRad(config.pitchHorizontalOffset);
@@ -101,45 +101,26 @@ void TurretSubsystem::refresh()
         auto getOptimalError = [](float desiredAngle, float currentAngle) -> float
             {
                 float error = desiredAngle - currentAngle;
-                return std::atan2(std::sin(error), std::cos(error));;
+                return std::atan2(std::sin(error), std::cos(error));
             };
         
         float currentElevation = getElevation();
         float currentAzimuth = getAzimuth();
         
-        float dt = LPF_SAMPLE_TIME;
-
         float elevationError = getOptimalError(m_desiredElevation, currentElevation);
-        //if (std::abs(elevationError) > DEAD_ZONE_ANGLE)
-        {
-            // m_elevationPid.update(elevationError);
-            // m_desiredPitchVoltage = m_elevationPid.getValue();
-            
-            // runControllerDerivateError calculates the derivative using (error - prev) / dt
-            m_logger.printf("Elevation Error: %.4f | DESIRED %.3f | MEASURE: %.3f \n", static_cast<double>(elevationError), static_cast<double>(m_desiredElevation), static_cast<double>(currentElevation));
-            m_logger.delay(100);
-            m_desiredPitchVoltage = m_elevationPid.runControllerDerivateError(elevationError, dt);
-        }
-        //else
-        {
-           // m_elevationPid.reset();
-           // m_desiredPitchVoltage = 0.0f;
-        }
+
+        // runControllerDerivateError calculates the derivative using (error - prev) / dt
+        // m_logger.printf("Elevation Error: %.4f | DESIRED %.3f | MEASURE: %.3f \n", static_cast<double>(elevationError), static_cast<double>(m_desiredElevation), static_cast<double>(currentElevation));
+        // m_logger.delay(100);
+
+        m_desiredPitchVoltage = m_elevationPid.runControllerDerivateError(elevationError, DT);
         
         float azimuthError = getOptimalError(m_desiredAzimuth, currentAzimuth);
-        if (std::abs(azimuthError) > DEAD_ZONE_ANGLE)
-        {
-            // m_azimuthPid.update(azimuthError);
-            // m_desiredYawVoltage = m_azimuthPid.getValue();
-            
+        
+        m_logger.printf("Elevation Error: %.4f | DESIRED %.3f | MEASURE: %.3f \n", static_cast<double>(azimuthError), static_cast<double>(m_desiredAzimuth), static_cast<double>(currentAzimuth));
+        m_logger.delay(400);
 
-            m_desiredYawVoltage = m_azimuthPid.runControllerDerivateError(azimuthError, dt);
-        }
-        else
-        {
-            m_azimuthPid.reset();
-            m_desiredYawVoltage = 0.0f;
-        }
+        m_desiredYawVoltage = m_azimuthPid.runControllerDerivateError(azimuthError, DT);
     }
     else 
     {
@@ -152,36 +133,24 @@ void TurretSubsystem::refresh()
          * - CONVERT To Using rad/s not rev/min
          */
         
-        // float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity() * 9.55f;  //TODO:REMOVE scaling to use rps
+        float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity() * 9.55f;  //TODO:REMOVE scaling to use rps
 
-        // float rawImu = m_imu.getGz();
-        // float lpfImu = m_ImuLpf.filterData(rawImu);
+        float rawImu = m_imu.getGz();
+        float lpfImu = m_ImuLpf.filterData(rawImu);
 
-        // float currentYawRpm = lpfImu * -1 * 9.55f;  
+        float currentYawRpm = lpfImu * -1 * 9.55f;  
     
-        // float pitchRpmError = m_desiredPitchRpm - currentPitchRpm;
-        // m_pitchRpmPid.update(pitchRpmError);
-        // m_desiredPitchVoltage = m_pitchRpmPid.getValue();
+        float pitchRpmError = m_desiredPitchRpm - currentPitchRpm;
+        m_pitchRpmPid.runController(pitchRpmError, currentPitchRpm, DT);
+        m_desiredPitchVoltage = m_pitchRpmPid.getOutput();
         
-        // float yawRpmError = m_desiredYawRpm - currentYawRpm;
-        // m_yawRpmPid.update(yawRpmError);
-        // m_desiredYawVoltage = m_yawRpmPid.getValue();
-  
-        // //deadzone creates issues when beyblading
-        // if (std::abs(yawRpmError) > DEAD_ZONE_RPM)
-        // {
-        //     m_yawRpmPid.update(yawRpmError);
-        //     m_desiredYawVoltage = m_yawRpmPid.getValue();
-        // }
-        // else
-        // {
-        //     m_desiredYawVoltage = 0.0f;
-        //     m_yawRpmPid.reset();
-        // }
+        float yawRpmError = m_desiredYawRpm - currentYawRpm;
+        m_yawRpmPid.runController(yawRpmError, currentYawRpm, DT);
+        m_desiredYawVoltage = m_yawRpmPid.getOutput();
 
+        m_logger.printf("Elevation Error: %.4f | DESIRED %.3f | MEASURE: %.3f \n", static_cast<double>(yawRpmError), static_cast<double>(m_desiredYawRpm), static_cast<double>(currentYawRpm));
+        m_logger.delay(400);
     }
-
-
 
 
     m_pitchMotor.setDesiredOutput(m_desiredPitchVoltage);

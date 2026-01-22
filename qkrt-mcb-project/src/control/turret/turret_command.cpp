@@ -32,6 +32,8 @@ void TurretCommand::execute()
     float yPos = data.yPos + yConst;
     float zPos = data.zPos + zConst;
 
+    //TODO: Why negative Y so small from husky
+
     float aimAzimuth = std::atan2(yPos, xPos);
     float groundDist = std::hypot(yPos, xPos);
     float aimElevation = std::atan2(groundDist, zPos); 
@@ -46,14 +48,11 @@ void TurretCommand::execute()
         float desiredElevation = 0.0f;
         float desiredAzimuth = 0.0f;
 
-       // m_logger.printf("X= %.3f | Y= %.3f | Z=%.3f\n", static_cast<double>(xPos), static_cast<double>(yPos), static_cast<double>(zPos));
-       // m_logger.delay(400);
-        if(xPos == 0.0f){
-            m_turret.setElevation(0.0f);
-        } else {
-            m_turret.setElevation(1.6f + aimElevation * -1.25f); 
-        }
-        
+        m_logger.printf("PITCH= %.3f | YAW= %.3f \n", static_cast<double>(aimElevation), static_cast<double>(aimAzimuth));
+        m_logger.delay(400);
+    
+        m_turret.setElevation(1.6f + aimElevation * -1.0f); 
+     
         // m_turret.setElevation(0.0f);
         m_turret.setAzimuth(aimAzimuth * -1);
     }

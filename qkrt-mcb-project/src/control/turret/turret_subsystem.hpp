@@ -36,7 +36,7 @@ class TurretSubsystem : public tap::control::Subsystem
 {
 private:
     using Motor = tap::motor::DjiMotor;
-    // using Pid = qkrt::Pid<float>;
+    //using Pid = qkrt::Pid<float>;
 
     static constexpr float MAX_TURRET_MOTOR_RPM = 300.0f;
     static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
@@ -46,7 +46,7 @@ private:
         
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
 
-    static constexpr float LPF_SAMPLE_TIME = 0.002f;
+    static constexpr float DT = 0.002f;
     static constexpr double LPF_CUTOFF_HZ = 40.0;
 
 public:
