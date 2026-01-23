@@ -38,6 +38,8 @@ private:
 
     float m_pitchSensitivity, m_yawSensitivity;
 
+    float m_targetYaw;
+
     // TODO: change to some target data structure when it exists
     void* m_target;
 };

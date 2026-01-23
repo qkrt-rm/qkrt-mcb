@@ -10,6 +10,7 @@ TurretCommand::TurretCommand(Drivers & drivers, TurretSubsystem& turret,
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
       m_pitchSensitivity(1.0f), m_yawSensitivity(1.0f),
+      m_targetYaw(0.0f),
       m_target(nullptr)
 {
     addSubsystemRequirement(&turret);
@@ -45,16 +46,26 @@ void TurretCommand::execute()
 
         m_turret.lock();
 
-        float desiredElevation = 0.0f;
-        float desiredAzimuth = 0.0f;
+        float currentAzimuth = m_turret.getAzimuth();
+        float currentElevation = m_turret.getElevation();
 
-        m_logger.printf("PITCH= %.3f | YAW= %.3f \n", static_cast<double>(aimElevation), static_cast<double>(aimAzimuth));
+        // m_logger.printf("CurrentYaw= %.3f | ExpectedYaw= %.3f \n", static_cast<double>(currentAzimuth), static_cast<double>(aimAzimuth));
+        // m_logger.printf("Target Data: X= %.3f | Y= %.3f | Z= %.3f \n", static_cast<double>(xPos), static_cast<double>(yPos), static_cast<double>(zPos));
+        
+        if(xPos == 0.0f){
+             m_turret.setElevation(0.0f);
+        } else {
+            m_turret.setElevation(1.6f + aimElevation * -1.0f);
+        }
+        if(currentAzimuth > 3.14159f){
+            m_turret.setAzimuth((currentAzimuth - 6.28318f) + aimAzimuth * -1.0f);
+            m_logger.printf("yaw= %.3f, currentYaw = %.3f \n", static_cast<double>((currentAzimuth - 6.28318f) + aimAzimuth * -1.0f), static_cast<double>(aimAzimuth));
+        } else {
+            m_turret.setAzimuth(currentAzimuth + aimAzimuth * -1.0f);
+            m_logger.printf("yaw= %.3f, currentYaw = %.3f \n", static_cast<double>(currentAzimuth + aimAzimuth * -1.0f), static_cast<double>(aimAzimuth));
+        }
         m_logger.delay(400);
-    
-        m_turret.setElevation(1.6f + aimElevation * -1.0f); 
-     
-        // m_turret.setElevation(0.0f);
-        m_turret.setAzimuth(aimAzimuth * -1);
+        
     }
     else
     {

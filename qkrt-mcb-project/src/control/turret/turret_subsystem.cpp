@@ -13,15 +13,15 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
 
       m_elevationPid({
           .kp = 4000.0f,
-          .ki = 100.0f,
+          .ki = 200.0f,
           .kd = 0.0f,
           .maxICumulative = 500.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
       m_azimuthPid({
-          .kp = 4000.0f,
+          .kp = 3000.0f,
           .ki = 200.0f,
-          .kd = 0.0f,
+          .kd = 25.0f,
           .maxICumulative = 5000.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
@@ -117,7 +117,7 @@ void TurretSubsystem::refresh()
         
         float azimuthError = getOptimalError(m_desiredAzimuth, currentAzimuth);
         
-        m_logger.printf("Elevation Error: %.4f | DESIRED %.3f | MEASURE: %.3f \n", static_cast<double>(azimuthError), static_cast<double>(m_desiredAzimuth), static_cast<double>(currentAzimuth));
+        // m_logger.printf("Elevation Error: %.4f | DESIRED %.3f | MEASURE: %.3f \n", static_cast<double>(azimuthError), static_cast<double>(m_desiredAzimuth), static_cast<double>(currentAzimuth));
         m_logger.delay(400);
 
         m_desiredYawVoltage = m_azimuthPid.runControllerDerivateError(azimuthError, DT);
