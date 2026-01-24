@@ -134,10 +134,10 @@ private:
     float m_desiredPitchVoltage, m_desiredYawVoltage;
 
     float m_desiredElevation, m_desiredAzimuth;
-    // Pid m_elevationPid, m_azimuthPid;
+    // Pid m_elevationPid, m_yawPid;
 
     tap::algorithms::SmoothPid m_elevationPid;
-    tap::algorithms::SmoothPid m_azimuthPid;
+    tap::algorithms::SmoothPid m_yawPid;
 
     float m_desiredPitchRpm, m_desiredYawRpm;
     // Pid m_pitchRpmPid, m_yawRpmPid;
