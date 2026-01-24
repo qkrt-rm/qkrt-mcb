@@ -6,6 +6,7 @@
 #include "control/turret/turret_subsystem.hpp"
 #include "communication/logger/logger.hpp"
 #include "communication/vision_coprocessor.hpp"
+#include <tap/algorithms/extended_kalman.hpp>
 
 namespace control::turret
 {
@@ -35,6 +36,10 @@ private:
 
     communication::VisionCoprocessor& m_visionCoprocessor;
     communication::logger::Logger& m_logger;
+
+    tap::algorithms::ExtendedKalman m_ImuKalmanX;
+    tap::algorithms::ExtendedKalman m_ImuKalmanY;
+    tap::algorithms::ExtendedKalman m_ImuKalmanZ;
 
     float m_pitchSensitivity, m_yawSensitivity;
 

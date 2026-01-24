@@ -9,6 +9,9 @@ TurretCommand::TurretCommand(Drivers & drivers, TurretSubsystem& turret,
       m_operatorInterface(m_operatorInterface),
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
+      m_ImuKalmanX(0.5f,1.0f),
+      m_ImuKalmanY(0.5f,1.0f),
+      m_ImuKalmanZ(0.5f,1.0f),
       m_pitchSensitivity(1.0f), m_yawSensitivity(1.0f),
       m_targetYaw(0.0f),
       m_target(nullptr)
@@ -25,15 +28,28 @@ void TurretCommand::execute()
 {
     volatile communication::TurretData data = m_visionCoprocessor.getTurretData();
 
-    const float xConst = 0.0f;
-    const float yConst = 0.0f;
-    const float zConst = 0.0f;
+    float rawX = data.xPos;
+    float rawY = data.yPos;
+    float rawZ = data.zPos;
 
-    float xPos = data.xPos + xConst;
-    float yPos = data.yPos + yConst;
-    float zPos = data.zPos + zConst;
+    float xPos, yPos, zPos;
 
-    //TODO: Why negative Y so small from husky
+    if (std::abs(rawX) < 0.001f) 
+    {
+        m_ImuKalmanX.reset();
+        m_ImuKalmanY.reset();
+        m_ImuKalmanZ.reset();
+        
+        xPos = 0.0f;
+        yPos = 0.0f;
+        zPos = 0.0f;
+    }
+    else
+    {
+        xPos = m_ImuKalmanX.filterData(rawX);
+        yPos = m_ImuKalmanY.filterData(rawY);
+        zPos = m_ImuKalmanZ.filterData(rawZ);
+    }
 
     float aimAzimuth = std::atan2(yPos, xPos);
     float groundDist = std::hypot(yPos, xPos);

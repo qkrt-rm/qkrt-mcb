@@ -19,9 +19,9 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
       m_azimuthPid({
-          .kp = 3000.0f,
+          .kp = 6000.0f,
           .ki = 200.0f,
-          .kd = 25.0f,
+          .kd = 100.0f,
           .maxICumulative = 5000.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
