@@ -104,8 +104,8 @@ void TurretSubsystem::refresh()
                 return std::atan2(std::sin(error), std::cos(error));
             };
         
-        float currentElevation = getElevation();
-        float currentAzimuth = getAzimuth();
+        float currentElevation = getPitch();
+        float currentAzimuth = getYaw();
         
         float elevationError = getOptimalError(m_desiredElevation, currentElevation);
 
@@ -159,7 +159,7 @@ void TurretSubsystem::refresh()
 
 void TurretSubsystem::setPitchRps(float pitchRps)
 {
-    float pitchAngle = getElevation();
+    float pitchAngle = getPitch();
     {
 
         //REMOVE when switching to rad/s not rev/s

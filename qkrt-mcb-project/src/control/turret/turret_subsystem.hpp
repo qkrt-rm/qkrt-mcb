@@ -60,7 +60,7 @@ public:
     /**
      * @brief Adjusts the pitch motor to a desired elevation angle
      */
-    inline void setElevation(float desiredElevation)
+    inline void setPitch(float desiredElevation)
     {
         m_desiredElevation = desiredElevation;
     }
@@ -70,7 +70,7 @@ public:
      * 
      * @return The pitch angle of the turret (elevation).
      */
-    inline float getElevation() const
+    inline float getPitch() const
     {
         auto currentAngle = m_pitchMotor.getEncoder()->getPosition();
         return (currentAngle - m_pitchHorizontalOffset).getWrappedValue();
@@ -79,7 +79,7 @@ public:
     /**
      * @brief Adjusts the yaw motor to a desired azimuth angle
      */
-    inline void setAzimuth(float desiredAzimuth)
+    inline void setYaw(float desiredAzimuth)
     {   
         m_desiredAzimuth = desiredAzimuth;
     }
@@ -89,7 +89,7 @@ public:
      * 
      * @return The yaw angle of the turret (azimuth).
      */
-    inline float getAzimuth() const
+    inline float getYaw() const
     {
         auto currentAngle = m_yawMotor.getEncoder()->getPosition();
         return (currentAngle - m_yawForwardOffset).getWrappedValue();

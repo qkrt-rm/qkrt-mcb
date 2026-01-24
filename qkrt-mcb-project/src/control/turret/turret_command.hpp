@@ -36,12 +36,13 @@ private:
     communication::VisionCoprocessor& m_visionCoprocessor;
     communication::logger::Logger& m_logger;
 
+    bool m_isAutoAim;
+
     float m_pitchSensitivity, m_yawSensitivity;
 
-    float m_targetYaw;
+    float m_globalYawTarget, m_globalPitchTarget;
 
-    // TODO: change to some target data structure when it exists
-    void* m_target;
+    communication::TurretData m_lastTarget;
 };
 
 }  // namespace control::turret
