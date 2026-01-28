@@ -21,10 +21,10 @@ namespace control::flywheel
         }
     }
 
-    void FlywheelSubsystem::setDesiredOuput(float leftFlywheel, float rightFlywheel) 
+    void FlywheelSubsystem::setDesiredOuput(float flywheelSpeed) 
     {
-        m_motors[static_cast<u_int8_t>(MotorId::LFly)].setDesiredOutput(leftFlywheel);
-        m_motors[static_cast<u_int8_t>(MotorId::RFly)].setDesiredOutput(rightFlywheel);
+        m_motors[static_cast<u_int8_t>(MotorId::LFly)].setDesiredOutput(flywheelSpeed);
+        m_motors[static_cast<u_int8_t>(MotorId::RFly)].setDesiredOutput(flywheelSpeed);
     }
 
     void FlywheelSubsystem::refresh() 

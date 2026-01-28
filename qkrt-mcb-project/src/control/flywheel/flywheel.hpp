@@ -40,7 +40,7 @@ public:
 
     void initialize() override;
 
-    void setDesiredOuput(float leftFlywheel, float rightFlywheel);
+    void setDesiredOuput(float flywheelSpeed);
 
     void refresh() override;
 
