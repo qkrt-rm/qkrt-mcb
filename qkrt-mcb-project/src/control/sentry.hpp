@@ -15,8 +15,8 @@
 
 
 // Flywheel Includes
-#include "control/flywheel/flywheel_subsystem.hpp"
-#include "control/flywheel/flywheel_on_command.hpp"
+#include "control/flywheel/flywheel.hpp"
+#include "control/flywheel/flywheel_command.hpp"
 
 
 // Agitator Includes
