@@ -2,7 +2,7 @@
 
 #include "tap/control/command.hpp"
 
-#include "flywheel_subsystem.hpp"
+#include "flywheel.hpp"
 
 namespace control::flywheel
 {
