@@ -6,7 +6,7 @@ namespace control::flywheel
         : tap::control::Subsystem(&drivers), 
         m_desiredOutput(),
         m_motors({
-                Motor(&drivers, config.rightFlywheelId, config.canBus, false, "RFly"),
+                Motor(&drivers, config.rightFlywheelId, config.canBus, false, "RFly"), //the false could be spinning it the other way.
                 Motor(&drivers, config.leftFlyWheelId, config.canBus, false, "LFly"),
             }),
         m_drivers(&drivers)
@@ -21,15 +21,24 @@ namespace control::flywheel
         }
     }
 
-    void FlywheelSubsystem::setDesiredOuput(float flywheelSpeed) 
+    void FlywheelSubsystem::setDesiredOutput(float flywheelSpeed) 
     {
-        m_motors[static_cast<u_int8_t>(MotorId::LFly)].setDesiredOutput(flywheelSpeed);
-        m_motors[static_cast<u_int8_t>(MotorId::RFly)].setDesiredOutput(flywheelSpeed);
+        m_desiredOutput[static_cast<uint8_t>(MotorId::LFly)] = flywheelSpeed;
+        m_desiredOutput[static_cast<uint8_t>(MotorId::RFly)] = flywheelSpeed;
     }
 
     void FlywheelSubsystem::refresh() 
     {
-        //do PID
+        // 1. Safety Check
+        if (m_drivers->isEmergencyStopActive()) {
+            for (auto& motor : m_motors) motor.setDesiredOutput(0);
+            return;
+        }
+
+        // 2. Send the command to the hardware
+        for (size_t i = 0; i < m_motors.size(); ++i) {
+            m_motors[i].setDesiredOutput(m_desiredOutput[i]);
+        }
     }
 
 } // namespace control::flywheel

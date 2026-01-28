@@ -11,6 +11,7 @@
 #include "tap/util_macros.hpp"
 
 #include <array>
+#include <cstdint>
 
 namespace control::flywheel 
 {
@@ -40,7 +41,7 @@ public:
 
     void initialize() override;
 
-    void setDesiredOuput(float flywheelSpeed);
+    void setDesiredOutput(float flywheelSpeed);
 
     void refresh() override;
 
