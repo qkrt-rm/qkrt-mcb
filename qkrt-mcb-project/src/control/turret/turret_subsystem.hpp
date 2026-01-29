@@ -108,6 +108,10 @@ public:
      */
     void setYawRps(float yawRps);
 
+    float getYawVelocity() const { return m_yawMotor.getEncoder()->getVelocity(); }
+
+    float getPitchVelocity() const { return m_pitchMotor.getEncoder()->getVelocity(); }
+
     void lock() { m_aimLock = true; }
 
     void unlock() { m_aimLock = false; }

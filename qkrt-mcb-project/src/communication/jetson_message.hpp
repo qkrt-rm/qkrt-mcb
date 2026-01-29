@@ -24,12 +24,30 @@ namespace communication
         float wVel;
     } modm_packed;
 
-    //TODO: adjust for what auto want
-    struct ImuData
+    struct OdomData
     {
-        float xAcl;
-        float yAcl;
-        float zGyro;
+        // Chassis wheel encoder velocities (rad/s)
+        float wheelLF;
+        float wheelLB;
+        float wheelRB;
+        float wheelRF;
+        // Turret encoder positions (rad) and velocities (rad/s)
+        float turretYawPos;
+        float turretYawVel;
+        float turretPitchPos;
+        float turretPitchVel;
+        // IMU accelerometer (m/s²)
+        float imuAx;
+        float imuAy;
+        float imuAz;
+        // IMU gyroscope (rad/s)
+        float imuGx;
+        float imuGy;
+        float imuGz;
+        // IMU Mahony orientation (rad)
+        float imuYaw;
+        float imuPitch;
+        float imuRoll;
     } modm_packed;
 
 }

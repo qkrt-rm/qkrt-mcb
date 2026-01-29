@@ -1,6 +1,7 @@
+#include "drivers.hpp"
 #include "vision_coprocessor.hpp"
 #include "control/turret/turret_subsystem.hpp"
-# include "drivers.hpp"
+#include "control/chassis/holonomic_chassis_subsystem.hpp"
 
 namespace communication {
 
@@ -76,16 +77,48 @@ namespace communication {
 
     void VisionCoprocessor::sendOdomData()
     {
-        DJISerial::SerialMessage<sizeof(ImuData)>message;
+        DJISerial::SerialMessage<sizeof(OdomData)> message;
         message.messageType = MCB_MESSAGE_TYPE_ODOM;
 
-        ImuData* data = reinterpret_cast<ImuData*>(message.data);
-        data->xAcl = m_imu.getAx();
-        data->yAcl = m_imu.getAy();
-        data->zGyro = m_imu.getGz();
+        OdomData* data = reinterpret_cast<OdomData*>(message.data);
 
-        m_logger.printf("Sent xAcl = %.3f", static_cast<double>(data->xAcl));
-        m_logger.delay(100);
+        // Chassis wheel encoder velocities
+        if (m_chassis != nullptr)
+        {
+            data->wheelLF = m_chassis->getWheelVelocity(0);
+            data->wheelLB = m_chassis->getWheelVelocity(1);
+            data->wheelRB = m_chassis->getWheelVelocity(2);
+            data->wheelRF = m_chassis->getWheelVelocity(3);
+        }
+        else
+        {
+            data->wheelLF = data->wheelLB = data->wheelRB = data->wheelRF = 0.0f;
+        }
+
+        // Turret encoder positions and velocities
+        if (m_turret != nullptr)
+        {
+            data->turretYawPos = m_turret->getAzimuth();
+            data->turretYawVel = m_turret->getYawVelocity();
+            data->turretPitchPos = m_turret->getElevation();
+            data->turretPitchVel = m_turret->getPitchVelocity();
+        }
+        else
+        {
+            data->turretYawPos = data->turretYawVel = 0.0f;
+            data->turretPitchPos = data->turretPitchVel = 0.0f;
+        }
+
+        // IMU data
+        data->imuAx = m_imu.getAx();
+        data->imuAy = m_imu.getAy();
+        data->imuAz = m_imu.getAz();
+        data->imuGx = m_imu.getGx();
+        data->imuGy = m_imu.getGy();
+        data->imuGz = m_imu.getGz();
+        data->imuYaw = m_imu.getYaw();
+        data->imuPitch = m_imu.getPitch();
+        data->imuRoll = m_imu.getRoll();
 
         message.setCRC16();
         drivers->uart.write(VISION_COPROCESSOR_UART_PORT, reinterpret_cast<uint8_t*>(&message), sizeof(message));

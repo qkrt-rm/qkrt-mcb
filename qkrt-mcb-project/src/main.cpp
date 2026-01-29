@@ -63,6 +63,7 @@ static void initializeIo(Drivers *drivers);
 // very frequently. Use PeriodicMilliTimers if you don't want something to be
 // called as frequently.
 static void updateIo(Drivers *drivers);
+static void updateImu(Drivers *drivers);
 
 int main()
 {

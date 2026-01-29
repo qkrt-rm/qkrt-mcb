@@ -9,6 +9,9 @@
 
 class Drivers;
 
+namespace control::chassis { class HolonomicChassisSubsystem; }
+namespace control::turret { class TurretSubsystem; }
+
 namespace communication
 {
     using tap::communication::serial::Uart;
@@ -35,7 +38,10 @@ namespace communication
 
             void sendOdomData();
 
-            bool isOnline() const;  
+            void setChassisSubsystem(control::chassis::HolonomicChassisSubsystem* chassis) { m_chassis = chassis; }
+            void setTurretSubsystem(control::turret::TurretSubsystem* turret) { m_turret = turret; }
+
+            bool isOnline() const;
 
 
         private:
@@ -54,6 +60,9 @@ namespace communication
             NavData lastNavData;
 
             tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
+
+            control::chassis::HolonomicChassisSubsystem* m_chassis = nullptr;
+            control::turret::TurretSubsystem* m_turret = nullptr;
 
     };
 }

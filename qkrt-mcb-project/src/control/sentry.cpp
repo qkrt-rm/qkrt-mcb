@@ -48,6 +48,9 @@ void Robot::initialize()
     setDefaultCommands();
     startCommands();
     registerIoMappings();
+
+    m_drivers.visionCoprocessor.setChassisSubsystem(&m_chassis);
+    m_drivers.visionCoprocessor.setTurretSubsystem(&m_turret);
 }
 
 
