@@ -2,7 +2,7 @@
 
 #include "tap/control/command.hpp"
 
-#include "flywheel.hpp"
+#include "flywheel_sub_dd.hpp"
 
 namespace control::flywheel
 {
@@ -17,7 +17,7 @@ namespace control::flywheel
 
         void end(bool interuppted) override;
 
-        bool isFinished() const override;
+        bool isFinished() const override {return false;}
 
         const char *getName() const override { return "flywheel on command";}
     private:

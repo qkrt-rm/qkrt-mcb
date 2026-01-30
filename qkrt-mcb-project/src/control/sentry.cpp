@@ -29,15 +29,16 @@ Robot::Robot(Drivers& drivers)
                     .pitchHorizontalOffset = 0u,  // TODO: get this number when pitch motor is mounted
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
-      m_flywheels(drivers, flywheel::FlywheelConfig{
-                        .leftFlyWheelId = MotorId::MOTOR7,
-                        .rightFlywheelId = MotorId::MOTOR8,
-                        .canBus = CanBus::CAN_BUS1
-                    }),
-      m_flywheelsCommand(m_flywheels, 10.0f),
+      m_flywheels(drivers,
+                 flywheel::FlywheelConfig {
+                     .leftFlyWheelId = MotorId::MOTOR7,
+                     .rightFlywheelId = MotorId::MOTOR8,
+                     .canBus = CanBus::CAN_BUS1
+                }),
+      m_flywheelsCommand(m_flywheels, 2000.0f),
       m_agitator(drivers,
                 agitator::agitatorConfig{
-                    .agitatorId = MotorId::MOTOR7,
+                    .agitatorId = MotorId::MOTOR4,
                     .canBus = CanBus::CAN_BUS1,
                     .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
                 }),

@@ -41,11 +41,11 @@ public:
 
     void initialize() override;
 
-    void setDesiredOutput(float flywheelSpeed);
+    void setWheelVelocities(float flywheelSpeed);
 
     void refresh() override;
 
-    const char* getName() override {return "Flywheel";}
+    const char* getName() const override {return "Flywheel";}
 
 private: 
     std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_desiredOutput;
