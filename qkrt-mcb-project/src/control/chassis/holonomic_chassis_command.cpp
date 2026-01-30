@@ -13,9 +13,7 @@ HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chas
     addSubsystemRequirement(&chassis);
 }
 
-void HolonomicChassisCommand::initialize()
-{
-}
+void HolonomicChassisCommand::initialize() {}
 
 void HolonomicChassisCommand::execute()
 {       
