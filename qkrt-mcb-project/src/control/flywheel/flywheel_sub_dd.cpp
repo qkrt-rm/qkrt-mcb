@@ -1,4 +1,4 @@
-#include "flywheel.hpp"
+#include "flywheel_sub_dd.hpp"
 
 namespace control::flywheel
 {
@@ -21,7 +21,7 @@ namespace control::flywheel
         }
     }
 
-    void FlywheelSubsystem::setDesiredOutput(float flywheelSpeed) 
+    void FlywheelSubsystem::setWheelVelocities(float flywheelSpeed) 
     {
         m_desiredOutput[static_cast<uint8_t>(MotorId::LFly)] = flywheelSpeed;
         m_desiredOutput[static_cast<uint8_t>(MotorId::RFly)] = flywheelSpeed;
@@ -29,16 +29,17 @@ namespace control::flywheel
 
     void FlywheelSubsystem::refresh() 
     {
-        // 1. Safety Check
-        if (m_drivers->isEmergencyStopActive()) {
-            for (auto& motor : m_motors) motor.setDesiredOutput(0);
-            return;
-        }
-
+        // // 1. Safety Check
+        // if (m_drivers->isEmergencyStopActive()) {
+        //     for (auto& motor : m_motors) motor.setDesiredOutput(0);
+        //     return;
+        // }
+        m_motors[static_cast<uint8_t>(MotorId::LFly)].setDesiredOutput(m_desiredOutput[0]);
+        m_motors[static_cast<uint8_t>(MotorId::RFly)].setDesiredOutput(m_desiredOutput[1]);
         // 2. Send the command to the hardware
-        for (size_t i = 0; i < m_motors.size(); ++i) {
-            m_motors[i].setDesiredOutput(m_desiredOutput[i]);
-        }
+        // for (size_t i = 0; i < m_motors.size(); ++i) {
+        //     m_motors[i].setDesiredOutput(m_desiredOutput[i]);
+        // }
     }
 
 } // namespace control::flywheel
