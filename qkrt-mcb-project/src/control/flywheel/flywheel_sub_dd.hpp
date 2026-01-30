@@ -20,8 +20,9 @@ namespace control::flywheel
         tap::motor::MotorId leftFlyWheelId;
         tap::motor::MotorId rightFlywheelId;
         tap::can::CanBus canBus;
+        modm::Pid<float>::Parameter wheelVelocityPidConfig;
     };
-
+    
 
 class FlywheelSubsystem : public tap::control::Subsystem
 {
@@ -33,8 +34,9 @@ private:
         NUM_MOTORS,
     };
 
-    static constexpr float MAX_WHEELSPEED_RPM = 3000.0f; //change maybe
+    static constexpr float MAX_WHEELSPEED_RPM = 5000.0f; //change maybe
 
+    using Pid = modm::Pid<float>;
     using Motor = tap::motor::DjiMotor; //use a simplfied name for a complex datatype
 public:
     FlywheelSubsystem(Drivers& drivers, const FlywheelConfig& config);
@@ -50,6 +52,7 @@ public:
 private: 
     std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_desiredOutput;
     std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_motors;
+    std::array<Pid,   static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_pidControllers;
     Drivers* m_drivers;
 };
 

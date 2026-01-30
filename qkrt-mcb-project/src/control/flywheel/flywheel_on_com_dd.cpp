@@ -8,8 +8,11 @@
 
 namespace control::flywheel
 {
-    FlywheelOnCommand::FlywheelOnCommand(FlywheelSubsystem& flywheel, float flywheel_speed) :
-    m_flywheel(flywheel), m_flywheelSpeed(flywheel_speed)
+    FlywheelOnCommand::FlywheelOnCommand(FlywheelSubsystem& flywheel,
+                                         float flywheel_speed)
+    : m_flywheel(flywheel),
+      m_flywheelSpeed(flywheel_speed)
+
     {
         addSubsystemRequirement(&flywheel);
     }
