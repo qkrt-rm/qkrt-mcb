@@ -24,7 +24,7 @@ public:
 
     float getTurretYawInput() const { return m_turretYawInput; };
 
-    bool getAgitatorInput() const { return m_agitatorInput; };
+    bool getAgitatorReverseInput() const { return m_agitatorReverseInput; };
 
 
 
@@ -45,7 +45,7 @@ private:
     float m_turretPitchInput = 0.0f;
     float m_turretYawInput = 0.0f;
 
-    bool m_agitatorInput = false;
+    bool m_agitatorReverseInput = false;
 
 };
 

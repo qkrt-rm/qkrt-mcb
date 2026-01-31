@@ -28,7 +28,7 @@ void ControlOperatorInterface::pollInputDevices()
             m_turretPitchInput = std::clamp(m_remote.getChannel(Remote::Channel::RIGHT_VERTICAL), -1.0f, 1.0f);
             m_turretYawInput = std::clamp(m_remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f);
             
-            m_agitatorInput = m_remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::UP;
+            m_agitatorReverseInput = m_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP;
 
 
     }

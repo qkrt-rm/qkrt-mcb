@@ -26,10 +26,10 @@ using tap::algorithms::limitVal;
 
 namespace control::agitator
 {
-AgitatorCommand::AgitatorCommand(
-    VelocityAgitatorSubsystem &agitator, float indexerSpeed)
+AgitatorCommand::AgitatorCommand(VelocityAgitatorSubsystem &agitator, float indexerSpeed, ControlOperatorInterface& operatorInterface)
     : m_agitator(agitator),
-      m_indexerSpeed(indexerSpeed)
+      m_indexerSpeed(indexerSpeed), 
+      m_operatorInterface(operatorInterface)
 {
     addSubsystemRequirement(&agitator);
 }
@@ -45,7 +45,7 @@ void AgitatorCommand::execute()
      */
     
 
-     if(m_agitator.getCurrentValue() == NULL)
+     if(m_operatorInterface.getAgitatorReverseInput() == true)
      {
         float newIndexerSpeed = -(isBOOST ? m_indexerSpeed  + 20.0f : m_indexerSpeed);
         m_agitator.setSetpoint(newIndexerSpeed);
