@@ -45,8 +45,16 @@ void AgitatorCommand::execute()
      */
     
 
-    float newIndexerSpeed = isBOOST ? m_indexerSpeed  + 20.0f : m_indexerSpeed;
-    m_agitator.setSetpoint(newIndexerSpeed);
+     if(m_agitator.getCurrentValue() == NULL)
+     {
+        float newIndexerSpeed = -(isBOOST ? m_indexerSpeed  + 20.0f : m_indexerSpeed);
+        m_agitator.setSetpoint(newIndexerSpeed);
+     }
+     else
+     {
+        float newIndexerSpeed = isBOOST ? m_indexerSpeed  + 20.0f : m_indexerSpeed;
+        m_agitator.setSetpoint(newIndexerSpeed);
+     }
 }
 
 void AgitatorCommand::end(bool) { m_agitator.setSetpoint(0); }

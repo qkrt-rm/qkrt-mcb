@@ -24,8 +24,6 @@ public:
 
     float getTurretYawInput() const { return m_turretYawInput; };
 
-    bool getFlywheelInput() const { return m_flywheelInput; };
-
     bool getAgitatorInput() const { return m_agitatorInput; };
 
 
@@ -47,7 +45,6 @@ private:
     float m_turretPitchInput = 0.0f;
     float m_turretYawInput = 0.0f;
 
-    bool m_flywheelInput = false;
     bool m_agitatorInput = false;
 
 };
