@@ -49,7 +49,14 @@ private:
 
     bool m_flywheelInput = false;
     bool m_agitatorInput = false;
+    
     bool speedBoost = false;
+
+    float directionX = 0.0f;
+    float multiplierX = 0.0f;
+    float directionY = 0.0f;
+    float multiplierY = 0.0f;
+
 
 };
 

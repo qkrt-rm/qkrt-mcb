@@ -39,22 +39,14 @@ void ControlOperatorInterface::pollInputDevices()
             speedBoost = m_remote.keyPressed(Remote::Key::SHIFT);
             
             // chassis X Input
-            m_chassisXInput = 
-                m_remote.keyPressed(Remote::Key::W) && m_remote.keyPressed(Remote::Key::S) ? 0.0f:
-                m_remote.keyPressed(Remote::Key::W) && speedBoost ? 2.0:
-                m_remote.keyPressed(Remote::Key::S) && speedBoost ? 2.0:
-                m_remote.keyPressed(Remote::Key::W) ? 1.0f : 
-                m_remote.keyPressed(Remote::Key::S) ? 1.0f :
-                0.0f;         
+            directionX = m_remote.keyPressed(Remote::Key::W) - m_remote.keyPressed(Remote::Key::S);
+            multiplierX = speedBoost ? 2.0f : 1.0f;
+            m_chassisXInput = directionX * multiplierX;        
 
             // chassis Y Input
-            m_chassisYInput = 
-                m_remote.keyPressed(Remote::Key::A) && m_remote.keyPressed(Remote::Key::D) ? 0.0f:
-                m_remote.keyPressed(Remote::Key::A) && speedBoost ? 2.0:
-                m_remote.keyPressed(Remote::Key::D) && speedBoost ? 2.0:
-                m_remote.keyPressed(Remote::Key::A) ? 1.0f : 
-                m_remote.keyPressed(Remote::Key::D) ? 1.0f :
-                0.0f;
+            directionY = m_remote.keyPressed(Remote::Key::A) - m_remote.keyPressed(Remote::Key::D);
+            multiplierY = speedBoost ? 2.0f : 1.0f;
+            m_chassisYInput = directionY * multiplierY;
 
 
             // chassis W Input (triggering beyblade ) (maybe mouse wheel)
