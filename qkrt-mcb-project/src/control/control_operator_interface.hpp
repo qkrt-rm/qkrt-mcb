@@ -49,6 +49,7 @@ private:
 
     bool m_flywheelInput = false;
     bool m_agitatorInput = false;
+    bool speedBoost = false;
 
 };
 
