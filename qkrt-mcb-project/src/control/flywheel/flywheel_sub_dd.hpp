@@ -24,37 +24,37 @@ namespace control::flywheel
     };
     
 
-class FlywheelSubsystem : public tap::control::Subsystem
-{
-private:
-    enum class MotorId : uint8_t //change later 
+    class FlywheelSubsystem : public tap::control::Subsystem
     {
-        LFly = 0,
-        RFly,
-        NUM_MOTORS,
+        private:
+            enum class MotorId : uint8_t //change later 
+            {
+                LFly = 0,
+                RFly,
+                NUM_MOTORS,
+            };
+
+            static constexpr float MAX_WHEELSPEED_RPM = 5000.0f; //change maybe
+
+            using Pid = modm::Pid<float>;
+            using Motor = tap::motor::DjiMotor; //use a simplfied name for a complex datatype
+        public:
+            FlywheelSubsystem(Drivers& drivers, const FlywheelConfig& config);
+
+            void initialize() override;
+
+            void setWheelVelocities(float flywheelSpeed);
+
+            void refresh() override;
+
+            const char* getName() override { return "Flywheel"; }
+
+        private: 
+            std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_desiredOutput;
+            std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_motors;
+            std::array<Pid,   static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_pidControllers;
+            Drivers* m_drivers;
     };
-
-    static constexpr float MAX_WHEELSPEED_RPM = 5000.0f; //change maybe
-
-    using Pid = modm::Pid<float>;
-    using Motor = tap::motor::DjiMotor; //use a simplfied name for a complex datatype
-public:
-    FlywheelSubsystem(Drivers& drivers, const FlywheelConfig& config);
-
-    void initialize() override;
-
-    void setWheelVelocities(float flywheelSpeed);
-
-    void refresh() override;
-
-    const char* getName() override { return "Flywheel"; }
-
-private: 
-    std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_desiredOutput;
-    std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_motors;
-    std::array<Pid,   static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_pidControllers;
-    Drivers* m_drivers;
-};
 
 
 }  // namespace control::flywheel
