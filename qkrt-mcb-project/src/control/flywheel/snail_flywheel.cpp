@@ -30,6 +30,11 @@ void SnailFlywheelSubsystem::refresh() {
 }
 
 void SnailFlywheelSubsystem::setTargetSpeed(float speed) {
+    // mapping one range to another
+    float a[2] = {0.0f, 1.0f}; // range1 
+    float b[2] = {MIN_SNAIL_OUTPUT, MAX_SNAIL_OUTPUT}; //range2
+    speed = b[0] + (((speed - a[0])*(b[1]-b[0])) / (a[1]-a[0]));
+    
     drivers->pwm.write(speed, FLYWHEEL_MOTOR_PIN1);
     drivers->pwm.write(speed, FLYWHEEL_MOTOR_PIN2);
     drivers->pwm.write(speed, FLYWHEEL_MOTOR_PIN3);
