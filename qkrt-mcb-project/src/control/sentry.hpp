@@ -72,13 +72,13 @@ private:
     /**
      * @brief Agitator subsystem for the sentry robot
      */
-    // agitator::VelocityAgitatorSubsystem m_agitator;
-    // agitator::AgitatorCommand m_agitatorCommand;
+    agitator::VelocityAgitatorSubsystem m_agitator;
+    agitator::AgitatorCommand m_agitatorCommand;
 
     //Mappings
     tap::control::HoldCommandMapping m_leftSwitchUP{
         &m_drivers,
-        {&m_flywheelsCommand},
+        {&m_agitatorCommand, &m_flywheelsCommand},
         tap::control::RemoteMapState(tap::communication::serial::Remote::Switch::LEFT_SWITCH, 
             tap::communication::serial::Remote::SwitchState::UP
         )

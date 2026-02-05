@@ -34,7 +34,7 @@ namespace control::flywheel
                 NUM_MOTORS,
             };
 
-            static constexpr float MAX_WHEELSPEED_RPM = 5000.0f; //change maybe
+            static constexpr float MAX_WHEELSPEED_RPM = 10000.0f; //change maybe
 
             using Pid = modm::Pid<float>;
             using Motor = tap::motor::DjiMotor; //use a simplfied name for a complex datatype
