@@ -64,6 +64,9 @@ namespace communication
             control::chassis::HolonomicChassisSubsystem* m_chassis = nullptr;
             control::turret::TurretSubsystem* m_turret = nullptr;
 
+            tap::arch::MilliTimeout sendTimeout;
+            static constexpr uint32_t SEND_INTERVAL_MS = 500;
+
     };
 }
 

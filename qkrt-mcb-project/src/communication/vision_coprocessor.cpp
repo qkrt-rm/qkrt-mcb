@@ -2,7 +2,7 @@
 #include "vision_coprocessor.hpp"
 #include "control/turret/turret_subsystem.hpp"
 #include "control/chassis/holonomic_chassis_subsystem.hpp"
-#include <cstring>  // For memset
+#include <cstring>
 
 namespace communication {
 
@@ -35,6 +35,7 @@ namespace communication {
     void VisionCoprocessor::initialize()
     {
         drivers->uart.init<VISION_COPROCESSOR_UART_PORT, BAUD_RATE>();
+        sendTimeout.restart(0);  // Start expired so first message sends immediately
     }
 
     bool VisionCoprocessor::isOnline() const { return !offlineTimeout.isExpired(); }
@@ -45,8 +46,8 @@ namespace communication {
         {
             memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
 
-            m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(lastTurretData.xPos), static_cast<double>(lastTurretData.yPos), static_cast<double>(lastTurretData.zPos));
-            m_logger.delay(200);
+            // m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(lastTurretData.xPos), static_cast<double>(lastTurretData.yPos), static_cast<double>(lastTurretData.zPos));
+            // m_logger.delay(200);
 
             return true;
         }
@@ -59,8 +60,8 @@ namespace communication {
         {
             memcpy(&lastNavData, &completeMessage.data, sizeof(lastNavData));
 
-            m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(lastNavData.xVel), static_cast<double>(lastNavData.yVel), static_cast<double>(lastNavData.wVel));
-            m_logger.delay(200);
+            // m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(lastNavData.xVel), static_cast<double>(lastNavData.yVel), static_cast<double>(lastNavData.wVel));
+            // m_logger.delay(200);
 
             return true;
         }
@@ -73,23 +74,19 @@ namespace communication {
 
     void VisionCoprocessor::sendData()
     {
+        if (!sendTimeout.isExpired())
+        {
+            return;
+        }
+
         sendOdomData();
+        sendTimeout.restart(SEND_INTERVAL_MS);
     }
 
     void VisionCoprocessor::sendOdomData()
     {
-        // Create and initialize the message
-        DJISerial::SerialMessage<sizeof(OdomData)> message(0);  // Explicitly pass seq=0
-
-        // Zero out the entire data array to avoid uninitialized memory
-        memset(message.data, 0, sizeof(message.data));
-
-        // Set message type (must be done after constructor but before setCRC16)
+        DJISerial::SerialMessage<sizeof(OdomData)> message;
         message.messageType = MCB_MESSAGE_TYPE_ODOM;
-
-        // Debug: Verify message structure
-        // sizeof(OdomData) should be 68 (17 floats * 4 bytes)
-        static_assert(sizeof(OdomData) == 68, "OdomData size must be 68 bytes");
 
         OdomData* data = reinterpret_cast<OdomData*>(message.data);
 

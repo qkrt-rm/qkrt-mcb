@@ -3,12 +3,15 @@
 namespace control::chassis
 {
 
-HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
+HolonomicChassisCommand::HolonomicChassisCommand(Drivers &drivers, HolonomicChassisSubsystem& chassis,
                                                  turret::TurretSubsystem& turret,
                                                  ControlOperatorInterface& m_operatorInterface)
     : m_chassis(chassis),
       m_turret(turret),
-      m_operatorInterface(m_operatorInterface)
+      m_operatorInterface(m_operatorInterface),
+      m_visionCoprocessor(drivers.visionCoprocessor),
+      m_logger(drivers.logger)
+
 {
     addSubsystemRequirement(&chassis);
 }
@@ -21,8 +24,17 @@ void HolonomicChassisCommand::execute()
 {       
         m_operatorInterface.pollInputDevices();
 
-        float xInp = m_operatorInterface.getChassisXInput() * REMOTE_SENSITIVITY;
-        float yInp = m_operatorInterface.getChassisYInput() * REMOTE_SENSITIVITY;
+        volatile communication::NavData data = m_visionCoprocessor.getNavData();
+
+        float xInp = data.xVel * 10.0f;
+        float yInp = data.yVel * 10.0f;
+
+        m_logger.printf("Message Recieved: x=%.3f y= %.3f\n", static_cast<double>(xInp), static_cast<double>(yInp));
+        m_logger.delay(200);
+
+
+        //float xInp = m_operatorInterface.getChassisXInput() * REMOTE_SENSITIVITY;
+        //float yInp = m_operatorInterface.getChassisYInput() * REMOTE_SENSITIVITY;
         float yawAngle = m_turret.getAzimuth();
         
         //compute rotation transformation
