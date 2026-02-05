@@ -72,8 +72,8 @@ private:
     /**
      * @brief Agitator subsystem for the sentry robot
      */
-    // agitator::VelocityAgitatorSubsystem m_agitator;
-    // agitator::AgitatorCommand m_agitatorCommand;
+    agitator::VelocityAgitatorSubsystem m_agitator;
+    agitator::AgitatorCommand m_agitatorCommand;
 
     //Mappings
     tap::control::HoldCommandMapping m_leftSwitchUP{
