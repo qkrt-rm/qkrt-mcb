@@ -1,4 +1,5 @@
 #include "holonomic_chassis_command.hpp"
+#include "control/turret/turret_subsystem.hpp"
 
 namespace control::chassis
 {
@@ -28,7 +29,7 @@ void HolonomicChassisCommand::execute()
         //compute rotation transformation
         float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);
         float v_x = yInp * std::sin(-yawAngle) + xInp * std::cos(-yawAngle);
-        float w = m_operatorInterface.getChassisWInput();       
+        float w = (m_operatorInterface.isChassisBeyblade()) ? CHASSIS_ROT_SPEED_RAD : 0.0f;   
         
         float denominator = std::max(std::abs(v_y) + std::abs(v_x) + std::abs(w), 1.0f);
         float leftFront  = (v_x + v_y + w) / denominator;

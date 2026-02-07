@@ -1,4 +1,5 @@
 #include "holonomic_chassis_subsystem.hpp"
+#include "control/turret/turret_subsystem.hpp"
 
 namespace control::chassis
 {
