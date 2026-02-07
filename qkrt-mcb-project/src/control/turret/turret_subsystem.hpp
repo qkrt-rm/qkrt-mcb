@@ -130,6 +130,8 @@ private:
         return rps * SEC_PER_MIN * TURRET_MOTOR_GEAR_RATIO;
     }
 
+    
+
     /**
      * @brief Computes the shortest angular error between two angles.
      *
@@ -157,10 +159,10 @@ private:
     tap::algorithms::SmoothPid m_pitchPid;
     tap::algorithms::SmoothPid m_yawPid;
 
-    float m_desiredPitchRpm, m_desiredYawRpm;
-    // Pid m_pitchRpmPid, m_yawRpsPid;
+    float m_desiredPitchRps, m_desiredYawRps;
+    // Pid m_pitchRpsPid, m_yawRpsPid;
 
-    tap::algorithms::SmoothPid m_pitchRpmPid;
+    tap::algorithms::SmoothPid m_pitchRpsPid;
     tap::algorithms::SmoothPid m_yawRpsPid;
 
     bool m_aimLock;
