@@ -5,7 +5,9 @@
 #include "control/chassis/holonomic_chassis_subsystem.hpp"
 #include "control/control_operator_interface.hpp"
 
-#include "control/turret/turret_subsystem.hpp"
+namespace control::turret {
+    class TurretSubsystem;
+}
 
 namespace control::chassis
 {
@@ -14,6 +16,7 @@ class HolonomicChassisCommand : public tap::control::Command
 {
 private:
     static constexpr float MAX_CHASSIS_SPEED_MPS = 1.0f;
+    float static constexpr REMOTE_SENSITIVITY = 0.5f;
 public:
     HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                             turret::TurretSubsystem& turret,
@@ -28,11 +31,12 @@ public:
     bool isFinished() const override { return false; }
 
     const char* getName() const override { return "Chassis Omni Drive Command"; }
+
+    static constexpr float CHASSIS_ROT_SPEED_RAD = 0.35f;
 private:
     HolonomicChassisSubsystem& m_chassis;
     turret::TurretSubsystem& m_turret;
     ControlOperatorInterface& m_operatorInterface;
-    float static constexpr REMOTE_SENSITIVITY = 0.5f;
 };
 
 }  // namespace control::chassis

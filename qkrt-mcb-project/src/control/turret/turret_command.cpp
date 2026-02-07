@@ -5,11 +5,14 @@ namespace control::turret
 
 TurretCommand::TurretCommand(Drivers & drivers, TurretSubsystem& turret,
                              ControlOperatorInterface& m_operatorInterface)
-    : m_turret(turret),
+    : m_drivers(drivers),
+      m_turret(turret),
       m_operatorInterface(m_operatorInterface),
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
       isAutoAim(true),
+      m_globalPitch(0.0f), m_globalYaw(0.0f),
+      m_pitchCommand(0.0f), m_yawCommand(0.0f),
       m_pitchSensitivity(1.0f), m_yawSensitivity(1.0f),
       m_globalYawTarget(0.0f), m_globalPitchTarget(0.0f),
       m_lastTarget{NAN, NAN, NAN}
@@ -31,6 +34,8 @@ void TurretCommand::execute()
 
     if (m_operatorInterface.isAutoAim())
     {
+        m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, true);
+
         //AIM Command once target is found 
         
         if(isNewData)
@@ -56,6 +61,8 @@ void TurretCommand::execute()
     }
     else
     {
+        m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, false);
+
         //Manual Velocity Control 
         m_operatorInterface.pollInputDevices();
 
@@ -64,9 +71,13 @@ void TurretCommand::execute()
         float pitchInp = m_operatorInterface.getTurretPitchInput();
         float yawInp = m_operatorInterface.getTurretYawInput();
         
-        //update setpoint to operator input
-        m_turret.setPitchRps(pitchInp);
+        m_pitchCommand = pitchInp * (2.0f * static_cast<float>(M_PI)) * m_pitchSensitivity * (turret::TurretSubsystem::DT);
+        m_globalPitch += m_pitchCommand;
+
+        m_turret.setPitch(m_globalPitch);
         m_turret.setYawRps(yawInp);
+
+        m_turret.ChassisRot(m_operatorInterface.isChassisBeyblade());
     }
 }
 

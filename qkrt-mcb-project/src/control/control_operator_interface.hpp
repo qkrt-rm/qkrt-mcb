@@ -18,7 +18,7 @@ public:
 
     float getChassisYInput() const { return m_chassisYInput; };
 
-    float getChassisWInput() const { return m_chassisWInput; }; 
+    bool isChassisBeyblade() const { return m_isChassisBey; }; 
 
     float getTurretPitchInput() const { return m_turretPitchInput; };
 
@@ -40,7 +40,7 @@ private:
 
     float m_chassisXInput = 0.0f;
     float m_chassisYInput = 0.0f;
-    float m_chassisWInput = 0.0f;
+    bool m_isChassisBey = false;
 
     float m_turretPitchInput = 0.0f;
     float m_turretYawInput = 0.0f;
