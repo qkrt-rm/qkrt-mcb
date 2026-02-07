@@ -38,7 +38,7 @@ private:
     using Motor = tap::motor::DjiMotor;
     //using Pid = qkrt::Pid<float>;
 
-    static constexpr float MAX_TURRET_MOTOR_RPM = 300.0f;
+    static constexpr float MAX_TURRET_MOTOR_RPS = 32.0f;
     static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
     
     static constexpr float DEAD_ZONE_ANGLE = 0.01f;
@@ -158,10 +158,10 @@ private:
     tap::algorithms::SmoothPid m_yawPid;
 
     float m_desiredPitchRpm, m_desiredYawRpm;
-    // Pid m_pitchRpmPid, m_yawRpmPid;
+    // Pid m_pitchRpmPid, m_yawRpsPid;
 
     tap::algorithms::SmoothPid m_pitchRpmPid;
-    tap::algorithms::SmoothPid m_yawRpmPid;
+    tap::algorithms::SmoothPid m_yawRpsPid;
 
     bool m_aimLock;
     float m_sensitivity;

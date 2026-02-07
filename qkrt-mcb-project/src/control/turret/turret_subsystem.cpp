@@ -34,9 +34,9 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
           .maxICumulative = 5000.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
-      m_yawRpmPid({
-          .kp = 800.0f,
-          .ki = 3.0f,
+      m_yawRpsPid({
+          .kp = 9000.0f,
+          .ki = 0.0f,
           .kd = 0.0f,
           .maxICumulative = 70.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
@@ -92,18 +92,18 @@ void TurretSubsystem::refresh()
         float desiredPitchRpm = m_pitchPid.runControllerDerivateError(pitchError, DT);
 
         //Pitch Velocity Inner Loop
-        float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity() * 9.55f;  //TODO:REMOVE scaling to use rps
+        float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity();  
         m_desiredPitchVoltage = m_pitchRpmPid.runControllerDerivateError(desiredPitchRpm - currentPitchRpm, DT);
 
         float currentYaw = getYaw();
-        float currentYawRpm = m_ImuLpf.filterData(m_imu.getGz()) * -1 * 9.55f;
+        float currentYawRpm = m_ImuLpf.filterData(m_imu.getGz()) * -1;
         
         //Yaw Position Outer Loop
         float azimuthError = getOptimalError(m_desiredYaw, currentYaw);
         float desiredYawRpm = m_yawPid.runController(azimuthError, currentYawRpm, DT);
 
         //Yaw Velocity Inner Loop
-        m_desiredYawVoltage = m_yawRpmPid.runController(desiredYawRpm - currentYawRpm, 0.0f, DT);
+        m_desiredYawVoltage = m_yawRpsPid.runController(desiredYawRpm - currentYawRpm, 0.0f, DT);
 
         // m_logger.printf("POS ERROR= %.3f\n", static_cast<double>(desiredYawRpm));
         // m_logger.delay(400);
@@ -120,7 +120,7 @@ void TurretSubsystem::refresh()
          * - CONVERT To Using rad/s not rev/min
          */
         
-        float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity() * 9.55f;  //TODO:REMOVE scaling to use rps
+        float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity();
 
         float currentPitch = getPitch();
         float gainFF = 2000.0;
@@ -130,20 +130,18 @@ void TurretSubsystem::refresh()
         float rawImu = m_imu.getGz();
         float lpfImu = m_ImuLpf.filterData(rawImu);
 
-        float currentYawRpm = lpfImu * -1 * 9.55f;  
+        float currentYawRpm = lpfImu * -1;
     
         float pitchRpmError = m_desiredPitchRpm - currentPitchRpm;
         m_pitchRpmPid.runControllerDerivateError(pitchRpmError, DT);
         m_desiredPitchVoltage = m_pitchRpmPid.getOutput() + gainFF;
         
         float yawRpmError = m_desiredYawRpm - currentYawRpm;
-        m_yawRpmPid.runControllerDerivateError(yawRpmError, DT);
-        m_desiredYawVoltage = m_yawRpmPid.getOutput();
+        m_yawRpsPid.runControllerDerivateError(yawRpmError, DT);
+        m_desiredYawVoltage = m_yawRpsPid.getOutput();
         
         m_desiredYawVoltage = std::clamp(m_desiredYawVoltage, -MAX_TURRET_MOTOR_VOLTAGE, MAX_TURRET_MOTOR_VOLTAGE);
 
-        // m_logger.printf("FF= %.5f\n", static_cast<double>(m_desiredPitchVoltage));
-        // m_logger.delay(400);
     }
 
 
@@ -155,11 +153,9 @@ void TurretSubsystem::setPitchRps(float pitchRps)
 {
     float pitchAngle = getPitch();
     {
-
-        //REMOVE when switching to rad/s not rev/s
         m_desiredPitchRpm = std::clamp(
-            rpsToRpm(pitchRps * m_sensitivity), 
-            -MAX_TURRET_MOTOR_RPM, MAX_TURRET_MOTOR_RPM
+            pitchRps * m_sensitivity, 
+            -MAX_TURRET_MOTOR_RPS, MAX_TURRET_MOTOR_RPS
         );
     }
 }
@@ -167,8 +163,8 @@ void TurretSubsystem::setPitchRps(float pitchRps)
 void TurretSubsystem::setYawRps(float yawRps)
 {
     m_desiredYawRpm = std::clamp(
-        rpsToRpm(yawRps * m_sensitivity), 
-        -MAX_TURRET_MOTOR_RPM, MAX_TURRET_MOTOR_RPM
+        yawRps * m_sensitivity, 
+        -MAX_TURRET_MOTOR_RPS, MAX_TURRET_MOTOR_RPS
     );
 }
 
