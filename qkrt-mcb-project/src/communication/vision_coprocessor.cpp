@@ -16,6 +16,7 @@ namespace communication {
         if (completeMessage.header.dataLength == sizeof(lastTurretData))
         {
             memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
+            // lastTurretData.timestamp = std::chrono::steady_clock::now();
 
             // float x = lastTurretData.xPos;
             // float y = lastTurretData.yPos;

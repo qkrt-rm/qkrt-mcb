@@ -6,6 +6,7 @@
 
 #include "aim_message.hpp"
 #include "communication/logger/logger.hpp"
+#include <chrono>
 
 class Drivers;
 
@@ -40,6 +41,8 @@ namespace communication
             logger::Logger& m_logger;         //member that references logger object
 
             TurretData lastTurretData;          //struct with turret data from jetson
+
+            std::chrono::steady_clock::time_point m_lastReceiveTime;
 
     };
 }

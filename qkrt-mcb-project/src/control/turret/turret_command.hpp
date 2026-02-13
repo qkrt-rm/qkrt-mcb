@@ -6,6 +6,8 @@
 #include "control/turret/turret_subsystem.hpp"
 #include "communication/logger/logger.hpp"
 #include "communication/vision_coprocessor.hpp"
+#include "tap/algorithms/ballistics.hpp"
+#include <chrono>
 
 namespace control::turret
 {
@@ -42,7 +44,14 @@ private:
 
     float m_globalYawTarget, m_globalPitchTarget;
 
-    communication::TurretData m_lastTarget;
+    float m_lastFiveTargetsVelocity[1][3];
+
+    float m_lastPosition[3];
+
+    float m_acceleration[3];
+
+    communication::TurretData m_lastTarget; 
+
 };
 
 }  // namespace control::turret
