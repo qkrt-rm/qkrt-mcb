@@ -18,9 +18,9 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
       m_yawPid({
-          .kp = 24.0f,
+          .kp = 40.0f,
           .ki = 0.0f,
-          .kd = 0.0f,
+          .kd = 1.0f,
           .maxICumulative = 5000.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
