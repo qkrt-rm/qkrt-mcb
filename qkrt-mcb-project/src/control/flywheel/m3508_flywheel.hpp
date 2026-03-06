@@ -1,6 +1,8 @@
 #pragma once
 
 #include "drivers.hpp"
+#include "flywheel_subsystem.hpp"
+
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
     #include "tap/mock/dji_motor_mock.hpp"
 #else
@@ -15,7 +17,7 @@
 
 namespace control::flywheel 
 {
-    struct FlywheelConfig
+    struct M3508FlywheelConfig
     {
         tap::motor::MotorId leftFlyWheelId;
         tap::motor::MotorId rightFlywheelId;
@@ -24,7 +26,7 @@ namespace control::flywheel
     };
     
 
-    class FlywheelSubsystem : public tap::control::Subsystem
+    class M3508FlywheelSubsystem : public FlywheelSubsystem
     {
         private:
             enum class MotorId : uint8_t //change later 
@@ -39,15 +41,15 @@ namespace control::flywheel
             using Pid = modm::Pid<float>;
             using Motor = tap::motor::DjiMotor; //use a simplfied name for a complex datatype
         public:
-            FlywheelSubsystem(Drivers& drivers, const FlywheelConfig& config);
+            M3508FlywheelSubsystem(Drivers& drivers, const M3508FlywheelConfig& config);
 
             void initialize() override;
 
-            void setWheelVelocities(float flywheelSpeed);
+            void setTargetSpeed(float speed) override;
 
             void refresh() override;
 
-            const char* getName() override { return "Flywheel"; }
+            const char* getName() override { return "DJIFlywheel"; }
 
         private: 
             std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_desiredOutput;

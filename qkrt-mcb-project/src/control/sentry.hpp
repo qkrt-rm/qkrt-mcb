@@ -15,8 +15,8 @@
 
 
 // Flywheel Includes
-#include "control/flywheel/flywheel_sub_dd.hpp"
-#include "control/flywheel/flywheel_on_com_dd.hpp"
+#include "control/flywheel/flywheel_subsystem.hpp"
+#include "control/flywheel/flywheel_on_command.hpp"
 
 
 // Agitator Includes
@@ -65,8 +65,8 @@ private:
     /**
      * @brief Flywheel subsystem for the sentry robot
      */
-    flywheel::FlywheelSubsystem m_flywheels;
-    flywheel::FlywheelOnCommand m_flywheelsCommand;
+    flywheel::FlywheelSubsystem* m_flywheels;
+    flywheel::FlywheelOnCommand* m_flywheelsCommand;
 
 
     /**
@@ -78,7 +78,7 @@ private:
     //Mappings
     tap::control::HoldCommandMapping m_leftSwitchUP{
         &m_drivers,
-        {&m_agitatorCommand, &m_flywheelsCommand},
+        {&m_agitatorCommand, m_flywheelsCommand},
         tap::control::RemoteMapState(tap::communication::serial::Remote::Switch::LEFT_SWITCH, 
             tap::communication::serial::Remote::SwitchState::UP
         )

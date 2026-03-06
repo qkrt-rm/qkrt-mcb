@@ -1,4 +1,5 @@
 #include "sentry.hpp"
+#include "control/flywheel/snail_flywheel.hpp"
 
 using tap::can::CanBus;
 using tap::motor::MotorId;
@@ -29,22 +30,18 @@ Robot::Robot(Drivers& drivers)
                     .pitchHorizontalOffset = 0u,  // TODO: get this number when pitch motor is mounted
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
-      m_flywheels(drivers,
-                 flywheel::FlywheelConfig {
-                     .leftFlyWheelId = MotorId::MOTOR7,
-                     .rightFlywheelId = MotorId::MOTOR8,
-                     .canBus = CanBus::CAN_BUS1, 
-                     .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000),
-                }),
-      m_flywheelsCommand(m_flywheels, 6500.0f),
       m_agitator(drivers,
                 agitator::agitatorConfig{
-                    .agitatorId = MotorId::MOTOR1,
-                    .canBus = CanBus::CAN_BUS2,
+                    .agitatorId = MotorId::MOTOR7,
+                    .canBus = CanBus::CAN_BUS1,
                     .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
                 }),
-     m_agitatorCommand(m_agitator, -38.0)
+     m_agitatorCommand(m_agitator, -15.0)
 {
+
+    m_flywheels = new flywheel::SnailFlywheelSubsystem(drivers);
+
+    m_flywheelsCommand = new flywheel::FlywheelOnCommand(m_flywheels, 0.39f);
 }
 
 void Robot::initialize()
@@ -61,7 +58,7 @@ void Robot::initializeSubsystems()
 {
     m_chassis.initialize();
     m_turret.initialize();
-    m_flywheels.initialize();
+    m_flywheels->initialize();
     m_agitator.initialize();
 }
 
@@ -69,7 +66,7 @@ void Robot::registerSubsystems()
 {
     m_drivers.commandScheduler.registerSubsystem(&m_chassis);
     m_drivers.commandScheduler.registerSubsystem(&m_turret);
-    m_drivers.commandScheduler.registerSubsystem(&m_flywheels);
+    m_drivers.commandScheduler.registerSubsystem(m_flywheels);
     m_drivers.commandScheduler.registerSubsystem(&m_agitator);
 }
 

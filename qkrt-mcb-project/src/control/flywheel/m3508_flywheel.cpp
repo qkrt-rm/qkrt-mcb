@@ -1,9 +1,11 @@
-#include "flywheel_sub_dd.hpp"
+#include "m3508_flywheel.hpp"
+#include <algorithm> // Required for std::clamp
 
 namespace control::flywheel
 {
-    FlywheelSubsystem::FlywheelSubsystem(Drivers& drivers, const FlywheelConfig& config)
-        : tap::control::Subsystem(&drivers), 
+    
+    M3508FlywheelSubsystem::M3508FlywheelSubsystem(Drivers& drivers, const M3508FlywheelConfig& config)
+        : FlywheelSubsystem(drivers), 
         m_desiredOutput(),
         m_motors({
                 Motor(&drivers, config.rightFlywheelId, config.canBus, false, "RFly"), //the false could be spinning it the other way.
@@ -18,7 +20,7 @@ namespace control::flywheel
 
         }
 
-    void FlywheelSubsystem::initialize() 
+    void M3508FlywheelSubsystem::initialize() 
     {
         for (auto& motor : m_motors)
         {
@@ -26,14 +28,14 @@ namespace control::flywheel
         }
     }
 
-    void FlywheelSubsystem::setWheelVelocities(float flywheelSpeed) 
+    void M3508FlywheelSubsystem::setTargetSpeed(float speed) 
     {
-        flywheelSpeed = std::clamp(flywheelSpeed, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
-        m_desiredOutput[static_cast<uint8_t>(MotorId::LFly)] = flywheelSpeed;
-        m_desiredOutput[static_cast<uint8_t>(MotorId::RFly)] = flywheelSpeed;
+        speed = std::clamp(speed, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
+        m_desiredOutput[static_cast<uint8_t>(MotorId::LFly)] = speed;
+        m_desiredOutput[static_cast<uint8_t>(MotorId::RFly)] = speed;
     }
 
-    void FlywheelSubsystem::refresh() 
+    void M3508FlywheelSubsystem::refresh() 
     {
         auto runPid = [](Pid& pid, Motor& motor, float desiredOutput, Drivers *m_drivers_lf) -> void
         { 
