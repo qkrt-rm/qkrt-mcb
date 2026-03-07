@@ -49,7 +49,7 @@ namespace control::flywheel
 
             void refresh() override;
 
-            const char* getName() override { return "DJIFlywheel"; }
+            const char* getName() override { return "M3508Flywheel"; }
 
         private: 
             std::array<float, static_cast<uint8_t>(MotorId::NUM_MOTORS)> m_desiredOutput;

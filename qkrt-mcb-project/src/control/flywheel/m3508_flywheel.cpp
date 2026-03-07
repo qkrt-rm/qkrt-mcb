@@ -30,6 +30,11 @@ namespace control::flywheel
 
     void M3508FlywheelSubsystem::setTargetSpeed(float speed) 
     {
+        // mapping one range to another
+        float a[2] = {0.0f, 1.0f}; // range1 
+        float b[2] = {0.0f, MAX_WHEELSPEED_RPM}; //range2
+        speed = b[0] + (((speed - a[0])*(b[1]-b[0])) / (a[1]-a[0]));
+
         speed = std::clamp(speed, -MAX_WHEELSPEED_RPM, MAX_WHEELSPEED_RPM);
         m_desiredOutput[static_cast<uint8_t>(MotorId::LFly)] = speed;
         m_desiredOutput[static_cast<uint8_t>(MotorId::RFly)] = speed;
