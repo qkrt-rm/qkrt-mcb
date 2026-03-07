@@ -16,4 +16,5 @@ docs/api
 docs/doxyoutput
 
 .DS_Store
+
 .vscode/
