@@ -35,10 +35,10 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
       m_yawRpmPid({
-          .kp = 800.0f,
-          .ki = 3.0f,
+          .kp = 128.0f,
+          .ki = 2.0f,
           .kd = 0.0f,
-          .maxICumulative = 70.0f,
+          .maxICumulative = 5000.0f,
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
 
@@ -130,7 +130,10 @@ void TurretSubsystem::refresh()
         float rawImu = m_imu.getGz();
         float lpfImu = m_ImuLpf.filterData(rawImu);
 
-        float currentYawRpm = lpfImu * -1 * 9.55f;  
+        float currentYawRpm = m_ImuLpf.filterData(m_yawMotor.getEncoder()->getVelocity()) * 9.55f;  
+        
+        //float currentYawRpm = lpfImu * -9.55f;  
+
     
         float pitchRpmError = m_desiredPitchRpm - currentPitchRpm;
         m_pitchRpmPid.runControllerDerivateError(pitchRpmError, DT);
