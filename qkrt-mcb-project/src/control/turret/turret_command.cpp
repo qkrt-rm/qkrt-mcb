@@ -39,7 +39,7 @@ void TurretCommand::execute()
         {
             // m_turret.zeroYaw();
 
-            m_globalYawTarget = PI / 4;
+            m_globalYawTarget = PI / 8;
 
             m_turret.lock();        //tells subsytem to lock on target not used atm
 

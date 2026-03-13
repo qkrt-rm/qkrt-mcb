@@ -70,7 +70,7 @@ void TurretSubsystem::refresh()
      * - pitch angle must always be in range [-MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION]
      */
 
-    m_yaw += m_imu.getGz() / DT;
+    m_yaw += m_imu.getGz() * -1.0f / DT;
 
     m_logger.printf("Yaw: %.2f", static_cast<double>(m_yaw));
     m_logger.delay(1000);
