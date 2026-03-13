@@ -70,9 +70,9 @@ void TurretSubsystem::refresh()
      * - pitch angle must always be in range [-MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION]
      */
 
-    m_yaw += m_imu.getGz() * -1.0f / DT;
+    m_yaw += m_imu.getGz()*-1.0f * DT;
 
-    m_logger.printf("Yaw: %.2f", static_cast<double>(m_yaw));
+    m_logger.printf("Yaw: %.2f || RPS: %.2f \n", static_cast<double>(m_yaw*180/PI), static_cast<double>(m_imu.getGz()*-1));
     m_logger.delay(1000);
 
     if(m_drivers->isEmergencyStopActive()) 
@@ -100,7 +100,7 @@ void TurretSubsystem::refresh()
         float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity();  
         m_desiredPitchVoltage = m_pitchRpsPid.runControllerDerivateError(desiredPitchRpm - currentPitchRpm, DT);
 
-        // float currentYaw = getYaw();
+        //float currentYaw = getYaw();
         float currentYaw = m_yaw;
         float currentYawRpm = m_ImuLpf.filterData(m_imu.getGz()) * -1;
         
