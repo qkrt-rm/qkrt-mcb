@@ -100,7 +100,8 @@ void TurretSubsystem::refresh()
         float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity();  
         m_desiredPitchVoltage = m_pitchRpsPid.runControllerDerivateError(desiredPitchRpm - currentPitchRpm, DT);
 
-        float currentYaw = getYaw();
+        // float currentYaw = getYaw();
+        float currentYaw = m_yaw;
         float currentYawRpm = m_ImuLpf.filterData(m_imu.getGz()) * -1;
         
         //Yaw Position Outer Loop
