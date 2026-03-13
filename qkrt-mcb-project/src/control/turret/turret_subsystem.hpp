@@ -113,6 +113,8 @@ public:
 
     void unlock() { m_aimLock = false; }
 
+    void zeroYaw() { m_yaw = 0.0f; }
+
 private:
     inline float encoderToRad(uint16_t encoder) const
     {
