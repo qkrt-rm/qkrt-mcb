@@ -169,6 +169,7 @@ private:
     float m_sensitivity;
     float m_yawForwardOffset;
     float m_pitchHorizontalOffset;
+    float m_yaw;
 
     tap::algorithms::ExtendedKalman m_ImuKalman;
     tap::algorithms::filter::DiscreteFilter<3, float> m_ImuLpf;

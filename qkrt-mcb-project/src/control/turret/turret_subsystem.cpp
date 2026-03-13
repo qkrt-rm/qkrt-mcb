@@ -8,7 +8,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
       m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW"),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
-      m_desiredElevation(0.0f), m_desiredYaw(0.0f),
+      m_desiredElevation(0.0f), m_desiredYaw(0.0f), m_yaw(0.0f),
 
       m_pitchPid({
           .kp = 25.0f,
@@ -69,6 +69,11 @@ void TurretSubsystem::refresh()
      * - Move some params to config 
      * - pitch angle must always be in range [-MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION]
      */
+
+    m_yaw += m_imu.getGz() / DT;
+
+    m_logger.printf("Yaw: %.2f", static_cast<double>(m_yaw));
+    m_logger.delay(1000);
 
     if(m_drivers->isEmergencyStopActive()) 
     {
