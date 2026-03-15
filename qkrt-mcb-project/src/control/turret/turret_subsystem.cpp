@@ -8,7 +8,7 @@ namespace control::turret
 TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
     : tap::control::Subsystem(&drivers),
       m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
-      m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW"),
+      m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW", true),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
       m_desiredPitch(0.0f), m_desiredYaw(0.0f),
       m_desiredPitchRps(0.0f), m_desiredYawRps(0.0f),
@@ -36,11 +36,11 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
       m_yawRpsPid({
-          .kp = 8000.0f,
-          .ki = 10.0f,
+          .kp = 400.0f,
+          .ki = 2.0f,
           .kd = 0.0f,
           .maxICumulative = 1000.0f,
-          .maxOutput = MAX_TURRET_MOTOR_VOLTAGE,
+          .maxOutput = MAX_GM6020_CURRENT,
           .tQProportionalKalman = 1.0f,
           .tRProportionalKalman = 0.01f, 
       }),

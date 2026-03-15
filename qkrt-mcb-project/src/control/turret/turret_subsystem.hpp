@@ -40,7 +40,8 @@ private:
 
     static constexpr float MAX_TURRET_MOTOR_RPS = 32.0f;
     static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
-    
+    static constexpr float MAX_GM6020_CURRENT = 16384.0f;
+
     static constexpr float DEAD_ZONE_ANGLE = 0.01f;
     static constexpr float DEAD_ZONE_RPM = 0.5f;
         
