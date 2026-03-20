@@ -7,7 +7,7 @@ namespace control::turret
 
 TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
     : tap::control::Subsystem(&drivers),
-      m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
+      m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH", true),
       m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW", true),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
       m_desiredPitch(0.0f), m_desiredYaw(0.0f),
