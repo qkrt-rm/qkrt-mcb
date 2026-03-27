@@ -54,8 +54,11 @@ void TurretCommand::execute()
             m_globalPitchTarget = aimPitchRelative; 
             m_globalYawTarget = m_turret.getYaw() + aimYawRelative;   
 
+            m_globalXTarget = currentTarget.xPos;
+            
         }
         
+        m_turret.getXTarget(m_globalXTarget);
         m_turret.setYaw(m_globalYawTarget);
         m_turret.setPitch(m_globalPitchTarget);
     }

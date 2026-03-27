@@ -32,6 +32,13 @@ struct TurretConfig
     float pitchHorizontalOffset;
 };
 
+struct TurretPidGains {
+    float kp;
+    float ki;
+    float kd;
+    float maxICumulative;
+};
+
 class TurretSubsystem : public tap::control::Subsystem
 {
 private:
@@ -47,6 +54,12 @@ private:
     static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
 
     static constexpr double LPF_CUTOFF_HZ = 40.0;
+
+    static constexpr TurretPidGains MANUAL_PITCH_GAINS = {15.0f, 0.0f, 0.0f, 500.0f};
+    static constexpr TurretPidGains MANUAL_YAW_GAINS   = {5.0f, 0.0f, 0.0f, 5000.0f};
+
+    static constexpr TurretPidGains AUTO_AIM_PITCH_GAINS = {3.0f, 2.0f, 0.0f, 500.0f};
+    static constexpr TurretPidGains AUTO_AIM_YAW_GAINS   = {2.0f, 0.0f, 0.0f, 5000.0f};
 
 public:
     static constexpr float DT = 0.002f;
@@ -110,11 +123,14 @@ public:
      */
     void setYawRps(float yawRps);
 
+    void getXTarget(float xTarget) { m_globalXTarget = xTarget; }
+
     void lock() { m_aimLock = true; }
 
     void unlock() { m_aimLock = false; }
 
     void ChassisRot(bool isRot);
+
 
 
 private:
@@ -163,6 +179,7 @@ private:
     float m_sensitivity;
     float m_yawOffset;
     float m_pitchOffset;
+    float m_globalXTarget;
 
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
     Drivers* m_drivers;

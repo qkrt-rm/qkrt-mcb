@@ -93,11 +93,26 @@ void TurretSubsystem::refresh()
          * AUTO AIM Position Control
          * TODO:
          * - Implement Cascade Position -> Velocity Control
+         * - Inplement position via IMU feedback
+         * - Tune PID Gains exponentally based on target distance
+         * - Ballistics??? Maybe\
+         * - Move set methods to lock and unlock methods later
          */
+
+        
+        m_pitchPid.setP(AUTO_AIM_PITCH_GAINS.kp);
+        m_pitchPid.setI(AUTO_AIM_PITCH_GAINS.ki);
+        m_pitchPid.setD(AUTO_AIM_PITCH_GAINS.kd);
+        m_pitchPid.setMaxICumulative(AUTO_AIM_PITCH_GAINS.maxICumulative);
+
+        m_yawPid.setP(AUTO_AIM_YAW_GAINS.kp);
+        m_yawPid.setI(AUTO_AIM_YAW_GAINS.ki);
+        m_yawPid.setD(AUTO_AIM_YAW_GAINS.kd);
+        m_yawPid.setMaxICumulative(AUTO_AIM_YAW_GAINS.maxICumulative);
 
         float currentPitch = getPitch();
 
-        float pitchKFF = 2600.0f;
+        float pitchKFF = 5000.0f; //I changed this for realsense
         float pitchFF = pitchKFF * cos(currentPitch);
 
         //Pitch Position Outer Loop
@@ -125,6 +140,15 @@ void TurretSubsystem::refresh()
     else 
     {
         //Manual Velocity PID
+        m_pitchPid.setP(MANUAL_PITCH_GAINS.kp);
+        m_pitchPid.setI(MANUAL_PITCH_GAINS.ki);
+        m_pitchPid.setD(MANUAL_PITCH_GAINS.kd);
+        m_pitchPid.setMaxICumulative(MANUAL_PITCH_GAINS.maxICumulative);
+
+        m_yawPid.setP(MANUAL_YAW_GAINS.kp);
+        m_yawPid.setI(MANUAL_YAW_GAINS.ki);
+        m_yawPid.setD(MANUAL_YAW_GAINS.kd);
+        m_yawPid.setMaxICumulative(MANUAL_YAW_GAINS.maxICumulative);
 
         float pitchKFF = 2600.0f;
         float yawKFF = 6560.0f;
