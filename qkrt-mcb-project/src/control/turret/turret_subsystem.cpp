@@ -112,7 +112,7 @@ void TurretSubsystem::refresh()
 
         float currentPitch = getPitch();
 
-        float pitchKFF = 5000.0f; //I changed this for realsense
+        float pitchKFF = 2600.0f;
         float pitchFF = pitchKFF * cos(currentPitch);
 
         //Pitch Position Outer Loop
