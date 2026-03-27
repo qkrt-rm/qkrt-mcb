@@ -18,7 +18,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
           .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
       }),
       m_yawPid({
-          .kp = 24.0f,
+          .kp = 4.0f, // 24
           .ki = 0.0f,
           .kd = 0.0f,
           .maxICumulative = 5000.0f,
@@ -72,7 +72,7 @@ void TurretSubsystem::refresh()
 
     m_yaw += m_imu.getGz()*-1.0f * DT;
 
-    m_logger.printf("Yaw: %.2f || RPS: %.2f \n", static_cast<double>(m_yaw*180/PI), static_cast<double>(m_imu.getGz()*-1));
+    m_logger.printf("Yaw: %.2f || RPS: %.2f || Des Yaw: %.2f \n", static_cast<double>(m_yaw*180/PI), static_cast<double>(m_imu.getGz()*-1), static_cast<double>(m_desiredYaw));
     m_logger.delay(1000);
 
     if(m_drivers->isEmergencyStopActive()) 
