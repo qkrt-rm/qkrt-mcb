@@ -63,6 +63,7 @@ static void initializeIo(Drivers *drivers);
 // very frequently. Use PeriodicMilliTimers if you don't want something to be
 // called as frequently.
 static void updateIo(Drivers *drivers);
+static void updateImu(Drivers *drivers);
 
 int main()
 {
@@ -95,7 +96,7 @@ int main()
         PROFILE(drivers->profiler, updateIo, (drivers));
         if (sendMotorTimeout.execute())
         {
-            PROFILE(drivers->profiler, drivers->bmi088.periodicIMUUpdate, ());
+            PROFILE(drivers->profiler, updateImu, (drivers));
             PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
             PROFILE(drivers->profiler, drivers->djiMotorTxHandler.encodeAndSendCanData, ());
             PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
@@ -132,6 +133,12 @@ static void updateIo(Drivers *drivers)
     drivers->canRxHandler.pollCanData();
    // drivers->refSerial.updateSerial();
     drivers->remote.read();
-    drivers->bmi088.read();
     drivers->visionCoprocessor.updateSerial();
+    drivers->visionCoprocessor.sendData();
+}
+
+static void updateImu(Drivers *drivers)
+{
+    drivers->bmi088.periodicIMUUpdate();
+    drivers->bmi088.read();
 }

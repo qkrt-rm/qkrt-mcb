@@ -4,10 +4,13 @@
 #include <tap/communication/serial/uart.hpp>
 #include <tap/architecture/timeout.hpp>
 
-#include "aim_message.hpp"
+#include "jetson_message.hpp"
 #include "communication/logger/logger.hpp"
 
 class Drivers;
+
+namespace control::chassis { class HolonomicChassisSubsystem; }
+namespace control::turret { class TurretSubsystem; }
 
 namespace communication
 {
@@ -23,9 +26,22 @@ namespace communication
 
             void initialize();
 
+            bool decodeTurretData(const ReceivedSerialMessage& completeMessage);
+
+            bool decodeNavData(const ReceivedSerialMessage& completeMessage);
+
             const TurretData& getTurretData() const;
-            
-            bool isOnline() const;  
+
+            const NavData& getNavData() const;
+
+            void sendData();
+
+            void sendOdomData();
+
+            void setChassisSubsystem(control::chassis::HolonomicChassisSubsystem* chassis) { m_chassis = chassis; }
+            void setTurretSubsystem(control::turret::TurretSubsystem* turret) { m_turret = turret; }
+
+            bool isOnline() const;
 
 
         private:
@@ -40,6 +56,16 @@ namespace communication
             logger::Logger& m_logger;         //member that references logger object
 
             TurretData lastTurretData;          //struct with turret data from jetson
+
+            NavData lastNavData;
+
+            tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
+
+            control::chassis::HolonomicChassisSubsystem* m_chassis = nullptr;
+            control::turret::TurretSubsystem* m_turret = nullptr;
+
+            tap::arch::MilliTimeout sendTimeout;
+            static constexpr uint32_t SEND_INTERVAL_MS = 500;
 
     };
 }
