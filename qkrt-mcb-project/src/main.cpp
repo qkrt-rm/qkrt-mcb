@@ -47,7 +47,7 @@
 
 static constexpr float IMU_SAMPLE_FREQUENCY = 500;
 static constexpr float MAHONY_KP = 0.5f;
-static constexpr float MAHONY_KI = 0;
+static constexpr float MAHONY_KI = 0.0;
 
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
@@ -116,8 +116,9 @@ static void initializeIo(Drivers *drivers)
     drivers->errorController.init();
     drivers->remote.initialize();
     drivers->bmi088.initialize(IMU_SAMPLE_FREQUENCY, MAHONY_KP, MAHONY_KI);
+    drivers->bmi088.setCalibrationSamples(2000);
     drivers->bmi088.requestCalibration();
-    //drivers->refSerial.initialize();              //enable when cv comm switched to another port
+    //drivers->refSerial.initialize();          
     drivers->terminalSerial.initialize();
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();

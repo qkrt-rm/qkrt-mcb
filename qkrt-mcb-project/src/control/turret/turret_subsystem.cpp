@@ -1,5 +1,7 @@
 #include "turret_subsystem.hpp"
 
+using ImuState = tap::communication::sensors::imu::ImuInterface::ImuState;
+
 namespace control::turret
 {
 
@@ -8,33 +10,62 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
       m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW"),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
+      m_desiredPitch(0.0f), m_desiredYaw(0.0f),
+      m_desiredPitchRps(0.0f), m_desiredYawRps(0.0f),
 
-      m_desiredElevation(0.0f), m_desiredAzimuth(0.0f),
-      m_elevationPid(4500.0f, 10.0f, 90.0f, MAX_TURRET_MOTOR_VOLTAGE),
-      m_azimuthPid  (4500.0f, 10.0f, 120.0f, MAX_TURRET_MOTOR_VOLTAGE),
+      m_pitchPid({
+          .kp = 15.0f,
+          .ki = 0.0f,
+          .kd = 0.0f,
+          .maxICumulative = 500.0f,
+          .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
+      }),
+      m_yawPid({
+          .kp = 5.0f,
+          .ki = 0.0f,
+          .kd = 0.0f,
+          .maxICumulative = 5000.0f,
+          .maxOutput = MAX_TURRET_MOTOR_VOLTAGE,
+      }),
 
-      m_desiredPitchRpm(0.0f), m_desiredYawRpm(0.0f),
-      m_pitchRpmPid(80.5f, 0.2f, 1.0f, MAX_TURRET_MOTOR_VOLTAGE),
-      m_yawRpmPid(350.0f, 2.5f, 0.0f, MAX_TURRET_MOTOR_VOLTAGE),
+      m_pitchRpsPid({
+          .kp = 4000.0f,
+          .ki = 110.0f,
+          .kd = 0.0f,
+          .maxICumulative = 3000.0f,
+          .maxOutput = MAX_TURRET_MOTOR_VOLTAGE
+      }),
+      m_yawRpsPid({
+          .kp = 8000.0f,
+          .ki = 10.0f,
+          .kd = 0.0f,
+          .maxICumulative = 1000.0f,
+          .maxOutput = MAX_TURRET_MOTOR_VOLTAGE,
+          .tQProportionalKalman = 1.0f,
+          .tRProportionalKalman = 0.01f, 
+      }),
 
       m_aimLock(false),  
+      m_isCalibrated(false),
+      m_isChassisRot(false),
       m_sensitivity(1.0f),
       m_imu(drivers.bmi088),
       m_drivers(&drivers),
-      m_ImuKalman(0.0f,1.0f),
-      m_ImuLpf(tap::algorithms::filter::butterworth<2, tap::algorithms::filter::LOWPASS>(
-        LPF_CUTOFF_HZ * 2.0 * std::numbers::pi,
-        LPF_SAMPLE_TIME)),
       m_logger(drivers.logger)
 {
-    m_pitchHorizontalOffset = encoderToRad(config.pitchHorizontalOffset);
-    m_yawForwardOffset = encoderToRad(config.yawForwardOffset);
+      m_pitchOffset = degToRad(config.pitchHorizontalOffset);
+      m_yawOffset = degToRad(config.yawForwardOffset); 
 }
 
 void TurretSubsystem::initialize()
 {
     m_pitchMotor.initialize();
     m_yawMotor.initialize();
+
+    m_pitchPid.reset();
+    m_yawPid.reset();
+    m_pitchRpsPid.reset();
+    m_yawRpsPid.reset();
 }
 
 void TurretSubsystem::refresh()
@@ -45,14 +76,18 @@ void TurretSubsystem::refresh()
      * - pitch angle must always be in range [-MAX_TURRET_ELEVATION, MAX_TURRET_ELEVATION]
      */
 
-    if(m_drivers->isEmergencyStopActive()) 
+
+    if(m_drivers->isEmergencyStopActive() || m_imu.getImuState() == ImuState::IMU_CALIBRATING) 
     {
-        m_elevationPid.reset();
-        m_azimuthPid.reset();
+        m_pitchPid.reset();
+        m_yawPid.reset();
+        m_yawRpsPid.reset();
+        m_pitchRpsPid.reset();
+
         m_desiredPitchVoltage = 0.0f;
         m_desiredYawVoltage = 0.0f;
     }
-    else if (m_aimLock)      //set to false in contructor
+    else if (m_aimLock)     
     {
         /**
          * AUTO AIM Position Control
@@ -60,93 +95,58 @@ void TurretSubsystem::refresh()
          * - Implement Cascade Position -> Velocity Control
          */
 
-        /**
-         * @brief Computes the shortest angular error between two angles.
-         *
-         * This function calculates the smallest difference between a desired angle 
-         * and the current angle, ensuring the result is within the range [-π, π]. 
-         * This prevents issues where an angle error of, for example, 350° would be 
-         * treated as -350° instead of 10°.
-         *
-         * @param desiredAngle The target angle in radians.
-         * @param currentAngle The current angle in radians.
-         * @return The shortest angular difference in radians, constrained to [-π, π].
-         */
-        auto getOptimalError = [](float desiredAngle, float currentAngle) -> float
-            {
-                float error = desiredAngle - currentAngle;
-                return std::atan2(std::sin(error), std::cos(error));;
-            };
+        float currentPitch = getPitch();
+
+        float pitchKFF = 2600.0f;
+        float pitchFF = pitchKFF * cos(currentPitch);
+
+        //Pitch Position Outer Loop
+        float pitchError = getOptimalError(m_desiredPitch, currentPitch);
+        float desiredPitchRpm = m_pitchPid.runControllerDerivateError(pitchError, DT);
+
+        //Pitch Velocity Inner Loop
+        float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity();  
+        m_pitchRpsPid.runControllerDerivateError(desiredPitchRpm - currentPitchRpm, DT);
+        m_desiredPitchVoltage = m_pitchRpsPid.getOutput();
+
+        float currentYawRpm = m_imu.getGz() * -1;  //TODO: make sure this is filtered
         
-        float currentElevation = getElevation();
-        float currentAzimuth = getAzimuth();
+        //Yaw Position Outer Loop
+        float azimuthError = getOptimalError(m_desiredYaw, getYaw());
+        float desiredYawRpm = m_yawPid.runController(azimuthError, currentYawRpm, DT);
+
+        //Yaw Velocity Inner Loop
+        m_desiredYawVoltage = m_yawRpsPid.runController(desiredYawRpm - currentYawRpm, 0.0f, DT);
+
+        // m_logger.printf("POS ERROR= %.3f\n", static_cast<double>(desiredYawRpm));
+        // m_logger.delay(400);
         
-        float elevationError = getOptimalError(m_desiredElevation, currentElevation);
-        if (std::abs(elevationError) > DEAD_ZONE_ANGLE)
-        {
-            m_elevationPid.update(elevationError);
-            m_desiredPitchVoltage = m_elevationPid.getValue();
-        }
-        else
-        {
-            m_elevationPid.reset();
-            m_desiredPitchVoltage = 0.0f;
-        }
-        
-        float azimuthError = getOptimalError(m_desiredAzimuth, currentAzimuth);
-        if (std::abs(azimuthError) > DEAD_ZONE_ANGLE)
-        {
-            m_azimuthPid.update(azimuthError);
-            m_desiredYawVoltage = m_azimuthPid.getValue();
-        }
-        else
-        {
-            m_azimuthPid.reset();
-            m_desiredYawVoltage = 0.0f;
-        }
     }
     else 
     {
-        /**
-         * Manual Velocity Control
-         * TODO: 
-         * - Filter IMU yaw feedback
-         * - Expirement with IMU on Pitch
-         * - TUNE params PID, Deadzone etc.
-         * - CONVERT To Using rad/s not rev/min
-         */
-        
-        float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity() * 9.55f;  //TODO:REMOVE scaling to use rps
+        //Manual Velocity PID
 
-        float rawImu = m_imu.getGz();
-        float lpfImu = m_ImuLpf.filterData(rawImu);
-
-        float currentYawRpm = lpfImu * -1 * 9.55f;  
+        float pitchKFF = 2600.0f;
+        float yawKFF = 6560.0f;
     
-        float pitchRpmError = m_desiredPitchRpm - currentPitchRpm;
-        m_pitchRpmPid.update(pitchRpmError);
-        m_desiredPitchVoltage = m_pitchRpmPid.getValue();
+        float yawFF = (m_isChassisRot) ? (yawKFF * -chassis::HolonomicChassisCommand::CHASSIS_ROT_SPEED_RAD) : 0.0f;
+        float pitchFF = pitchKFF * cos(getPitch());
+
+        float pitchError = getOptimalError(m_desiredPitch, getPitch());
+        float desiredPitchRps = m_pitchPid.runControllerDerivateError(pitchError, DT);
+
+        float pitchRpsError = desiredPitchRps - (m_pitchMotor.getEncoder()->getVelocity());
+        m_pitchRpsPid.runControllerDerivateError(pitchRpsError, DT);
+        m_desiredPitchVoltage = m_pitchRpsPid.getOutput() + pitchFF;
         
-        float yawRpmError = m_desiredYawRpm - currentYawRpm;
-        m_yawRpmPid.update(yawRpmError);
-        m_desiredYawVoltage = m_yawRpmPid.getValue();
-  
-        // //deadzone creates issues when beyblading
-        // if (std::abs(yawRpmError) > DEAD_ZONE_RPM)
-        // {
-        //     m_yawRpmPid.update(yawRpmError);
-        //     m_desiredYawVoltage = m_yawRpmPid.getValue();
-        // }
-        // else
-        // {
-        //     m_desiredYawVoltage = 0.0f;
-        //     m_yawRpmPid.reset();
-        // }
+        float yawRpsError = m_desiredYawRps - (m_imu.getGz() * -1);
+        m_yawRpsPid.runControllerDerivateError(yawRpsError, DT);
+        m_desiredYawVoltage = m_yawRpsPid.getOutput() + yawFF;
 
     }
 
-
-
+    m_desiredPitchVoltage = std::clamp(m_desiredPitchVoltage, -MAX_TURRET_MOTOR_VOLTAGE, MAX_TURRET_MOTOR_VOLTAGE);
+    m_desiredYawVoltage = std::clamp(m_desiredYawVoltage, -MAX_TURRET_MOTOR_VOLTAGE, MAX_TURRET_MOTOR_VOLTAGE);
 
     m_pitchMotor.setDesiredOutput(m_desiredPitchVoltage);
     m_yawMotor.setDesiredOutput(m_desiredYawVoltage);
@@ -154,23 +154,23 @@ void TurretSubsystem::refresh()
 
 void TurretSubsystem::setPitchRps(float pitchRps)
 {
-    float pitchAngle = getElevation();
+    float pitchAngle = getPitch();
     {
-
-        //REMOVE when switching to rad/s not rev/s
-        m_desiredPitchRpm = std::clamp(
-            rpsToRpm(pitchRps * m_sensitivity), 
-            -MAX_TURRET_MOTOR_RPM, MAX_TURRET_MOTOR_RPM
+        m_desiredPitchRps = std::clamp(
+            pitchRps * (2.0f * static_cast<float>(M_PI)) * m_sensitivity, 
+            -MAX_TURRET_MOTOR_RPS, MAX_TURRET_MOTOR_RPS
         );
     }
 }
 
 void TurretSubsystem::setYawRps(float yawRps)
 {
-    m_desiredYawRpm = std::clamp(
-        rpsToRpm(yawRps * m_sensitivity), 
-        -MAX_TURRET_MOTOR_RPM, MAX_TURRET_MOTOR_RPM
+    m_desiredYawRps = std::clamp(
+        yawRps * (2.0f * static_cast<float>(M_PI)) * m_sensitivity, 
+        -MAX_TURRET_MOTOR_RPS, MAX_TURRET_MOTOR_RPS
     );
 }
+
+void TurretSubsystem::ChassisRot(bool isRot) { m_isChassisRot = isRot; }
 
 }  // namespace control::turret

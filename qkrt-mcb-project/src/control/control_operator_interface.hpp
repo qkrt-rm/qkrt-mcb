@@ -18,7 +18,7 @@ public:
 
     float getChassisYInput() const { return m_chassisYInput; };
 
-    float getChassisWInput() const { return m_chassisWInput; }; 
+    bool isChassisBeyblade() const { return m_isChassisBey; }; 
 
     float getTurretPitchInput() const { return m_turretPitchInput; };
 
@@ -28,9 +28,7 @@ public:
 
     bool getAgitatorInput() const { return m_agitatorInput; };
 
-
-
-
+    bool isAutoAim () const { return m_autoAimInput; };
     
 private:
     tap::communication::serial::Remote& m_remote;
@@ -42,7 +40,7 @@ private:
 
     float m_chassisXInput = 0.0f;
     float m_chassisYInput = 0.0f;
-    float m_chassisWInput = 0.0f;
+    bool m_isChassisBey = false;
 
     float m_turretPitchInput = 0.0f;
     float m_turretYawInput = 0.0f;
@@ -50,6 +48,7 @@ private:
     bool m_flywheelInput = false;
     bool m_agitatorInput = false;
 
+    bool m_autoAimInput = false;
 };
 
 }  // control

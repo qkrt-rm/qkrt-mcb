@@ -6,6 +6,7 @@
 #include "control/turret/turret_subsystem.hpp"
 #include "communication/logger/logger.hpp"
 #include "communication/vision_coprocessor.hpp"
+#include "tap/communication/gpio/digital.hpp"
 
 namespace control::turret
 {
@@ -36,10 +37,19 @@ private:
     communication::VisionCoprocessor& m_visionCoprocessor;
     communication::logger::Logger& m_logger;
 
+    Drivers &m_drivers;
+    
+    bool isAutoAim;
+
+    float m_globalPitch, m_globalYaw;
+
+    float m_pitchCommand, m_yawCommand;
+
     float m_pitchSensitivity, m_yawSensitivity;
 
-    // TODO: change to some target data structure when it exists
-    void* m_target;
+    float m_globalYawTarget, m_globalPitchTarget;
+
+    communication::TurretData m_lastTarget;
 };
 
 }  // namespace control::turret
