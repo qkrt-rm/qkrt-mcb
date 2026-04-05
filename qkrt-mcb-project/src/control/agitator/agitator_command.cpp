@@ -43,18 +43,35 @@ void AgitatorCommand::execute()
      * - Use Balls Per Second instead of rpm
      * - UNIT FIX reading radians per second now
      */
-    
 
-     if(m_operatorInterface.getAgitatorReverseInput() == true)
-     {
-        float newIndexerSpeed = -(isBOOST ? m_indexerSpeed  + 20.0f : m_indexerSpeed);
+    float torque = m_agitator.getTorque();
+
+    // If torque too high, reverse motor for 30 cycles
+    if (torque > torqueLimit && counter < 30)
+    {
+        float reverseSpeed = -(isBOOST ? m_indexerSpeed + 20.0f : m_indexerSpeed);
+        m_agitator.setSetpoint(reverseSpeed);
+
+        counter++;
+        return;
+    }
+
+    // Reset counter once reverse period is finished
+    if (counter >= 30)
+    {
+        counter = 0;
+    }
+
+    if (m_operatorInterface.getAgitatorReverseInput())
+    {
+        float newIndexerSpeed = -(isBOOST ? m_indexerSpeed + 20.0f : m_indexerSpeed);
         m_agitator.setSetpoint(newIndexerSpeed);
-     }
-     else
-     {
-        float newIndexerSpeed = isBOOST ? m_indexerSpeed  + 20.0f : m_indexerSpeed;
+    }
+    else
+    {
+        float newIndexerSpeed = isBOOST ? m_indexerSpeed + 20.0f : m_indexerSpeed;
         m_agitator.setSetpoint(newIndexerSpeed);
-     }
+    }
 }
 
 void AgitatorCommand::end(bool) { m_agitator.setSetpoint(0); }

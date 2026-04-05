@@ -70,6 +70,7 @@ void HolonomicChassisSubsystem::refresh()
         else {
             pid.update(desiredOutput - motor.getEncoder()->getVelocity());
         }
+        
         motor.setDesiredOutput(pid.getValue());
     };
 

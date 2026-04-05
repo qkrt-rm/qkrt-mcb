@@ -146,8 +146,6 @@ void TurretSubsystem::refresh()
     }
 
 
-
-
     m_pitchMotor.setDesiredOutput(m_desiredPitchVoltage);
     m_yawMotor.setDesiredOutput(m_desiredYawVoltage);
 }

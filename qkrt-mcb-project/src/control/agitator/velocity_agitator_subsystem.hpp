@@ -137,6 +137,8 @@ public:
      */
     float getCurrentValueIntegral() const override;
 
+    float getTorque();
+
 private:
     /// @return Uncalibrated agitator angle.
     float getUncalibratedAgitatorAngle() const;

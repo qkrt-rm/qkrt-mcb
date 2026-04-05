@@ -20,6 +20,7 @@
 #pragma once
 
 #include "tap/control/command.hpp"
+#include "control/control_operator_interface.hpp"
 
 namespace control::agitator
 {
@@ -41,7 +42,8 @@ public:
     bool isFinished() const { return false; }
 
 private:
-    
+
+    using Motor = tap::motor::DjiMotor;
     static inline bool isBOOST = false;
 
     VelocityAgitatorSubsystem &m_agitator;
@@ -49,6 +51,12 @@ private:
 
 
     float m_indexerSpeed;
+
+    int counter = 0;
+    const float torqueLimit = 5;
+
+    // Motor m_motors;
+    Drivers* m_drivers;
 };
 
 }  // namespace control::chassis
