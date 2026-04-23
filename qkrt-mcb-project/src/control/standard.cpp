@@ -1,6 +1,6 @@
-#if defined(TARGET_SENTRY)
+#if defined(TARGET_STANDARD)
 
-#include "sentry.hpp"
+#include "standard.hpp"
 
 using tap::can::CanBus;
 using tap::motor::MotorId;
@@ -27,8 +27,8 @@ Robot::Robot(Drivers& drivers)
                     .pitchInverted = false,
                     .yawInverted = true,
                     .canBus  = CanBus::CAN_BUS1,
-                    .yawForwardOffset = 8.35f,
-                    .pitchHorizontalOffset = -10.9f,  // TODO: get this number when pitch motor is mounted
+                    .yawForwardOffset = 5455u,
+                    .pitchHorizontalOffset = 0u,  // TODO: get this number when pitch motor is mounted
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
       m_flywheels(drivers),
@@ -94,4 +94,4 @@ void Robot::registerIoMappings()
 
 }  // namespace control
 
-#endif
+#endif  // TARGET_STANDARD
