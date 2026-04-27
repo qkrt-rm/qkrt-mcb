@@ -14,7 +14,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_desiredPitchRps(0.0f), m_desiredYawRps(0.0f),
 
       m_pitchPid({
-          .kp = 15.0f,
+          .kp = 10.0f,
           .ki = 0.0f,
           .kd = 0.0f,
           .maxICumulative = 500.0f,
@@ -53,8 +53,8 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_drivers(&drivers),
       m_logger(drivers.logger)
 {
-      m_pitchOffset = degToRad(config.pitchHorizontalOffset);
-      m_yawOffset = degToRad(config.yawForwardOffset); 
+      m_pitchOffset = config.pitchHorizontalOffset;
+      m_yawOffset = config.yawForwardOffset; 
 }
 
 void TurretSubsystem::initialize()
@@ -95,13 +95,13 @@ void TurretSubsystem::refresh()
          * - Implement Cascade Position -> Velocity Control
          */
 
-        float currentPitch = getPitch();
+        float currPitch = getPitch();
 
         float pitchKFF = 2600.0f;
-        float pitchFF = pitchKFF * cos(currentPitch);
+        float pitchFF = pitchKFF * cos(currPitch);
 
         //Pitch Position Outer Loop
-        float pitchError = getOptimalError(m_desiredPitch, currentPitch);
+        float pitchError = getOptimalError(m_desiredPitch, currPitch);
         float desiredPitchRpm = m_pitchPid.runControllerDerivateError(pitchError, DT);
 
         //Pitch Velocity Inner Loop
@@ -126,13 +126,18 @@ void TurretSubsystem::refresh()
     {
         //Manual Velocity PID
 
-        float pitchKFF = 2600.0f;
+        float pitchKFF = 1000.0f;
         float yawKFF = 6560.0f;
     
-        float yawFF = (m_isChassisRot) ? (yawKFF * -chassis::HolonomicChassisCommand::CHASSIS_ROT_SPEED_RAD) : 0.0f;
-        float pitchFF = pitchKFF * cos(getPitch());
+        float currPitch = getPitch();
 
-        float pitchError = getOptimalError(m_desiredPitch, getPitch());
+        m_logger.printf("PITCH: %.4f\n", static_cast<double>(currPitch));
+        m_logger.delay(200);
+
+        float yawFF = (m_isChassisRot) ? (yawKFF * -chassis::HolonomicChassisCommand::CHASSIS_ROT_SPEED_RAD) : 0.0f;
+        float pitchFF = pitchKFF * cos(currPitch);
+
+        float pitchError = m_desiredPitch - currPitch;
         float desiredPitchRps = m_pitchPid.runControllerDerivateError(pitchError, DT);
 
         float pitchRpsError = desiredPitchRps - (m_pitchMotor.getEncoder()->getVelocity());
