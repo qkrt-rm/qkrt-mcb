@@ -27,8 +27,8 @@ Robot::Robot(Drivers& drivers)
                     .pitchInverted = false,
                     .yawInverted = true,
                     .canBus  = CanBus::CAN_BUS1,
-                    .yawForwardOffset = 8.35f,
-                    .pitchHorizontalOffset = -10.9f,  // TODO: get this number when pitch motor is mounted
+                    .yawForwardOffset = -6.27091f,
+                    .pitchHorizontalOffset = -3.1991f, 
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
       m_flywheels(drivers),
@@ -39,7 +39,7 @@ Robot::Robot(Drivers& drivers)
                     .canBus = CanBus::CAN_BUS1,
                     .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
                 }),
-     m_agitatorCommand(m_agitator, -15.0)
+     m_agitatorCommand(m_agitator, -5.0)
 {
 }
 

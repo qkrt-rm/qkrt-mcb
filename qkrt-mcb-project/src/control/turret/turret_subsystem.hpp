@@ -74,7 +74,7 @@ public:
     inline float getPitch() const
     {
         auto relativeAngle = m_pitchMotor.getEncoder()->getPosition() + m_pitchOffset;
-        return (relativeAngle).getWrappedValue();
+        return (relativeAngle).getUnwrappedValue();
     }
 
     /**
@@ -93,7 +93,7 @@ public:
     inline float getYaw() const
     {
         auto currentAngle = m_yawMotor.getEncoder()->getPosition() + m_yawOffset;
-        return (currentAngle - m_yawOffset).getWrappedValue();
+        return (currentAngle).getWrappedValue();
     }
 
     /**

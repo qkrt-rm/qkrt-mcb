@@ -74,6 +74,8 @@ void TurretCommand::execute()
         m_pitchCommand = pitchInp * (2.0f * static_cast<float>(M_PI)) * m_pitchSensitivity * (turret::TurretSubsystem::DT);
         m_globalPitch += m_pitchCommand;
 
+        m_globalPitch = std::clamp(m_globalPitch, -0.2761f, 0.5691f);
+  
         m_turret.setPitch(m_globalPitch);
         m_turret.setYawRps(yawInp);
 
