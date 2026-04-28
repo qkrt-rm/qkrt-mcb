@@ -27,8 +27,17 @@ Robot::Robot(Drivers& drivers)
                     .pitchInverted = false,
                     .yawInverted = true,
                     .canBus  = CanBus::CAN_BUS1,
-                    .yawForwardOffset = 5455u,
-                    .pitchHorizontalOffset = 0u,  // TODO: get this number when pitch motor is mounted
+                    .yawForwardOffset = 0.0f,           //find with logger
+                    .pitchHorizontalOffset = 0.0f,      //find with logger
+                    .pitchUpLim = 0.5691f,                  //edit
+                    .pitchDownLim = -0.2761f,               //edit
+                    .MAX_PITCH_POWER = GM6020::MAX_VOLTAGE,
+                    .MAX_YAW_POWER = GM6020::MAX_VOLTAGE,
+                    .MAX_RPS = GM6020::MAX_RPS,
+                    .pitchPosGains = { .kp = 10.0f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = 1.0f },
+                    .pitchVelGains = { .kp = 4000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = 1.0f },
+                    .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = 1.0f },
+                    .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = 1.0f }
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
       m_flywheels(drivers),

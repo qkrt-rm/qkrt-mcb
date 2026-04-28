@@ -21,35 +21,49 @@
 namespace control::turret
 {
 
+struct PidGains
+{
+    float kp, ki, kd;
+    float maxICumulative;
+    float maxOutput;
+
+    float tQ = 1.0f;
+    float tR = 0.0f;
+};
+
 struct TurretConfig
 {
+    //hardware settings
     tap::motor::MotorId pitchId;
     tap::motor::MotorId yawId;
     bool pitchInverted;
     bool yawInverted;
     tap::can::CanBus canBus;
+
+    //offsets and limits
     float yawForwardOffset;
     float pitchHorizontalOffset;
+    float pitchUpLim;
+    float pitchDownLim;
+    float MAX_PITCH_POWER;
+    float MAX_YAW_POWER;
+    float MAX_RPS;
+
+    //PID gains
+    PidGains pitchPosGains;
+    PidGains pitchVelGains;
+    PidGains yawPosGains;
+    PidGains yawVelGains;
 };
 
 class TurretSubsystem : public tap::control::Subsystem
 {
-private:
-    using Motor = tap::motor::DjiMotor;
-    //using Pid = qkrt::Pid<float>;
-
-    static constexpr float MAX_TURRET_MOTOR_RPS = 32.0f;
-    static constexpr float MAX_TURRET_MOTOR_VOLTAGE = 25000.0f;
-    
-    static constexpr float DEAD_ZONE_ANGLE = 0.01f;
-    static constexpr float DEAD_ZONE_RPM = 0.5f;
-        
-    static constexpr float MAX_TURRET_ELEVATION = M_PI_4;
-
-    static constexpr double LPF_CUTOFF_HZ = 40.0;
 
 public:
     static constexpr float DT = 0.002f;
+    
+    float m_pitchUpLim;
+    float m_pitchDownLim;
 
     TurretSubsystem(Drivers& drivers, const TurretConfig& config);
 
@@ -57,13 +71,12 @@ public:
     void refresh() override;
     const char* getName() const override { return "Turret"; }
 
-public:
     /**
      * @brief Adjusts the pitch motor to a desired elevation angle
      */
-    inline void setPitch(float desiredElevation)
+    inline void setPitch(float pitchInp)
     {
-        m_desiredPitch = desiredElevation;
+        m_desiredPitch = std::clamp(pitchInp, m_pitchDownLim, m_pitchUpLim);
     }
     
     /**
@@ -80,9 +93,9 @@ public:
     /**
      * @brief Adjusts the yaw motor to a desired azimuth angle
      */
-    inline void setYaw(float desiredAzimuth)
+    inline void setYaw(float YawInp)
     {   
-        m_desiredYaw = desiredAzimuth;
+        m_desiredYaw = YawInp;
     }
 
     /**
@@ -119,12 +132,40 @@ public:
 
 private:
 
-    inline float degToRad(float deg) const
-    {
-        return deg * (M_PI/180.0f);
-    }
+    using Motor = tap::motor::DjiMotor;
 
-    /**
+    Motor m_pitchMotor, m_yawMotor;
+    float m_desiredPitchVoltage, m_desiredYawVoltage;
+
+    float m_desiredPitch, m_desiredYaw;
+
+    tap::algorithms::SmoothPid m_pitchPosPid;
+    tap::algorithms::SmoothPid m_yawPosPid;
+
+    float m_desiredPitchRps, m_desiredYawRps;
+
+    tap::algorithms::SmoothPid m_pitchVelPid;
+    tap::algorithms::SmoothPid m_yawVelPid;
+
+    bool m_isCalibrated;
+    bool m_aimLock;
+    bool m_isChassisRot;
+
+    float m_sensitivity;
+    
+    float m_yawOffset;
+    float m_pitchOffset;
+
+    float m_maxPitchPower;
+    float m_maxYawPower;
+    float m_maxRps;
+
+    tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
+    Drivers* m_drivers;
+
+    communication::logger::Logger& m_logger;
+
+        /**
      * @brief Computes the shortest angular error between two angles.
      *
      * This function calculates the smallest difference between a desired angle 
@@ -142,32 +183,6 @@ private:
             return std::atan2(std::sin(error), std::cos(error));
         };
 
-    Motor m_pitchMotor, m_yawMotor;
-    float m_desiredPitchVoltage, m_desiredYawVoltage;
-
-    float m_desiredPitch, m_desiredYaw;
-    // Pid m_pitchPid, m_yawPid;
-
-    tap::algorithms::SmoothPid m_pitchPid;
-    tap::algorithms::SmoothPid m_yawPid;
-
-    float m_desiredPitchRps, m_desiredYawRps;
-    // Pid m_pitchRpsPid, m_yawRpsPid;
-
-    tap::algorithms::SmoothPid m_pitchRpsPid;
-    tap::algorithms::SmoothPid m_yawRpsPid;
-
-    bool m_isCalibrated;
-    bool m_aimLock;
-    bool m_isChassisRot;
-    float m_sensitivity;
-    float m_yawOffset;
-    float m_pitchOffset;
-
-    tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
-    Drivers* m_drivers;
-
-    communication::logger::Logger& m_logger;
 
 };
 
