@@ -18,8 +18,8 @@
 
 
 // Flywheel Includes
-#include "control/flywheel/flywheel_subsystem.hpp"
-#include "control/flywheel/flywheel_on_command.hpp"
+#include "control/flywheel/snail/snail_flywheel_subsystem.hpp"
+#include "control/flywheel/snail/snail_flywheel_on_command.hpp"
 
 
 // Agitator Includes
@@ -68,8 +68,8 @@ private:
     /**
      * @brief Flywheel subsystem for the sentry robot
      */
-    flywheel::FlywheelSubsystem m_flywheels;
-    flywheel::FlywheelOnCommand m_flywheelsCommand;
+    flywheel::snail::SnailFlywheelSubsystem m_flywheels;
+    flywheel::snail::SnailFlywheelOnCommand m_flywheelsCommand;
 
 
     /**

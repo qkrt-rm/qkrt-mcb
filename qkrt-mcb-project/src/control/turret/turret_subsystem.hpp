@@ -38,6 +38,7 @@ struct TurretConfig
     tap::motor::MotorId yawId;
     bool pitchInverted;
     bool yawInverted;
+    bool mcbHoriz; 
     tap::can::CanBus canBus;
 
     //offsets and limits
@@ -150,6 +151,7 @@ private:
     bool m_isCalibrated;
     bool m_aimLock;
     bool m_isChassisRot;
+    bool m_mcbHoriz;
 
     float m_sensitivity;
     
