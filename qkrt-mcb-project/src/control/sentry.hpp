@@ -4,6 +4,9 @@
 // Taproot Drivers Include
 #include "drivers.hpp"
 
+//Hardware Constants
+#include "control/constants.hpp"
+
 // Chassis (Holonomic Drive) Includes
 #include "control/chassis/holonomic_chassis_subsystem.hpp"
 #include "control/chassis/holonomic_chassis_command.hpp"
