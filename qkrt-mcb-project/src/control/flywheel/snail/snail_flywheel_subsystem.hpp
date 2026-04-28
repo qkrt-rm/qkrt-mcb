@@ -27,15 +27,15 @@ class Drivers;
 
 namespace control
 {
-namespace flywheel
+namespace flywheel::snail
 {
 
-class FlywheelSubsystem : public tap::control::Subsystem
+class SnailFlywheelSubsystem : public tap::control::Subsystem
 {
 public:
-    FlywheelSubsystem(Drivers& drivers);
+    SnailFlywheelSubsystem(Drivers& drivers);
         
-    ~FlywheelSubsystem() = default;
+    ~SnailFlywheelSubsystem() = default;
 
     void initialize() override;
 

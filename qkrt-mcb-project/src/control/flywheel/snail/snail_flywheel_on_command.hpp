@@ -17,34 +17,35 @@
  * along with qkrt-mcb.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "flywheel_on_command.hpp"
+#pragma once
 
 #include "tap/control/command.hpp"
 
-#include "flywheel_subsystem.hpp"
+#include "snail_flywheel_subsystem.hpp"
 
-#include "tap/communication/gpio/leds.hpp"
 
-#include "control/control_operator_interface.hpp"
-
-namespace control::flywheel
+namespace control::flywheel::snail
 {
-
-FlywheelOnCommand::FlywheelOnCommand(FlywheelSubsystem &flywheel, float flywheel_speed)
-    : m_flywheel(flywheel), m_flywheelPWM(flywheel_speed)
+class SnailFlywheelOnCommand : public tap::control::Command
 {
-    addSubsystemRequirement(&flywheel);
-}
+public:
+    SnailFlywheelOnCommand(SnailFlywheelSubsystem &flywheel, float flywheel_speed);
 
-void FlywheelOnCommand::initialize() {}
+    void initialize() override;
 
-void FlywheelOnCommand::execute() 
-{    
-    m_flywheel.setDesiredOutput(m_flywheelPWM);
-}
+    void execute() override;
 
-void FlywheelOnCommand::end(bool) { m_flywheel.setDesiredOutput(OFF_PWM); }
+    void end(bool interrupted) override;
 
-bool FlywheelOnCommand::isFinished() const { return false; }
+    bool isFinished() const override;
+
+    const char *getName() const override { return "flywheel on command"; }
+
+private:
+    SnailFlywheelSubsystem &m_flywheel;
+
+    float m_flywheelPWM;
+    static constexpr float OFF_PWM = 0.25f;
+
+};  // class SnailFlywheelOnCommand
 }  // namespace control::flywheel
-

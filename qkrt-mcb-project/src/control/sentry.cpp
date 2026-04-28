@@ -26,6 +26,7 @@ Robot::Robot(Drivers& drivers)
                     .yawId   = MotorId::MOTOR5,
                     .pitchInverted = false,
                     .yawInverted = true,
+                    .mcbHoriz = true,
                     .canBus  = CanBus::CAN_BUS1,
                     .yawForwardOffset = -6.27091f,
                     .pitchHorizontalOffset = -3.1991f, 
@@ -82,10 +83,6 @@ void Robot::setDefaultCommands()
 {
     m_chassis.setDefaultCommand(&m_chassisCommand);
     m_turret.setDefaultCommand(&m_turretCommand);
-
-    //don't continously run these commands
-    //m_flywheels.setDefaultCommand(&m_flywheelsCommand);
-    //m_velocityAgitatorSubsystem.setDefaultCommand(&m_agitatorCommand);
 }
 
 void Robot::startCommands()

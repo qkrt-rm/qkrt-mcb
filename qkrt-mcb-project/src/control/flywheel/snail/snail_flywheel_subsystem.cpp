@@ -17,29 +17,29 @@
  * along with qkrt-mcb.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "flywheel_subsystem.hpp"
+#include "snail_flywheel_subsystem.hpp"
 
 #include "tap/communication/serial/remote.hpp"
 #include "drivers.hpp"
 
 using namespace control;
 
-namespace control::flywheel
+namespace control::flywheel::snail
 {
-FlywheelSubsystem::FlywheelSubsystem(Drivers& drivers)
+SnailFlywheelSubsystem::SnailFlywheelSubsystem(Drivers& drivers)
     : tap::control::Subsystem(&drivers), 
     m_drivers(&drivers)
 {
 }
         
-void FlywheelSubsystem::initialize() { 
+void SnailFlywheelSubsystem::initialize() { 
     drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN1);
     drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN2);
     drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN3);
     drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN4);
 }
 
-void FlywheelSubsystem::refresh() {
+void SnailFlywheelSubsystem::refresh() {
     if (m_drivers->isEmergencyStopActive()) {
         m_drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN1);
         m_drivers->pwm.write(OFF_PWM, FLYWHEEL_MOTOR_PIN2);
@@ -48,7 +48,7 @@ void FlywheelSubsystem::refresh() {
     }
 }
 
-void FlywheelSubsystem::setDesiredOutput(float output) {
+void SnailFlywheelSubsystem::setDesiredOutput(float output) {
     drivers->pwm.write(output, FLYWHEEL_MOTOR_PIN1);
     drivers->pwm.write(output, FLYWHEEL_MOTOR_PIN2);
     drivers->pwm.write(output, FLYWHEEL_MOTOR_PIN3);
