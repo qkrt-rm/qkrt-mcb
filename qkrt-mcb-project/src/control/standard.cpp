@@ -99,6 +99,8 @@ void Robot::registerIoMappings()
 {
     //Flywheel and Agitator Mapping
     m_drivers.commandMapper.addMap(& m_leftSwitchUP);
+    m_drivers.commandMapper.addMap(& m_rightSwitchUP);
+
 }
 }  // namespace control
 
