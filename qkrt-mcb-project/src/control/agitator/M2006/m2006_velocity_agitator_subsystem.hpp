@@ -27,7 +27,7 @@
 
 class Drivers;
 
-namespace control::agitator
+namespace control::agitator::m2006
 {
 /**
  * Subsystem whose primary purpose is to encapsulate an agitator motor that operates using a
@@ -41,11 +41,7 @@ struct agitatorConfig
     tap::motor::MotorId agitatorId;
     tap::can::CanBus canBus;
     modm::Pid<float>::Parameter agitatorVelocityPidConfig;
-
-
 };
-
-
 
 class VelocityAgitatorSubsystem : public tap::control::setpoint::IntegrableSetpointSubsystem
 {

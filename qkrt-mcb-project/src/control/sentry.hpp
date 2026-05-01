@@ -23,8 +23,8 @@
 
 
 // Agitator Includes
-#include "control/agitator/velocity_agitator_subsystem.hpp"
-#include "control/agitator/agitator_command.hpp"
+#include "control/agitator/M2006/m2006_velocity_agitator_subsystem.hpp"
+#include "control/agitator/M2006/m2006_agitator_command.hpp"
 
 // currently unknown:
 #include "tap/communication/serial/remote.hpp"
@@ -75,8 +75,8 @@ private:
     /**
      * @brief Agitator subsystem for the sentry robot
      */
-    agitator::VelocityAgitatorSubsystem m_agitator;
-    agitator::AgitatorCommand m_agitatorCommand;
+    agitator::m2006::VelocityAgitatorSubsystem m_agitator;
+    agitator::m2006::AgitatorCommand m_agitatorCommand;
 
     //Mappings
     tap::control::HoldCommandMapping m_leftSwitchUP{

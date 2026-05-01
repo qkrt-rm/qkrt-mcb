@@ -17,14 +17,14 @@
  * along with qkrt-mcb.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "agitator_command.hpp"
+#include "m2006_agitator_command.hpp"
 #include "tap/algorithms/math_user_utils.hpp"
 #include "control/control_operator_interface.hpp"
-#include "velocity_agitator_subsystem.hpp"
+#include "m2006_velocity_agitator_subsystem.hpp"
 
 using tap::algorithms::limitVal;
 
-namespace control::agitator
+namespace control::agitator::m2006
 {
 AgitatorCommand::AgitatorCommand(
     VelocityAgitatorSubsystem &agitator, float indexerSpeed)

@@ -44,7 +44,7 @@ Robot::Robot(Drivers& drivers)
       m_flywheels(drivers),
       m_flywheelsCommand(m_flywheels, 0.39f),
       m_agitator(drivers,
-                agitator::agitatorConfig{
+                agitator::m2006::agitatorConfig{
                     .agitatorId = MotorId::MOTOR7,
                     .canBus = CanBus::CAN_BUS1,
                     .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
