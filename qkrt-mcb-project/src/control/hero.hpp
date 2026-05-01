@@ -15,15 +15,13 @@
 #include "control/turret/turret_subsystem.hpp"
 #include "control/turret/turret_command.hpp"
 
-
 // Flywheel Includes
-#include "control/flywheel/flywheel_subsystem.hpp"
-#include "control/flywheel/flywheel_on_command.hpp"
-
+#include "control/flywheel/m3508/m3508_flywheel_subsystem.hpp"
+#include "control/flywheel/m3508/m3508_flywheel_on_command.hpp"
 
 // Agitator Includes
-#include "control/agitator/velocity_agitator_subsystem.hpp"
-#include "control/agitator/agitator_command.hpp"
+#include "control/agitator/M3508/m3508_velocity_agitator_subsystem.hpp"
+#include "control/agitator/M3508/m3508_agitator_command.hpp"
 
 // currently unknown:
 #include "tap/communication/serial/remote.hpp"
@@ -67,23 +65,31 @@ private:
     /**
      * @brief Flywheel subsystem for the sentry robot
      */
-    flywheel::FlywheelSubsystem m_flywheels;
-    flywheel::FlywheelOnCommand m_flywheelsCommand;
+    flywheel::m3508::M3508FlywheelSubsystem m_flywheels;
+    flywheel::m3508::M3508FlywheelOnCommand m_flywheelsCommand;
 
 
     /**
      * @brief Agitator subsystem for the sentry robot
      */
-    agitator::VelocityAgitatorSubsystem m_agitator;
-    agitator::AgitatorCommand m_agitatorCommand;
+    agitator::m3508::M3508AgitatorSubsystem m_agitator;
+    agitator::m3508::M3508AgitatorCommand m_agitatorCommand;
 
     //Mappings
     tap::control::HoldCommandMapping m_leftSwitchUP{
         &m_drivers,
-        {&m_agitatorCommand, &m_flywheelsCommand},
+        {&m_agitatorCommand},
         tap::control::RemoteMapState(tap::communication::serial::Remote::Switch::LEFT_SWITCH, 
             tap::communication::serial::Remote::SwitchState::UP
         )
+    };
+
+    tap::control::HoldCommandMapping m_rightSwitchUP{
+    &m_drivers,
+    {&m_flywheelsCommand},
+    tap::control::RemoteMapState(tap::communication::serial::Remote::Switch::RIGHT_SWITCH, 
+        tap::communication::serial::Remote::SwitchState::UP
+    )
     };
 
     //TODO: Add keyboard mapping

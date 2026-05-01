@@ -17,7 +17,7 @@
  * along with qkrt-mcb.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "velocity_agitator_subsystem.hpp"
+#include "m2006_velocity_agitator_subsystem.hpp"
 
 #include "tap/architecture/clock.hpp"
 
@@ -28,7 +28,7 @@
 using tap::arch::clock::getTimeMilliseconds;
 using Motor = tap::motor::DjiMotor;
 
-namespace control::agitator
+namespace control::agitator::m2006
 {
 VelocityAgitatorSubsystem::VelocityAgitatorSubsystem(Drivers& drivers, const agitatorConfig &config)
     : Subsystem(&drivers), 

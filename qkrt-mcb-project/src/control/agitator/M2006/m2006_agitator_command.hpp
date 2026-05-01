@@ -21,7 +21,7 @@
 
 #include "tap/control/command.hpp"
 
-namespace control::agitator
+namespace control::agitator::m2006
 {
 class VelocityAgitatorSubsystem;
 

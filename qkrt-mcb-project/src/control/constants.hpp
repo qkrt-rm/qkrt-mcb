@@ -9,4 +9,5 @@ namespace GM6020 {
 namespace M3508 {
 
     static constexpr float MAX_CURRENT = 16384.0f;
+    static constexpr float MAX_RPS = 49.11f;
 }
