@@ -14,6 +14,7 @@ HolonomicChassisSubsystem::HolonomicChassisSubsystem(Drivers& drivers, const Cha
           Motor(&drivers, config.rightBackId,  config.canBus, true,  "RB"),
           Motor(&drivers, config.rightFrontId, config.canBus, true,  "RF")
       }),
+      m_logger(drivers.logger),
       m_drivers(&drivers)
 {
     for (auto& controller : m_pidControllers)
@@ -78,10 +79,35 @@ void HolonomicChassisSubsystem::refresh()
     * TODO: Power Limiting Logics
     */
 
+    constexpr float CURRENT_RAW_TO_AMPS = 20.0f / 16384.0f;
+    constexpr float M3508_TORQUE_CONSTANT = 0.3f;        
+    constexpr float M3508_GEAR_RATIO = 3591.0f / 187.0f; 
+    constexpr float EFFICIENCY_MULTIPLIER = 1.0f / 0.70f;;        
+
+    float mechPower = 0.0f;
+
     for (size_t ii = 0; ii < m_motors.size(); ii++)
     {
-        runPid(m_pidControllers[ii], m_motors[ii], m_desiredOutput[ii],m_drivers);
+        float rawCurrent = m_motors[ii].getTorque();
+        float rotorVelocityRps = m_motors[ii].getEncoder()->getVelocity();
+
+        float motorCurrentAmps = rawCurrent * CURRENT_RAW_TO_AMPS;
+        float shaftTorque = motorCurrentAmps * M3508_TORQUE_CONSTANT;
+
+        float shaftVelocityRps = rotorVelocityRps / M3508_GEAR_RATIO;
+
+        float motorPower = std::abs(shaftTorque * shaftVelocityRps);
+        
+        mechPower += motorPower;
+
+        runPid(m_pidControllers[ii], m_motors[ii], m_desiredOutput[ii], m_drivers);
     }
+
+    float chassisPower = mechPower * EFFICIENCY_MULTIPLIER;
+
+    m_logger.printf("CHASSIS POWER: %.2f W \n", static_cast<double>(chassisPower));
+    m_logger.delay(200);
+
 }
 
 }  // namespace control::chassis

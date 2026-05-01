@@ -10,6 +10,7 @@
 
 #include <tap/control/subsystem.hpp>
 #include "tap/util_macros.hpp"
+#include "communication/logger/logger.hpp"
 
 #include "modm/math/filter/pid.hpp"
 #include "modm/math/geometry/angle.hpp"
@@ -44,6 +45,8 @@ private:
     using Motor = tap::motor::DjiMotor;
 
     static constexpr float MAX_CURRENT = 16384.0f;
+    communication::logger::Logger& m_logger;
+
 public:
     HolonomicChassisSubsystem(Drivers& drivers, const ChassisConfig& config);
 
