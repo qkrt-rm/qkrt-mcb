@@ -26,14 +26,14 @@ void HolonomicChassisCommand::execute()
 
         volatile communication::NavData data = m_visionCoprocessor.getNavData();
 
-        float xInp = data.xVel * 0.5f;
-        float yInp = data.yVel * -0.5f;
+        bool isAutoNav = m_operatorInterface.getAutoNavInput();
+
+        float xInp = isAutoNav ? data.xVel * 0.5f : m_operatorInterface.getChassisXInput() * REMOTE_SENSITIVITY;
+        float yInp = isAutoNav ? data.yVel * 0.5f :  m_operatorInterface.getChassisYInput() * REMOTE_SENSITIVITY;
 
         // m_logger.printf("Message Recieved: x=%.3f y= %.3f\n", static_cast<double>(xInp), static_cast<double>(yInp));
         // m_logger.delay(200);
 
-        //float xInp = m_operatorInterface.getChassisXInput() * REMOTE_SENSITIVITY;
-        //float yInp = m_operatorInterface.getChassisYInput() * REMOTE_SENSITIVITY;
         float yawAngle = m_turret.getAzimuth();
         
         //compute rotation transformation
