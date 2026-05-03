@@ -25,7 +25,7 @@ Robot::Robot(Drivers& drivers)
                     .pitchInverted = false,
                     .yawInverted = true,
                     .canBus  = CanBus::CAN_BUS1,
-                    .yawForwardOffset = 5455u,
+                    .yawForwardOffset =  -6.27091f,
                     .pitchHorizontalOffset = 0u,  // TODO: get this number when pitch motor is mounted
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),

@@ -27,7 +27,7 @@ struct TurretConfig
     bool pitchInverted;
     bool yawInverted;
     tap::can::CanBus canBus;
-    uint16_t yawForwardOffset;
+    float yawForwardOffset;
     uint16_t pitchHorizontalOffset;
 };
 
@@ -91,7 +91,7 @@ public:
     inline float getAzimuth() const
     {
         auto currentAngle = m_yawMotor.getEncoder()->getPosition();
-        return (currentAngle - m_yawForwardOffset).getWrappedValue();
+        return (currentAngle + m_yawForwardOffset).getWrappedValue();
     }
 
     /**

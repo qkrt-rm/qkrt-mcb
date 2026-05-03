@@ -28,7 +28,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_logger(drivers.logger)
 {
     m_pitchHorizontalOffset = encoderToRad(config.pitchHorizontalOffset);
-    m_yawForwardOffset = encoderToRad(config.yawForwardOffset);
+    m_yawForwardOffset = config.yawForwardOffset;
 }
 
 void TurretSubsystem::initialize()
