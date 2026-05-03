@@ -65,7 +65,7 @@ namespace communication
             control::turret::TurretSubsystem* m_turret = nullptr;
 
             tap::arch::MilliTimeout sendTimeout;
-            static constexpr uint32_t SEND_INTERVAL_MS = 500;
+            static constexpr uint32_t SEND_INTERVAL_MS = 10;
 
     };
 }
