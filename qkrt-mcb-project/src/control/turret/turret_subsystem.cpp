@@ -144,11 +144,14 @@ void TurretSubsystem::refresh()
         m_desiredPitchVoltage = m_pitchVelPid.getOutput() + pitchFF;
 
         //yaw velocity loop 
-        float imuYawRps = (m_mcbHoriz ? m_imu.getGz() : m_imu.getGx());
+        float imuYawRps = (m_mcbHoriz ? m_imu.getGz() * -1 : m_imu.getGx());
 
         float yawRpsError = m_desiredYawRps - imuYawRps;
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
+
+        m_logger.printf("PITCH: %.4f\n", static_cast<double>(imuYawRps));
+        m_logger.delay(200);
 
     }
 
