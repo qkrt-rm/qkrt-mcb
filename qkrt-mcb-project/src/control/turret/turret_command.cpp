@@ -28,6 +28,7 @@ void TurretCommand::execute()
 {
     volatile communication::TurretData currentTarget = m_visionCoprocessor.getTurretData();
 
+    
     bool isNewData = (currentTarget.xPos != m_lastTarget.xPos 
                         || currentTarget.yPos != m_lastTarget.yPos
                         || currentTarget.zPos != m_lastTarget.zPos) && currentTarget.xPos != 0;
@@ -40,6 +41,8 @@ void TurretCommand::execute()
         
         if(isNewData)
         {
+            m_turret.zeroYaw();
+
             m_turret.lock();        //tells subsytem to lock on target not used atm
 
             float targetYpos = currentTarget.yPos - 0.095f;  //magic offset
@@ -51,8 +54,8 @@ void TurretCommand::execute()
             m_lastTarget.yPos = targetYpos;
             m_lastTarget.zPos = currentTarget.zPos;  
             
-            m_globalPitchTarget = aimPitchRelative; 
-            m_globalYawTarget = m_turret.getYaw() + aimYawRelative;   
+            m_globalPitchTarget = m_turret.getPitch() + aimPitchRelative; 
+            m_globalYawTarget =  aimYawRelative;   
 
         }
         

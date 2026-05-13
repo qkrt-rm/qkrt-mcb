@@ -10,7 +10,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
       m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW"),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
-      m_desiredPitch(0.0f), m_desiredYaw(0.0f),
+      m_desiredPitch(0.0f), m_desiredYaw(0.0f), m_yawPos(0.0f),
       m_pitchPosPid({
           .kp = config.pitchPosGains.kp,
           .ki = config.pitchPosGains.ki,
@@ -73,6 +73,11 @@ void TurretSubsystem::initialize()
 void TurretSubsystem::refresh()
 {
 
+    if (m_imu.getImuState() != ImuState::IMU_CALIBRATING)
+    {
+        m_yawPos += m_imu.getGz() * -1.0f * DT; //filter imu
+    }
+
     if(m_drivers->isEmergencyStopActive() || m_imu.getImuState() == ImuState::IMU_CALIBRATING) 
     {
         m_pitchPosPid.reset();
@@ -108,14 +113,21 @@ void TurretSubsystem::refresh()
         float currentYawRpm = m_imu.getGz() * -1;  //TODO: make sure this is filtered
         
         //Yaw Position Outer Loop
-        float azimuthError = getOptimalError(m_desiredYaw, getYaw());
+        float currentYaw = m_yawPos;
+
+
+        float azimuthError = m_desiredYaw - currentYaw;
         float desiredYawRpm = m_yawPosPid.runController(azimuthError, currentYawRpm, DT);
 
         //Yaw Velocity Inner Loop
         m_desiredYawVoltage = m_yawVelPid.runController(desiredYawRpm - currentYawRpm, 0.0f, DT);
 
-        // m_logger.printf("POS ERROR= %.3f\n", static_cast<double>(desiredYawRpm));
-        // m_logger.delay(400);
+        m_logger.printf("ACTUAL = %.3f \n", static_cast<double>(currentYaw*180.0f/3.14f));
+        m_logger.delay(400);
+        // m_logger.printf("m_desiredYaw POS ERROR= %.3f\n", static_cast<double>(m_desiredYaw));
+        // m_logger.delay(200);
+
+
         
     }
     else 
@@ -150,10 +162,13 @@ void TurretSubsystem::refresh()
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
 
-        m_logger.printf("PITCH: %.4f\n", static_cast<double>(imuYawRps));
-        m_logger.delay(200);
+        //m_logger.printf("PITCH: %.4f\n", static_cast<double>(imuYawRps));
+        //m_logger.delay(200);
 
     }
+
+    m_logger.printf("DESIRED | ACTUAL = %.3f \n", static_cast<double>(m_yawPos*180.0f/3.14f));
+    m_logger.delay(400);
 
     m_desiredPitchVoltage = std::clamp(m_desiredPitchVoltage, -m_maxPitchPower, m_maxPitchPower);
     m_desiredYawVoltage = std::clamp(m_desiredYawVoltage, -m_maxYawPower, m_maxYawPower);

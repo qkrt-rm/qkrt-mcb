@@ -130,6 +130,8 @@ public:
 
     void ChassisRot(bool isRot);
 
+    void zeroYaw() { m_yawPos= 0.0f; }
+
 
 private:
 
@@ -161,6 +163,8 @@ private:
     float m_maxPitchPower;
     float m_maxYawPower;
     float m_maxRps;
+
+    float m_yawPos;
 
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
     Drivers* m_drivers;
