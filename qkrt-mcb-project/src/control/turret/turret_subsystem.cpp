@@ -94,7 +94,8 @@ void TurretSubsystem::refresh()
         float currPitch = getPitch();
 
         float pitchKFF = 2600.0f;
-        float pitchFF = pitchKFF * cos(currPitch);
+        
+        float pitchFF = pitchKFF * std::sin(currPitch);
 
         //Pitch Position Outer Loop
         float pitchError = getOptimalError(m_desiredPitch, currPitch);
@@ -103,7 +104,7 @@ void TurretSubsystem::refresh()
         //Pitch Velocity Inner Loop
         float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity();  
         m_pitchVelPid.runControllerDerivateError(desiredPitchRpm - currentPitchRpm, DT);
-        m_desiredPitchVoltage = m_pitchVelPid.getOutput();
+        m_desiredPitchVoltage = m_pitchVelPid.getOutput()+ pitchFF;
 
         float currentYawRpm = m_imu.getGz() * -1;  //TODO: make sure this is filtered
         
@@ -150,8 +151,8 @@ void TurretSubsystem::refresh()
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
 
-        m_logger.printf("PITCH: %.4f\n", static_cast<double>(imuYawRps));
-        m_logger.delay(200);
+        // m_logger.printf("Output: %.0f\n", static_cast<double>(m_desiredPitchVoltage));
+        // m_logger.delay(100);
 
     }
 

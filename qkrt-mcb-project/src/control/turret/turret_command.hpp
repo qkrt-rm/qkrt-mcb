@@ -7,6 +7,8 @@
 #include "communication/logger/logger.hpp"
 #include "communication/vision_coprocessor.hpp"
 #include "tap/communication/gpio/digital.hpp"
+#include "tap/algorithms\kalman_filter.hpp"
+#include "tap/algorithms\ballistics.hpp"
 
 namespace control::turret
 {
@@ -37,6 +39,7 @@ private:
     communication::VisionCoprocessor& m_visionCoprocessor;
     communication::logger::Logger& m_logger;
 
+
     Drivers &m_drivers;
     
     bool isAutoAim;
@@ -50,6 +53,17 @@ private:
     float m_globalYawTarget, m_globalPitchTarget;
 
     communication::TurretData m_lastTarget;
+
+    static constexpr int K_STATES = 6;
+    static constexpr int K_INPUTS = 3;
+
+    tap::algorithms::KalmanFilter<K_STATES, K_INPUTS> m_kalmanFilter;
+
+    bool m_kalInit;
+
+    modm::Vector3f m_currentRawPos;
+    modm::Vector3f m_currentFilteredVel;
+
 };
 
 }  // namespace control::turret

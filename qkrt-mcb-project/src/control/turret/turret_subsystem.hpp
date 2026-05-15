@@ -124,6 +124,11 @@ public:
      */
     void setYawRps(float yawRps);
 
+    inline float getPitchOffset() const
+    {
+        return m_pitchOffset;
+    }
+
     void lock() { m_aimLock = true; }
 
     void unlock() { m_aimLock = false; }
