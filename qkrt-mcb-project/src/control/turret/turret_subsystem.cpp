@@ -73,11 +73,6 @@ void TurretSubsystem::initialize()
 void TurretSubsystem::refresh()
 {
 
-    if (m_imu.getImuState() != ImuState::IMU_CALIBRATING)
-    {
-        m_yawPos += m_imu.getGz() * -1.0f * DT; //filter imu
-    }
-
     if(m_drivers->isEmergencyStopActive() || m_imu.getImuState() == ImuState::IMU_CALIBRATING) 
     {
         m_pitchPosPid.reset();
@@ -87,6 +82,10 @@ void TurretSubsystem::refresh()
 
         m_desiredPitchVoltage = 0.0f;
         m_desiredYawVoltage = 0.0f;
+    }
+    if (m_imu.getImuState() != ImuState::IMU_CALIBRATED)
+    {
+        m_yawPos += (m_imu.getGz() * -1.0f) * DT; //filter imu
     }
     else if (m_aimLock)     
     {
@@ -115,7 +114,6 @@ void TurretSubsystem::refresh()
         //Yaw Position Outer Loop
         float currentYaw = m_yawPos;
 
-
         float azimuthError = m_desiredYaw - currentYaw;
         float desiredYawRpm = m_yawPosPid.runController(azimuthError, currentYawRpm, DT);
 
@@ -124,11 +122,9 @@ void TurretSubsystem::refresh()
 
         m_logger.printf("ACTUAL = %.3f \n", static_cast<double>(currentYaw*180.0f/3.14f));
         m_logger.delay(400);
+
         // m_logger.printf("m_desiredYaw POS ERROR= %.3f\n", static_cast<double>(m_desiredYaw));
-        // m_logger.delay(200);
-
-
-        
+        // m_logger.delay(200);        
     }
     else 
     {
