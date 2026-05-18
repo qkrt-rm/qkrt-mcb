@@ -19,7 +19,7 @@ Robot::Robot(Drivers& drivers)
                      .canBus       = CanBus::CAN_BUS1,
                      .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
                  }),
-      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface),
+      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface, true),
       m_turret(drivers,
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
@@ -28,17 +28,17 @@ Robot::Robot(Drivers& drivers)
                     .yawInverted = true,
                     .mcbHoriz = false,
                     .canBus  = CanBus::CAN_BUS1,
-                    .yawForwardOffset = -3.2260f,          
+                    .yawForwardOffset = 0.0f,          
                     .pitchHorizontalOffset = -3.8672f,      
                     .pitchUpLim = 0.3121f,                  
                     .pitchDownLim = -0.5438f,               
                     .MAX_PITCH_POWER = GM6020::MAX_VOLTAGE,
-                    .MAX_YAW_POWER = GM6020::MAX_VOLTAGE,
+                    .MAX_YAW_POWER = M3508::MAX_CURRENT,
                     .MAX_RPS = GM6020::MAX_RPS,
                     .pitchPosGains = { .kp = 10.0f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .pitchVelGains = { .kp = 4000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-                    .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-                    .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE }
+                    .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = M3508::MAX_CURRENT },
+                    .yawVelGains   = { .kp = 4000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = M3508::MAX_CURRENT }
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
       m_flywheels(drivers, 

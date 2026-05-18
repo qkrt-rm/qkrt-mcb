@@ -16,11 +16,13 @@ class HolonomicChassisCommand : public tap::control::Command
 {
 private:
     static constexpr float MAX_CHASSIS_SPEED_MPS = 1.0f;
-    float static constexpr REMOTE_SENSITIVITY = 0.5f;
+    static constexpr float REMOTE_SENSITIVITY = 0.5f;
+    static constexpr float HERO_YAW_GEAR_RATIO = 0.5f;
 public:
     HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                             turret::TurretSubsystem& turret,
-                            ControlOperatorInterface& m_operatorInterface);
+                            ControlOperatorInterface& m_operatorInterface,
+                            bool isHero);
 
     void initialize() override;
 
@@ -37,6 +39,7 @@ private:
     HolonomicChassisSubsystem& m_chassis;
     turret::TurretSubsystem& m_turret;
     ControlOperatorInterface& m_operatorInterface;
+    bool m_isHero;
 };
 
 }  // namespace control::chassis
