@@ -24,6 +24,8 @@ Robot::Robot(Drivers& drivers)
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
                     .yawId   = MotorId::MOTOR5,
+                    .pitchGearRatio = GM6020::GEAR_RATIO,
+                    .yawGearRatio = GM6020::GEAR_RATIO,
                     .pitchInverted = true,
                     .yawInverted = true,
                     .mcbHoriz = false,

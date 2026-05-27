@@ -48,6 +48,7 @@ private:
 
     Drivers& m_drivers;
 
+    static constexpr float HERO_GEAR_RATIO = 0.5f;
 
     /**
     * @brief Chassis subsystem for the sentry robot

@@ -9,6 +9,8 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
     : tap::control::Subsystem(&drivers),
       m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
       m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW"),
+      m_pitchGearRatio(config.pitchGearRatio),
+      m_yawGearRatio(config.yawGearRatio),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
       m_desiredPitch(0.0f), m_desiredYaw(0.0f),
       m_pitchPosPid({
@@ -45,6 +47,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_aimLock(false),  
       m_isChassisRot(false),
       m_mcbHoriz(config.mcbHoriz),
+      m_isYawZeroed(false),
       m_sensitivity(1.0f),
       m_yawOffset(config.yawForwardOffset),
       m_pitchOffset(config.pitchHorizontalOffset),
@@ -63,7 +66,6 @@ void TurretSubsystem::initialize()
 {
     m_pitchMotor.initialize();
     m_yawMotor.initialize();
-
     m_pitchPosPid.reset();
     m_yawPosPid.reset();
     m_pitchVelPid.reset();
@@ -82,6 +84,11 @@ void TurretSubsystem::refresh()
 
         m_desiredPitchVoltage = 0.0f;
         m_desiredYawVoltage = 0.0f;
+    }
+    if(!m_isYawZeroed && m_yawMotor.getEncoder()->isOnline())    
+    {    
+        m_yawMotor.getEncoder()->resetEncoderValue();   //zero yaw encoder once motor is powered up
+        m_isYawZeroed=true;
     }
     else if (m_aimLock)     
     {
@@ -150,7 +157,7 @@ void TurretSubsystem::refresh()
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
 
-        m_logger.printf("YAW: %.4f\n", static_cast<double>(getYaw()*0.5f));
+        m_logger.printf("YAW: %.1f\n", static_cast<double>(getYaw()*(180.0f / M_PI)));
         m_logger.delay(200);
 
     }

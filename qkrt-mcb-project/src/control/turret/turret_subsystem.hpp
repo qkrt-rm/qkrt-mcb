@@ -36,6 +36,8 @@ struct TurretConfig
     //hardware settings
     tap::motor::MotorId pitchId;
     tap::motor::MotorId yawId;
+    float pitchGearRatio;
+    float yawGearRatio;
     bool pitchInverted;
     bool yawInverted;
     bool mcbHoriz; 
@@ -106,8 +108,14 @@ public:
      */
     inline float getYaw() const
     {
-        auto currentAngle = m_yawMotor.getEncoder()->getPosition() + m_yawOffset;
-        return (currentAngle).getWrappedValue();
+        auto rawAngle = m_yawMotor.getEncoder()->getPosition();
+
+        float unwrappedMotorRad = rawAngle.getUnwrappedValue();
+        float unwrappedShaftRad = unwrappedMotorRad / m_yawGearRatio;
+
+        auto rawWrappedAngle = rawAngle.withSameBounds(unwrappedShaftRad);
+
+        return rawWrappedAngle.getWrappedValue();
     }
 
     /**
@@ -136,6 +144,7 @@ private:
     using Motor = tap::motor::DjiMotor;
 
     Motor m_pitchMotor, m_yawMotor;
+    float m_pitchGearRatio, m_yawGearRatio;
     float m_desiredPitchVoltage, m_desiredYawVoltage;
 
     float m_desiredPitch, m_desiredYaw;
@@ -152,6 +161,7 @@ private:
     bool m_aimLock;
     bool m_isChassisRot;
     bool m_mcbHoriz;
+    bool m_isYawZeroed;
 
     float m_sensitivity;
     

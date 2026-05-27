@@ -4,10 +4,12 @@ namespace GM6020 {
     static constexpr float MAX_VOLTAGE = 25000.0f;
     static constexpr float MAX_CURRENT = 16284.0f;
     static constexpr float MAX_RPS = 32.0f;  //not true, test true values
+    static constexpr float GEAR_RATIO = 1.0f;
 }
 
 namespace M3508 {
 
     static constexpr float MAX_CURRENT = 16384.0f;
     static constexpr float MAX_RPS = 49.11f;
+    static constexpr float GEAR_RATIO = 3591.0f/187.0f;
 }

@@ -24,6 +24,8 @@ Robot::Robot(Drivers& drivers)
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
                     .yawId   = MotorId::MOTOR5,
+                    .pitchGearRatio = M3508::GEAR_RATIO,
+                    .yawGearRatio = M3508::GEAR_RATIO * HERO_GEAR_RATIO,
                     .pitchInverted = true,
                     .yawInverted = true,
                     .mcbHoriz = false,
