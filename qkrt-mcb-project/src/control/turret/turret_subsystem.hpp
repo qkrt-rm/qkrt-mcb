@@ -119,6 +119,7 @@ public:
     }
 
     /**
+     * 
      * @brief Rotates the pitch motor at a specified revolutions per second.
      * 
      * @param pitchRps Desired revolutions per second of the pitch motor.

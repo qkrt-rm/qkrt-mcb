@@ -6,12 +6,10 @@ namespace control::chassis
 
 HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                                                  turret::TurretSubsystem& turret,
-                                                 ControlOperatorInterface& m_operatorInterface,
-                                                 bool isHero)
+                                                 ControlOperatorInterface& m_operatorInterface)
     : m_chassis(chassis),
       m_turret(turret),
-      m_operatorInterface(m_operatorInterface),
-      m_isHero(isHero)
+      m_operatorInterface(m_operatorInterface)
 {
     addSubsystemRequirement(&chassis);
 }
@@ -26,7 +24,7 @@ void HolonomicChassisCommand::execute()
 
         float xInp = m_operatorInterface.getChassisXInput() * REMOTE_SENSITIVITY;
         float yInp = m_operatorInterface.getChassisYInput() * REMOTE_SENSITIVITY;
-        float yawAngle = m_isHero ? m_turret.getYaw() * HERO_YAW_GEAR_RATIO : m_turret.getYaw();
+        float yawAngle = m_turret.getYaw();
         
         //compute rotation transformation
         float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);

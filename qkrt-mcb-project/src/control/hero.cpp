@@ -19,13 +19,13 @@ Robot::Robot(Drivers& drivers)
                      .canBus       = CanBus::CAN_BUS1,
                      .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
                  }),
-      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface, true),
+      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface),
       m_turret(drivers,
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
                     .yawId   = MotorId::MOTOR5,
                     .pitchGearRatio = M3508::GEAR_RATIO,
-                    .yawGearRatio = M3508::GEAR_RATIO * HERO_GEAR_RATIO,
+                    .yawGearRatio = M3508::GEAR_RATIO * BELT_GEAR_RATIO,
                     .pitchInverted = true,
                     .yawInverted = true,
                     .mcbHoriz = false,
