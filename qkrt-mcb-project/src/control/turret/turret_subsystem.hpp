@@ -92,7 +92,7 @@ public:
         auto rawAngle = m_pitchMotor.getEncoder()->getPosition();
 
         float unwrappedMotorRad = rawAngle.getUnwrappedValue();
-        float unwrappedShaftRad = unwrappedMotorRad / m_pitchGearRatio;
+        float unwrappedShaftRad = (unwrappedMotorRad / m_pitchGearRatio) + m_pitchOffset;
 
         auto rawWrappedAngle = rawAngle.withSameBounds(unwrappedShaftRad);
 

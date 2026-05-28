@@ -130,7 +130,7 @@ void TurretSubsystem::refresh()
         //Manual Velocity PID
 
         float pitchKFF = 1000.0f;
-        float yawKFF = 6560.0f;
+        float yawKFF = 1560.0f;     //6560 TODO:make part of gains struct
     
         float currPitch = getPitch();
 
@@ -157,7 +157,7 @@ void TurretSubsystem::refresh()
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
 
-        m_logger.printf("PITCH: %.1f\n", static_cast<double>(getPitch()*(180.0f / M_PI)));
+        m_logger.printf("PITCH: %.5f\n", static_cast<double>(getPitch()));
         m_logger.delay(200);
 
     }
