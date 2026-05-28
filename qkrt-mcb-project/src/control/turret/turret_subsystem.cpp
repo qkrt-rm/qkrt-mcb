@@ -157,7 +157,7 @@ void TurretSubsystem::refresh()
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
 
-        m_logger.printf("YAW: %.1f\n", static_cast<double>(getYaw()*(180.0f / M_PI)));
+        m_logger.printf("PITCH: %.1f\n", static_cast<double>(getPitch()*(180.0f / M_PI)));
         m_logger.delay(200);
 
     }

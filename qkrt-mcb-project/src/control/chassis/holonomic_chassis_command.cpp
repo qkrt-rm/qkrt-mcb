@@ -31,6 +31,7 @@ void HolonomicChassisCommand::execute()
         float v_x = yInp * std::sin(-yawAngle) + xInp * std::cos(-yawAngle);
         float w = (m_operatorInterface.isChassisBeyblade()) ? CHASSIS_ROT_SPEED_RAD : 0.0f;   
         
+        //TODO: remove normalization
         float denominator = std::max(std::abs(v_y) + std::abs(v_x) + std::abs(w), 1.0f);
         float leftFront  = (v_x + v_y + w) / denominator;
         float leftBack   = (v_x - v_y + w) / denominator;

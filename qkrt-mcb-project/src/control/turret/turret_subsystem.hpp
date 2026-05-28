@@ -89,8 +89,14 @@ public:
      */
     inline float getPitch() const
     {
-        auto relativeAngle = m_pitchMotor.getEncoder()->getPosition() + m_pitchOffset;
-        return (relativeAngle).getUnwrappedValue();
+        auto rawAngle = m_pitchMotor.getEncoder()->getPosition();
+
+        float unwrappedMotorRad = rawAngle.getUnwrappedValue();
+        float unwrappedShaftRad = unwrappedMotorRad / m_pitchGearRatio;
+
+        auto rawWrappedAngle = rawAngle.withSameBounds(unwrappedShaftRad);
+
+        return rawWrappedAngle.getUnwrappedValue();
     }
 
     /**
