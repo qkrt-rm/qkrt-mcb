@@ -56,6 +56,8 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_maxPitchPower(config.MAX_PITCH_POWER),
       m_maxYawPower(config.MAX_YAW_POWER),
       m_maxRps(config.MAX_RPS),
+      m_yawGainFF(config.yawFF),
+      m_pitchGainFF(config.pitchFF),
       m_imu(drivers.bmi088),
       m_drivers(&drivers),
       m_logger(drivers.logger)
@@ -129,17 +131,10 @@ void TurretSubsystem::refresh()
     {
         //Manual Velocity PID
 
-        float pitchKFF = 1000.0f;
-        float yawKFF = 1560.0f;     //6560 TODO:make part of gains struct
-    
-        float currPitch = getPitch();
-
-        // m_logger.printf("PITCH: %.4f\n", static_cast<double>(currPitch));
-        // m_logger.delay(200);
-
         //feed forward terms
-        float yawFF = (m_isChassisRot) ? (yawKFF * -chassis::HolonomicChassisCommand::CHASSIS_ROT_SPEED_RAD) : 0.0f;
-        float pitchFF = pitchKFF * cos(currPitch);
+        float currPitch = getPitch();
+        float yawFF = (m_isChassisRot) ? (m_yawGainFF * -chassis::HolonomicChassisCommand::CHASSIS_ROT_SPEED_RAD) : 0.0f;
+        float pitchFF = m_pitchGainFF * cos(currPitch);
 
         //pitch position outer loop
         float pitchError = m_desiredPitch - currPitch;
@@ -157,8 +152,8 @@ void TurretSubsystem::refresh()
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
 
-        m_logger.printf("PITCH: %.5f\n", static_cast<double>(getPitch()));
-        m_logger.delay(200);
+        // m_logger.printf("PITCH: %.5f\n", static_cast<double>(getPitch()));
+        // m_logger.delay(200);
 
     }
 

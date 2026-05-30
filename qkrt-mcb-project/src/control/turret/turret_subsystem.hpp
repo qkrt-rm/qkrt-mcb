@@ -57,6 +57,7 @@ struct TurretConfig
     PidGains pitchVelGains;
     PidGains yawPosGains;
     PidGains yawVelGains;
+    float yawFF, pitchFF;
 };
 
 class TurretSubsystem : public tap::control::Subsystem
@@ -169,15 +170,12 @@ private:
     bool m_isChassisRot;
     bool m_mcbHoriz;
     bool m_isYawZeroed;
-
     float m_sensitivity;
     
-    float m_yawOffset;
-    float m_pitchOffset;
-
-    float m_maxPitchPower;
-    float m_maxYawPower;
+    float m_yawOffset, m_pitchOffset;
+    float m_maxPitchPower, m_maxYawPower;
     float m_maxRps;
+    float m_yawGainFF, m_pitchGainFF;
 
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
     Drivers* m_drivers;
