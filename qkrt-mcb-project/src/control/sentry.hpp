@@ -78,16 +78,36 @@ private:
     agitator::m2006::VelocityAgitatorSubsystem m_agitator;
     agitator::m2006::AgitatorCommand m_agitatorCommand;
 
+
     //Mappings
     tap::control::HoldCommandMapping m_leftSwitchUP{
         &m_drivers,
-        {&m_agitatorCommand, &m_flywheelsCommand},
+        {&m_agitatorCommand},
         tap::control::RemoteMapState(tap::communication::serial::Remote::Switch::LEFT_SWITCH, 
             tap::communication::serial::Remote::SwitchState::UP
         )
     };
 
-    //TODO: Add keyboard mapping
+    tap::control::HoldCommandMapping m_rightSwitchUP{
+    &m_drivers,
+    {&m_flywheelsCommand},
+    tap::control::RemoteMapState(tap::communication::serial::Remote::Switch::RIGHT_SWITCH, 
+        tap::communication::serial::Remote::SwitchState::UP
+    )
+    };
+
+    tap::control::HoldCommandMapping m_rightMouseFlywheel{
+        &m_drivers,
+        {&m_flywheelsCommand},
+        tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::RIGHT)
+    };
+
+    tap::control::HoldCommandMapping m_leftMouseIndex{
+        &m_drivers,
+        {&m_agitatorCommand},
+        tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::LEFT)
+    };
+
 };
   
 }  // namespace control

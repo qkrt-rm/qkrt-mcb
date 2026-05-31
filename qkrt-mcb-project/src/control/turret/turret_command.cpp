@@ -79,7 +79,7 @@ void TurretCommand::execute()
         m_turret.setPitch(m_globalPitch);
         m_turret.setYawRps(yawInp);
 
-        m_turret.ChassisRot(m_operatorInterface.isChassisBeyblade());
+        m_turret.isChassisRot(m_operatorInterface.getChassisBeyblade());
     }
 }
 

@@ -102,8 +102,13 @@ void Robot::startCommands()
 void Robot::registerIoMappings()
 {
     //Flywheel and Agitator Mapping
+    //remote
     m_drivers.commandMapper.addMap(& m_leftSwitchUP);
     m_drivers.commandMapper.addMap(& m_rightSwitchUP);
+
+    //mouse
+    m_drivers.commandMapper.addMap(& m_rightMouseFlywheel);
+    m_drivers.commandMapper.addMap(& m_leftMouseIndex);
 }
 
 }  // namespace control
