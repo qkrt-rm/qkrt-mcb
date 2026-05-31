@@ -90,9 +90,20 @@ private:
     tap::control::RemoteMapState(tap::communication::serial::Remote::Switch::RIGHT_SWITCH, 
         tap::communication::serial::Remote::SwitchState::UP
     )
-};
+    };
 
-    //TODO: Add keyboard mapping
+    tap::control::HoldCommandMapping m_rightMouseFlywheel{
+        &m_drivers,
+        {&m_flywheelsCommand},
+        tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::RIGHT)
+    };
+
+    tap::control::HoldCommandMapping m_leftMouseIndex{
+        &m_drivers,
+        {&m_agitatorCommand},
+        tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::LEFT)
+    };
+
 };
   
 }  // namespace control

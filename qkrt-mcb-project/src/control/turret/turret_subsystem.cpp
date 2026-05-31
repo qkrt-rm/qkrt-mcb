@@ -184,6 +184,9 @@ void TurretSubsystem::setYawRps(float yawRps)
     );
 }
 
-void TurretSubsystem::ChassisRot(bool isRot) { m_isChassisRot = isRot; }
+bool TurretSubsystem::isChassisRot(float beybladeDirection) 
+{
+    return beybladeDirection != 0.0f;
+}
 
 }  // namespace control::turret

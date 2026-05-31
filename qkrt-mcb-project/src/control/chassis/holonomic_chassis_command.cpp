@@ -22,6 +22,8 @@ void HolonomicChassisCommand::execute()
 {       
         m_operatorInterface.pollInputDevices();
 
+        //TODO: senstivities and rot speed to config
+
         float xInp = m_operatorInterface.getChassisXInput() * REMOTE_SENSITIVITY;
         float yInp = m_operatorInterface.getChassisYInput() * REMOTE_SENSITIVITY;
         float yawAngle = m_turret.getYaw();
@@ -29,7 +31,7 @@ void HolonomicChassisCommand::execute()
         //compute rotation transformation
         float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);
         float v_x = yInp * std::sin(-yawAngle) + xInp * std::cos(-yawAngle);
-        float w = (m_operatorInterface.isChassisBeyblade()) ? CHASSIS_ROT_SPEED_RAD : 0.0f;   
+        float w = CHASSIS_ROT_SPEED_RAD * m_operatorInterface.getChassisBeyblade();
         
         float leftFront  = (v_x + v_y + w);
         float leftBack   = (v_x - v_y + w);

@@ -145,7 +145,7 @@ public:
 
     void unlock() { m_aimLock = false; }
 
-    void ChassisRot(bool isRot);
+    bool isChassisRot(float beybladeDirection);
 
 
 private:
