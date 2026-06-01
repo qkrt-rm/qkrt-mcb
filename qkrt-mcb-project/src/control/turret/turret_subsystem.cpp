@@ -127,8 +127,8 @@ void TurretSubsystem::refresh()
     
         float currPitch = getPitch();
 
-        // m_logger.printf("PITCH: %.4f\n", static_cast<double>(currPitch));
-        // m_logger.delay(200);
+        m_logger.printf("PITCH: %.4f\n", static_cast<double>(currPitch));
+        m_logger.delay(200);
 
         //feed forward terms
         float yawFF = (m_isChassisRot) ? (yawKFF * -chassis::HolonomicChassisCommand::CHASSIS_ROT_SPEED_RAD) : 0.0f;
@@ -150,8 +150,8 @@ void TurretSubsystem::refresh()
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
 
-        m_logger.printf("PITCH: %.4f\n", static_cast<double>(imuYawRps));
-        m_logger.delay(200);
+        // m_logger.printf("PITCH: %.4f\n", static_cast<double>(imuYawRps));
+        // m_logger.delay(200);
 
     }
 
