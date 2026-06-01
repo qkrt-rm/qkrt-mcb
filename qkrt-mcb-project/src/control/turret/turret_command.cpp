@@ -15,9 +15,9 @@ TurretCommand::TurretCommand(Drivers & drivers, TurretSubsystem& turret,
       m_pitchCommand(0.0f), m_yawCommand(0.0f),
       m_pitchSensitivity(1.0f), m_yawSensitivity(1.0f),
       m_globalYawTarget(0.0f), m_globalPitchTarget(0.0f),
-      m_lastTarget{NAN, NAN, NAN}
+      m_lastTarget{NAN, NAN, NAN},
       //
-      m_currentState(SentryState::SCANNING),
+      m_currentState(SentryState::SCANNING), ////////////////////////////////////////////
       m_targetLostTicks(0),
       m_scanDirection(1.0f)
       //
@@ -34,10 +34,10 @@ void TurretCommand::execute()
 {
     volatile communication::TurretData currentTarget = m_visionCoprocessor.getTurretData();
 
-    bool hasValidTarget = (currentTarget.xPos != 0);
-    // bool isNewData = (currentTarget.xPos != m_lastTarget.xPos 
-    //                     || currentTarget.yPos != m_lastTarget.yPos
-    //                     || currentTarget.zPos != m_lastTarget.zPos) && currentTarget.xPos != 0;
+    //bool hasValidTarget = (currentTarget.xPos != 0);
+    bool hasValidTarget = (currentTarget.xPos != m_lastTarget.xPos 
+                         || currentTarget.yPos != m_lastTarget.yPos
+                         || currentTarget.zPos != m_lastTarget.zPos) && currentTarget.xPos != 0;
     
     //     if(isNewData) --> used instead of has valid target in phase 2
     
@@ -79,7 +79,7 @@ void TurretCommand::execute()
     else
     {
         // Fallback if auto-aim is disabled
-        m_currentState = SentryState::SCANNING; 
+        m_currentState = SentryState::SCANNING; ///////////////////////////////////////////////////
     }
 
     // -----------------------------------------
@@ -123,21 +123,23 @@ void TurretCommand::execute()
             float currentYaw = m_turret.getYaw();
             
             // Limit is pi/2 radians (90 degrees) in either direction from 0
-            const float SCAN_LIMIT = static_cast<float>(M_PI) / 2.0f; 
+            // const float SCAN_LIMIT = static_cast<float>(M_PI) / 2.0f; 
             const float SCAN_SPEED_RPS = 0.2f; // Adjust this for faster/slower sweeping
             
             // Reverse direction if we hit or exceed the limits
-            if (currentYaw >= SCAN_LIMIT)
-            {
-                m_scanDirection = -1.0f;
-            }
-            else if (currentYaw <= -SCAN_LIMIT)
-            {
-                m_scanDirection = 1.0f;
-            }
+            //if (currentYaw >= SCAN_LIMIT)
+            //{
+            m_scanDirection = -1.0f;
+            //}
+            // else if (currentYaw <= -SCAN_LIMIT)
+            // {
+            //     m_scanDirection = 1.0f;
+            // }
 
             // Command the turret to move at the set velocity
             m_turret.setYawRps(SCAN_SPEED_RPS * m_scanDirection);
+            m_turret.setPitch(0.0f);
+
         }
     }
     else

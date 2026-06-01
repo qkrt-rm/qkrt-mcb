@@ -35,8 +35,8 @@ Robot::Robot(Drivers& drivers)
                     .MAX_PITCH_POWER = GM6020::MAX_VOLTAGE,
                     .MAX_YAW_POWER = GM6020::MAX_VOLTAGE,
                     .MAX_RPS = GM6020::MAX_RPS,
-                    .pitchPosGains = { .kp = 3.5f, .ki = 0.02f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-                    .pitchVelGains = { .kp = 3000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+                    .pitchPosGains = { .kp = 4.0f, .ki = 0.02f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+                    .pitchVelGains = { .kp = 8000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .yawPosGains   = { .kp = 3.0f,  .ki = 0.0f, .kd = 0.65f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .yawVelGains   = { .kp = 9000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE}
                 }),

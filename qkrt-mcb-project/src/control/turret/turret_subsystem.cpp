@@ -73,7 +73,7 @@ void TurretSubsystem::initialize()
 void TurretSubsystem::refresh()
 {
 
-    if (m_imu.getImuState() != ImuState::IMU_CALIBRATING)
+    if (m_imu.getImuState() != ImuState::IMU_CALIBRATED)
     {
         m_yawPos += m_imu.getGz() * -1.0f * DT; //filter imu
     }
