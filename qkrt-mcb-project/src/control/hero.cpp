@@ -28,6 +28,7 @@ Robot::Robot(Drivers& drivers)
                     .yawGearRatio = M3508::GEAR_RATIO * BELT_GEAR_RATIO,
                     .pitchInverted = true,
                     .yawInverted = true,
+                    .isYawZeroed = false,       // need to point turret north on startup 
                     .mcbHoriz = true,
                     .canBus  = CanBus::CAN_BUS1,
                     .yawForwardOffset = 0.0f,         

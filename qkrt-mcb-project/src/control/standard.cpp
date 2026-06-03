@@ -28,6 +28,7 @@ Robot::Robot(Drivers& drivers)
                     .yawGearRatio = GM6020::GEAR_RATIO,
                     .pitchInverted = true,
                     .yawInverted = true,
+                    .isYawZeroed = true,
                     .mcbHoriz = false,
                     .canBus  = CanBus::CAN_BUS1,
                     .yawForwardOffset = -4.7155f,          

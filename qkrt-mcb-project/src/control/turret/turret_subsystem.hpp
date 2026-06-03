@@ -40,6 +40,7 @@ struct TurretConfig
     float yawGearRatio;
     bool pitchInverted;
     bool yawInverted;
+    bool isYawZeroed;
     bool mcbHoriz; 
     tap::can::CanBus canBus;
 

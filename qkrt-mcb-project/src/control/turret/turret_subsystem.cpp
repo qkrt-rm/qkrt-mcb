@@ -47,7 +47,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_aimLock(false),  
       m_isChassisRot(false),
       m_mcbHoriz(config.mcbHoriz),
-      m_isYawZeroed(false),
+      m_isYawZeroed(config.isYawZeroed),
       m_sensitivity(1.0f),
       m_yawOffset(config.yawForwardOffset),
       m_pitchOffset(config.pitchHorizontalOffset),
