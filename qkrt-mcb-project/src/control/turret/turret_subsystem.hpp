@@ -119,7 +119,7 @@ public:
         auto rawAngle = m_yawMotor.getEncoder()->getPosition();
 
         float unwrappedMotorRad = rawAngle.getUnwrappedValue();
-        float unwrappedShaftRad = unwrappedMotorRad / m_yawGearRatio;
+        float unwrappedShaftRad = (unwrappedMotorRad / m_yawGearRatio) + m_yawOffset;
 
         auto rawWrappedAngle = rawAngle.withSameBounds(unwrappedShaftRad);
 
