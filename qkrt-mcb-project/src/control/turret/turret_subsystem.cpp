@@ -10,7 +10,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
       m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW"),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
-      m_desiredPitch(0.0f), m_desiredYaw(0.0f),
+      m_desiredPitch(0.0f), m_desiredYaw(0.0f), m_yawPos(0.0f),
       m_pitchPosPid({
           .kp = config.pitchPosGains.kp,
           .ki = config.pitchPosGains.ki,
@@ -72,6 +72,7 @@ void TurretSubsystem::initialize()
 
 void TurretSubsystem::refresh()
 {
+    // REMOVED: m_yawPos calibration tracking block from here.
 
     if(m_drivers->isEmergencyStopActive() || m_imu.getImuState() == ImuState::IMU_CALIBRATING) 
     {
@@ -85,75 +86,56 @@ void TurretSubsystem::refresh()
     }
     else if (m_aimLock)     
     {
-        /**
-         * AUTO AIM Position Control
-         * TODO:
-         * 
-         */
-
         float currPitch = getPitch();
 
+        // Feed forward logic using cos()
         float pitchKFF = 2600.0f;
-        
-        float pitchFF = pitchKFF * std::sin(currPitch);
+        float pitchFF = pitchKFF * std::cos(currPitch);
 
-        //Pitch Position Outer Loop
+        // Pitch Loop
         float pitchError = getOptimalError(m_desiredPitch, currPitch);
         float desiredPitchRpm = m_pitchPosPid.runControllerDerivateError(pitchError, DT);
 
-        //Pitch Velocity Inner Loop
         float currentPitchRpm = m_pitchMotor.getEncoder()->getVelocity();  
         m_pitchVelPid.runControllerDerivateError(desiredPitchRpm - currentPitchRpm, DT);
-        m_desiredPitchVoltage = m_pitchVelPid.getOutput()+ pitchFF;
-
-        float currentYawRpm = m_imu.getGz() * -1;  //TODO: make sure this is filtered
         
-        //Yaw Position Outer Loop
+        m_desiredPitchVoltage = m_pitchVelPid.getOutput() + pitchFF;
+
+        // Yaw Loop
+        float currentYawRpm = m_imu.getGz() * -1;  
+        
+        // FIX: Replaced m_yawPos tracking with direct getYaw() and getOptimalError()
         float azimuthError = getOptimalError(m_desiredYaw, getYaw());
         float desiredYawRpm = m_yawPosPid.runController(azimuthError, currentYawRpm, DT);
 
-        //Yaw Velocity Inner Loop
         m_desiredYawVoltage = m_yawVelPid.runController(desiredYawRpm - currentYawRpm, 0.0f, DT);
-
-        // m_logger.printf("POS ERROR= %.3f\n", static_cast<double>(desiredYawRpm));
-        // m_logger.delay(400);
-        
     }
     else 
     {
-        //Manual Velocity PID
-
+        // Manual Velocity PID
         float pitchKFF = 1000.0f;
         float yawKFF = 6560.0f;
     
         float currPitch = getPitch();
 
-        m_logger.printf("PITCH: %.4f\n", static_cast<double>(currPitch));
-        m_logger.delay(200);
-
-        //feed forward terms
         float yawFF = (m_isChassisRot) ? (yawKFF * -chassis::HolonomicChassisCommand::CHASSIS_ROT_SPEED_RAD) : 0.0f;
-        float pitchFF = pitchKFF * cos(currPitch);
+        
+        float pitchFF = pitchKFF * std::cos(currPitch);
 
-        //pitch position outer loop
+        // Pitch Loop
         float pitchError = m_desiredPitch - currPitch;
         float desiredPitchRps = m_pitchPosPid.runControllerDerivateError(pitchError, DT);
 
-        //pitch position inner loop
         float pitchRpsError = desiredPitchRps - (m_pitchMotor.getEncoder()->getVelocity());
         m_pitchVelPid.runControllerDerivateError(pitchRpsError, DT);
         m_desiredPitchVoltage = m_pitchVelPid.getOutput() + pitchFF;
 
-        //yaw velocity loop 
+        // Yaw Loop 
         float imuYawRps = (m_mcbHoriz ? m_imu.getGz() * -1 : m_imu.getGx());
 
         float yawRpsError = m_desiredYawRps - imuYawRps;
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
-
-        // m_logger.printf("PITCH: %.4f\n", static_cast<double>(imuYawRps));
-        // m_logger.delay(200);
-
     }
 
     m_desiredPitchVoltage = std::clamp(m_desiredPitchVoltage, -m_maxPitchPower, m_maxPitchPower);

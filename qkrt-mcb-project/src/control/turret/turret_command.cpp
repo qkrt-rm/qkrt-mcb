@@ -17,6 +17,9 @@ TurretCommand::TurretCommand(Drivers & drivers, TurretSubsystem& turret,
       m_pitchSensitivity(1.0f), m_yawSensitivity(1.0f),
       m_globalYawTarget(0.0f), m_globalPitchTarget(0.0f),
       m_lastTarget{NAN, NAN, NAN},
+      m_currentState(SentryState::SCANNING), 
+      m_targetLostTicks(0),
+      m_scanDirection(1.0f),
       m_kalmanFilter(kalman_config::KALMAN_A, 
                      kalman_config::KALMAN_C, 
                      kalman_config::KALMAN_Q, 
@@ -39,130 +42,178 @@ void TurretCommand::execute()
                         || currentTarget.yPos != m_lastTarget.yPos
                         || currentTarget.zPos != m_lastTarget.zPos) && currentTarget.xPos != 0;
 
+    // -----------------------------------------
+    // Phase 1: State Transitions
+    // -----------------------------------------
     if (m_operatorInterface.isAutoAim())
     {
-        m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, true);
-        static uint32_t loopsWithoutData = 0;
-
-        // No Pitch in Kalman Filter and Ballistics cuz I couldn't get it working
-
-        if(isNewData)
+        m_logger.printf("Current State: %f \n", m_turret.getPitch());
+        m_logger.delay(400);
+        switch (m_currentState)
         {
-            loopsWithoutData = 0;
+            case SentryState::SCANNING:
+                if (isNewData)
+                {
+                    m_currentState = SentryState::SHOOTING;
+                    m_targetLostTicks = 0; 
+                }
+                break;
+
+            case SentryState::SHOOTING:
+                if (!isNewData)
+                {
+                    m_targetLostTicks++;
+                    if (m_targetLostTicks >= TARGET_LOST_TIMEOUT_TICKS)
+                    {
+                        m_currentState = SentryState::SCANNING;
+                        m_kalInit = false; // Reset Kalman filter on target drop
+                    }
+                }
+                else
+                {
+                    m_targetLostTicks = 0; 
+                }
+                break;
+        }
+    }
+    else
+    {
+        m_currentState = SentryState::SCANNING; 
+    }
+
+    // -----------------------------------------
+    // Phase 2: State Behaviors
+    // -----------------------------------------
+    if (m_operatorInterface.isAutoAim())
+    {
+        if (m_currentState == SentryState::SHOOTING)
+        {
+            m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, true);
             m_turret.lock();
 
-            float cvX = currentTarget.xPos;
-            float cvY = currentTarget.yPos - 0.095f; 
-            float cvZ = currentTarget.zPos; 
+            static uint32_t loopsWithoutData = 0;
 
-            float flatDist = std::hypot(cvX, cvY);
-
-            // Pitch not used in Kalman Filter and Ballistics
-            float aimYawRelative = std::atan2(cvY * -1, currentTarget.xPos);
-            float aimPitchRelative = std::atan2(cvZ, flatDist);
-                
-            m_globalPitchTarget = aimPitchRelative; 
-
-            // Yaw only
-            float relYaw = std::atan2(-cvY, cvX);  
-            float mathTurretYaw = m_turret.getYaw();      
-            float absYaw = mathTurretYaw + relYaw; 
-
-            // world x, y, z *not relative to turret*
-            float worldX = flatDist * std::cos(absYaw);
-            float worldY = flatDist * std::sin(absYaw);
-            float worldZ = 0.0f; 
-
-            m_currentRawPos.set(worldX, worldY, worldZ);
-
-            // Kalman Filter
-            tap::algorithms::CMSISMat<K_INPUTS, 1> measurement;
-            measurement.data[0] = worldX;
-            measurement.data[1] = worldY;
-            measurement.data[2] = worldZ;
-
-            if (!m_kalInit)
+            if(isNewData)
             {
-                float initialState[K_STATES] = {worldX, worldY, worldZ, 0.0f, 0.0f, 0.0f};
-                m_kalmanFilter.init(initialState);
-                m_kalInit = true;
+                loopsWithoutData = 0;
+
+                float cvX = currentTarget.xPos;
+                float cvY = currentTarget.yPos - 0.045f; 
+                float cvZ = currentTarget.zPos - 0.075f; 
+
+                float flatDist = std::hypot(cvX, cvY);
+
+                // FIX: Assign direct relative aim, NO compounded turret angle
+                float aimPitchRelative = std::atan2(cvZ, flatDist);
+                m_globalPitchTarget = aimPitchRelative; 
+
+                // Yaw relative calculation
+                float relYaw = std::atan2(-cvY, cvX);  
+                float mathTurretYaw = m_turret.getYaw();      
+                float absYaw = mathTurretYaw + relYaw; 
+
+                // World coordinates
+                float worldX = flatDist * std::cos(absYaw);
+                float worldY = flatDist * std::sin(absYaw);
+                float worldZ = 0.0f; 
+
+                m_currentRawPos.set(worldX, worldY, worldZ);
+
+                // Kalman Filter
+                tap::algorithms::CMSISMat<K_INPUTS, 1> measurement;
+                measurement.data[0] = worldX;
+                measurement.data[1] = worldY;
+                measurement.data[2] = worldZ;
+
+                if (!m_kalInit)
+                {
+                    float initialState[K_STATES] = {worldX, worldY, worldZ, 0.0f, 0.0f, 0.0f};
+                    m_kalmanFilter.init(initialState);
+                    m_kalInit = true;
+                }
+                else
+                {
+                    m_kalmanFilter.performUpdate(measurement);
+                }
+
+                const auto& state = m_kalmanFilter.getStateVectorAsMatrix();
+                m_currentFilteredVel.set(state[3], state[4], state[5]);
             }
-            else
+            else if (m_kalInit)
             {
-                m_kalmanFilter.performUpdate(measurement);
+                loopsWithoutData++;
+
+                m_currentRawPos.x += m_currentFilteredVel.x * turret::TurretSubsystem::DT;
+                m_currentRawPos.y += m_currentFilteredVel.y * turret::TurretSubsystem::DT;
+
+                if (loopsWithoutData > 15)
+                {
+                    m_kalInit = false; 
+                }
             }
 
-            const auto& state = m_kalmanFilter.getStateVectorAsMatrix();
+            if (m_kalInit)
+            {
+                // Ballistics
+                modm::Vector3f zeroAccel(0.0f, 0.0f, 0.0f);
+                modm::Vector3f stableVel(m_currentFilteredVel.x, -m_currentFilteredVel.y, 0.0f);
 
-            // Gets current velocity from Kalman Filter
-            m_currentFilteredVel.set(state[3], state[4], state[5]);
+                tap::algorithms::ballistics::SecondOrderKinematicState targetState(
+                    m_currentRawPos,
+                    stableVel,
+                    zeroAccel
+                );
+
+                float bulletVelocity = 15.0f; 
+                uint8_t iterations = 3;
+                float projectedTravelTime = 0.0f;
+                float aimPitchAbsolute = 0.0f;
+                float aimYawAbsolute = 0.0f;
+
+                bool solutionFound = tap::algorithms::ballistics::findTargetProjectileIntersection( 
+                    targetState,
+                    bulletVelocity,
+                    iterations,
+                    &aimPitchAbsolute,
+                    &aimYawAbsolute,
+                    &projectedTravelTime,
+                    m_turret.getPitchOffset()
+                );
+
+                if (solutionFound)
+                {
+                    m_globalYawTarget = aimYawAbsolute;
+                    m_globalPitchTarget = aimPitchAbsolute;
+                    
+                    m_lastTarget.xPos = currentTarget.xPos;
+                    m_lastTarget.yPos = currentTarget.yPos;
+                    m_lastTarget.zPos = currentTarget.zPos;  
+                }
+            }
+
+            m_turret.setYaw(m_globalYawTarget);
+            m_turret.setPitch(m_globalPitchTarget);
         }
-        else if (m_kalInit)
+        else if (m_currentState == SentryState::SCANNING)
         {
-            loopsWithoutData++;
+            m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, false);
+            m_turret.unlock();
 
-            m_currentRawPos.x += m_currentFilteredVel.x * turret::TurretSubsystem::DT;
-            m_currentRawPos.y += m_currentFilteredVel.y * turret::TurretSubsystem::DT;
-
-            if (loopsWithoutData > 15) // 30ms without data, lost target
-            {
-                m_kalInit = false; 
-            }
-        }
-
-        if (m_kalInit)
-        {
-            //Balistics
-            modm::Vector3f zeroAccel(0.0f, 0.0f, 0.0f);
+            // Automatic sweeping logic
+            const float SCAN_SPEED_RPS = 0.2f; 
             
-            modm::Vector3f stableVel(m_currentFilteredVel.x, -m_currentFilteredVel.y, 0.0f);
+            // Re-implement your bounds check here if you need it to bounce back and forth
+            m_scanDirection = -1.0f;
 
-            tap::algorithms::ballistics::SecondOrderKinematicState targetState(
-                m_currentRawPos,
-                stableVel,
-                zeroAccel
-            );
-
-            float bulletVelocity = 15.0f; 
-            uint8_t iterations = 3;
-            float projectedTravelTime = 0.0f;
-            float aimPitchAbsolute = 0.0f;
-            float aimYawAbsolute = 0.0f;
-
-            // predicts future target position
-            bool solutionFound = tap::algorithms::ballistics::findTargetProjectileIntersection( 
-                targetState,
-                bulletVelocity,
-                iterations,
-                &aimPitchAbsolute,
-                &aimYawAbsolute,
-                &projectedTravelTime,
-                m_turret.getPitchOffset()
-            );
-
-            if (solutionFound)
-            {
-                m_globalYawTarget = aimYawAbsolute; 
-                
-                m_lastTarget.xPos = currentTarget.xPos;
-                m_lastTarget.yPos = currentTarget.yPos;
-                m_lastTarget.zPos = currentTarget.zPos;  
-            }
+            m_turret.setYawRps(SCAN_SPEED_RPS * m_scanDirection);
+            m_turret.setPitch(-0.05f);
         }
-
-        // m_logger.printf("Target: %.2f | Actual: %.2f\n", static_cast<double>(m_globalYawTarget), static_cast<double>(m_turret.getYaw()));
-        // m_logger.delay(50);
-
-        m_turret.setYaw(m_globalYawTarget);
-        m_turret.setPitch(m_globalPitchTarget);
     }
     else
     {
         m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, false);
 
-        //Manual Velocity Control 
         m_operatorInterface.pollInputDevices();
-
         m_turret.unlock(); 
 
         float pitchInp = m_operatorInterface.getTurretPitchInput();

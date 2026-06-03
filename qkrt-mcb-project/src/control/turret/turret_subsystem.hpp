@@ -167,6 +167,8 @@ private:
     float m_maxYawPower;
     float m_maxRps;
 
+    float m_yawPos;
+
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
     Drivers* m_drivers;
 
