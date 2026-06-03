@@ -16,7 +16,7 @@ class HolonomicChassisCommand : public tap::control::Command
 {
 private:
     static constexpr float MAX_CHASSIS_SPEED_MPS = 1.0f;
-    float static constexpr REMOTE_SENSITIVITY = 0.5f;
+    static constexpr float REMOTE_SENSITIVITY = 0.5f;
 public:
     HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                             turret::TurretSubsystem& turret,

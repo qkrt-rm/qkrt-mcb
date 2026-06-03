@@ -48,6 +48,7 @@ private:
 
     Drivers& m_drivers;
 
+    static constexpr float BELT_GEAR_RATIO = 2.0f;
 
     /**
     * @brief Chassis subsystem for the sentry robot

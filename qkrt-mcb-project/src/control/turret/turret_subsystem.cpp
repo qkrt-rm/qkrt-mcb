@@ -9,6 +9,8 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
     : tap::control::Subsystem(&drivers),
       m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
       m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW"),
+      m_pitchGearRatio(config.pitchGearRatio),
+      m_yawGearRatio(config.yawGearRatio),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
       m_desiredPitch(0.0f), m_desiredYaw(0.0f),
       m_pitchPosPid({
@@ -45,6 +47,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_aimLock(false),  
       m_isChassisRot(false),
       m_mcbHoriz(config.mcbHoriz),
+      m_isYawZeroed(config.isYawZeroed),
       m_sensitivity(1.0f),
       m_yawOffset(config.yawForwardOffset),
       m_pitchOffset(config.pitchHorizontalOffset),
@@ -53,6 +56,8 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_maxPitchPower(config.MAX_PITCH_POWER),
       m_maxYawPower(config.MAX_YAW_POWER),
       m_maxRps(config.MAX_RPS),
+      m_yawGainFF(config.yawFF),
+      m_pitchGainFF(config.pitchFF),
       m_imu(drivers.bmi088),
       m_drivers(&drivers),
       m_logger(drivers.logger)
@@ -63,7 +68,6 @@ void TurretSubsystem::initialize()
 {
     m_pitchMotor.initialize();
     m_yawMotor.initialize();
-
     m_pitchPosPid.reset();
     m_yawPosPid.reset();
     m_pitchVelPid.reset();
@@ -82,6 +86,11 @@ void TurretSubsystem::refresh()
 
         m_desiredPitchVoltage = 0.0f;
         m_desiredYawVoltage = 0.0f;
+    }
+    if(!m_isYawZeroed && m_yawMotor.getEncoder()->isOnline())    
+    {    
+        m_yawMotor.getEncoder()->resetEncoderValue();   //zero yaw encoder once motor is powered up
+        m_isYawZeroed=true;
     }
     else if (m_aimLock)     
     {
@@ -122,10 +131,10 @@ void TurretSubsystem::refresh()
     {
         //Manual Velocity PID
 
-        float pitchKFF = 1000.0f;
-        float yawKFF = 6560.0f;
-    
+        //feed forward terms
         float currPitch = getPitch();
+        float yawFF = (m_isChassisRot) ? (m_yawGainFF * -chassis::HolonomicChassisCommand::CHASSIS_ROT_SPEED_RAD) : 0.0f;
+        float pitchFF = m_pitchGainFF * cos(currPitch);
 
         m_logger.printf("PITCH: %.4f\n", static_cast<double>(currPitch));
         m_logger.delay(200);
@@ -150,6 +159,8 @@ void TurretSubsystem::refresh()
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
 
+        // m_logger.printf("PITCH: %.5f\n", static_cast<double>(getPitch()));
+        // m_logger.delay(200);
         // m_logger.printf("PITCH: %.4f\n", static_cast<double>(imuYawRps));
         // m_logger.delay(200);
 

@@ -24,8 +24,11 @@ Robot::Robot(Drivers& drivers)
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
                     .yawId   = MotorId::MOTOR5,
+                    .pitchGearRatio = GM6020::GEAR_RATIO,
+                    .yawGearRatio = GM6020::GEAR_RATIO,
                     .pitchInverted = true,
                     .yawInverted = true,
+                    .isYawZeroed = true,
                     .mcbHoriz = false,
                     .canBus  = CanBus::CAN_BUS1,
                     .yawForwardOffset = -4.7155f,          
@@ -38,7 +41,9 @@ Robot::Robot(Drivers& drivers)
                     .pitchPosGains = { .kp = 10.0f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .pitchVelGains = { .kp = 4000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-                    .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE }
+                    .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+                    .yawFF = 6560.0f,
+                    .pitchFF = 1000.0f
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
       m_flywheels(drivers, 

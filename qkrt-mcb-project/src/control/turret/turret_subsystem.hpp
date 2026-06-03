@@ -36,8 +36,11 @@ struct TurretConfig
     //hardware settings
     tap::motor::MotorId pitchId;
     tap::motor::MotorId yawId;
+    float pitchGearRatio;
+    float yawGearRatio;
     bool pitchInverted;
     bool yawInverted;
+    bool isYawZeroed;
     bool mcbHoriz; 
     tap::can::CanBus canBus;
 
@@ -55,6 +58,7 @@ struct TurretConfig
     PidGains pitchVelGains;
     PidGains yawPosGains;
     PidGains yawVelGains;
+    float yawFF, pitchFF;
 };
 
 class TurretSubsystem : public tap::control::Subsystem
@@ -87,8 +91,14 @@ public:
      */
     inline float getPitch() const
     {
-        auto relativeAngle = m_pitchMotor.getEncoder()->getPosition() + m_pitchOffset;
-        return (relativeAngle).getUnwrappedValue();
+        auto rawAngle = m_pitchMotor.getEncoder()->getPosition();
+
+        float unwrappedMotorRad = rawAngle.getUnwrappedValue();
+        float unwrappedShaftRad = (unwrappedMotorRad / m_pitchGearRatio) + m_pitchOffset;
+
+        auto rawWrappedAngle = rawAngle.withSameBounds(unwrappedShaftRad);
+
+        return rawWrappedAngle.getUnwrappedValue();
     }
 
     /**
@@ -106,11 +116,18 @@ public:
      */
     inline float getYaw() const
     {
-        auto currentAngle = m_yawMotor.getEncoder()->getPosition() + m_yawOffset;
-        return (currentAngle).getWrappedValue();
+        auto rawAngle = m_yawMotor.getEncoder()->getPosition();
+
+        float unwrappedMotorRad = rawAngle.getUnwrappedValue();
+        float unwrappedShaftRad = (unwrappedMotorRad / m_yawGearRatio) + m_yawOffset;
+
+        auto rawWrappedAngle = rawAngle.withSameBounds(unwrappedShaftRad);
+
+        return rawWrappedAngle.getWrappedValue();
     }
 
     /**
+     * 
      * @brief Rotates the pitch motor at a specified revolutions per second.
      * 
      * @param pitchRps Desired revolutions per second of the pitch motor.
@@ -136,6 +153,7 @@ private:
     using Motor = tap::motor::DjiMotor;
 
     Motor m_pitchMotor, m_yawMotor;
+    float m_pitchGearRatio, m_yawGearRatio;
     float m_desiredPitchVoltage, m_desiredYawVoltage;
 
     float m_desiredPitch, m_desiredYaw;
@@ -152,15 +170,13 @@ private:
     bool m_aimLock;
     bool m_isChassisRot;
     bool m_mcbHoriz;
-
+    bool m_isYawZeroed;
     float m_sensitivity;
     
-    float m_yawOffset;
-    float m_pitchOffset;
-
-    float m_maxPitchPower;
-    float m_maxYawPower;
+    float m_yawOffset, m_pitchOffset;
+    float m_maxPitchPower, m_maxYawPower;
     float m_maxRps;
+    float m_yawGainFF, m_pitchGainFF;
 
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
     Drivers* m_drivers;
