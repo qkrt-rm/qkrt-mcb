@@ -154,7 +154,7 @@ void TurretSubsystem::refresh()
 
         // m_logger.printf("PITCH: %.5f\n", static_cast<double>(getPitch()));
         // m_logger.delay(200);
-        // m_logger.printf("PITCH: %.4f\n", static_cast<double>(imuYawRps));
+        // m_logger.printf("YAW: %.4f\n", static_cast<double>(yawFF));
         // m_logger.delay(200);
 
     }
@@ -186,7 +186,7 @@ void TurretSubsystem::setYawRps(float yawRps)
 
 bool TurretSubsystem::isChassisRot(float beybladeDirection) 
 {
-    return beybladeDirection != 0.0f;
+    m_isChassisRot = beybladeDirection != 0.0f;
 }
 
 }  // namespace control::turret
