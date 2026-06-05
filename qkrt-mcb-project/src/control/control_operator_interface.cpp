@@ -77,11 +77,11 @@ void ControlOperatorInterface::pollKeyboardMouse()
     bool currEPressed = m_remote.keyPressed(Remote::Key::E);
     bool currQPressed = m_remote.keyPressed(Remote::Key::Q);
 
-    if (currEPressed && m_prevQState) 
+    if (currEPressed && !m_prevEState) 
     {
         m_beybladeDirection = (m_beybladeDirection == 1.0f) ? 0.0f : 1.0f;
     }
-    else if (currQPressed && m_prevEState) 
+    else if (currQPressed && !m_prevQState) 
     {
         m_beybladeDirection = (m_beybladeDirection == -1.0f) ? 0.0f : -1.0f;
     }
