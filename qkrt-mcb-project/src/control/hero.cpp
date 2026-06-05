@@ -38,11 +38,11 @@ Robot::Robot(Drivers& drivers)
                     .MAX_PITCH_POWER = M3508::MAX_CURRENT,
                     .MAX_YAW_POWER = M3508::MAX_CURRENT,
                     .MAX_RPS = GM6020::MAX_RPS,
-                    .pitchPosGains = { .kp = 10.0f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-                    .pitchVelGains = { .kp = 4000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+                    .pitchPosGains = { .kp = 15.5f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+                    .pitchVelGains = { .kp = 6000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = M3508::MAX_CURRENT },
                     .yawVelGains   = { .kp = 2500.0f, .ki = 100.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = M3508::MAX_CURRENT },
-                    .yawFF = 1560.0f,
+                    .yawFF = 1360.0f,
                     .pitchFF = 1000.0f           
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
@@ -51,13 +51,13 @@ Robot::Robot(Drivers& drivers)
             .leftFlyId = MotorId::MOTOR1, 
             .rightFlyId = MotorId::MOTOR2, 
             .canBus = CanBus::CAN_BUS2,
-            .flyVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000)
-        }),      m_flywheelsCommand(m_flywheels, 0.15f),
+            .flyVelocityPidConfig = modm::Pid<float>::Parameter(180, 10, 0, 1000, 10000)
+        }),      m_flywheelsCommand(m_flywheels, 0.0364f),
       m_agitator(drivers,
                 agitator::m3508::agitatorConfig{
                     .agitatorId = MotorId::MOTOR7,
                     .canBus = CanBus::CAN_BUS1,
-                    .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(55, 1, 0, 1000, 10000), 
+                    .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(85, 10, 0, 1000, 10000), 
                 }),
      m_agitatorCommand(m_agitator,65.5)
 {
