@@ -19,7 +19,11 @@ Robot::Robot(Drivers& drivers)
                      .canBus       = CanBus::CAN_BUS1,
                      .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
                  }),
-      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface),
+      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface,
+                 chassis::chassisCommandConfig {
+                     .maxChassisSpeed = 0.5f,
+                     .maxRotSpeed = 0.35f
+                }),
       m_turret(drivers,
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
@@ -43,7 +47,8 @@ Robot::Robot(Drivers& drivers)
                     .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = M3508::MAX_CURRENT },
                     .yawVelGains   = { .kp = 2500.0f, .ki = 100.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = M3508::MAX_CURRENT },
                     .yawFF = 1360.0f,
-                    .pitchFF = 1000.0f           
+                    .pitchFF = 1000.0f,  
+                    .yawSetWeight = 0.8f         
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
       m_flywheels(drivers, 

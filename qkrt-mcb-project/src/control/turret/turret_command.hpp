@@ -45,8 +45,6 @@ private:
 
     float m_pitchCommand, m_yawCommand;
 
-    float m_pitchSensitivity, m_yawSensitivity;
-
     float m_globalYawTarget, m_globalPitchTarget;
 
     communication::TurretData m_lastTarget;

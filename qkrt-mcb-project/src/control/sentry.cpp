@@ -19,7 +19,11 @@ Robot::Robot(Drivers& drivers)
                      .canBus       = CanBus::CAN_BUS1,
                      .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
                  }),
-      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface),
+      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface,
+                 chassis::chassisCommandConfig {
+                     .maxChassisSpeed = 0.5f,
+                     .maxRotSpeed = 0.35f,
+                 }),
       m_turret(drivers,
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,

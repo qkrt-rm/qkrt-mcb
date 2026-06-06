@@ -1,10 +1,14 @@
 #pragma once
 
 #include <tap/communication/serial/remote.hpp>
+#include <algorithm>
+#include <cmath>
+#include <modm/math/geometry/vector.hpp>
 
 namespace control
 {
-
+    using Vector2f = modm::Vector<float, (uint8_t)2U>;
+    
 class ControlOperatorInterface
 {
 public:

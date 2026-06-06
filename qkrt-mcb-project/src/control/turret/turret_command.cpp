@@ -13,7 +13,6 @@ TurretCommand::TurretCommand(Drivers & drivers, TurretSubsystem& turret,
       isAutoAim(true),
       m_globalPitch(0.0f), m_globalYaw(0.0f),
       m_pitchCommand(0.0f), m_yawCommand(0.0f),
-      m_pitchSensitivity(1.0f), m_yawSensitivity(1.0f),
       m_globalYawTarget(0.0f), m_globalPitchTarget(0.0f),
       m_lastTarget{NAN, NAN, NAN}
 {
@@ -71,7 +70,7 @@ void TurretCommand::execute()
         float pitchInp = m_operatorInterface.getTurretPitchInput();
         float yawInp = m_operatorInterface.getTurretYawInput();
         
-        m_pitchCommand = pitchInp * (2.0f * static_cast<float>(M_PI)) * m_pitchSensitivity * (turret::TurretSubsystem::DT);
+        m_pitchCommand = pitchInp * (2.0f * static_cast<float>(M_PI)) * (turret::TurretSubsystem::DT);
         m_globalPitch += m_pitchCommand;
 
         m_globalPitch = std::clamp(m_globalPitch, m_turret.m_pitchDownLim, m_turret.m_pitchUpLim);

@@ -12,15 +12,17 @@ namespace control::turret {
 namespace control::chassis
 {
 
+struct chassisCommandConfig {
+    float maxChassisSpeed = 0.5f;
+    float maxRotSpeed = 0.35f;
+};
+
 class HolonomicChassisCommand : public tap::control::Command
 {
-private:
-    static constexpr float MAX_CHASSIS_SPEED_MPS = 1.0f;
-    static constexpr float REMOTE_SENSITIVITY = 0.5f;
 public:
     HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                             turret::TurretSubsystem& turret,
-                            ControlOperatorInterface& m_operatorInterface);
+                            ControlOperatorInterface& m_operatorInterface, chassisCommandConfig config);
 
     void initialize() override;
 
@@ -37,6 +39,9 @@ private:
     HolonomicChassisSubsystem& m_chassis;
     turret::TurretSubsystem& m_turret;
     ControlOperatorInterface& m_operatorInterface;
+
+    float m_maxSpeed;
+    float m_chassisRotSpeed;
 };
 
 }  // namespace control::chassis
