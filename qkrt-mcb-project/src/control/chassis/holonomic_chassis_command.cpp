@@ -6,10 +6,13 @@ namespace control::chassis
 
 HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
                                                  turret::TurretSubsystem& turret,
-                                                 ControlOperatorInterface& m_operatorInterface)
+                                                 ControlOperatorInterface& m_operatorInterface,
+                                                 chassisCommandConfig config)
     : m_chassis(chassis),
       m_turret(turret),
-      m_operatorInterface(m_operatorInterface)
+      m_operatorInterface(m_operatorInterface),
+      m_maxSpeed(config.maxChassisSpeed),
+      m_chassisRotSpeed(config.maxRotSpeed)
 {
     addSubsystemRequirement(&chassis);
 }
@@ -22,16 +25,27 @@ void HolonomicChassisCommand::execute()
 {       
         m_operatorInterface.pollInputDevices();
 
-        //TODO: senstivities and rot speed to config
+        float rawInpX = m_operatorInterface.getChassisXInput();
+        float rawInpY = m_operatorInterface.getChassisYInput();
 
-        float xInp = m_operatorInterface.getChassisXInput() * REMOTE_SENSITIVITY;
-        float yInp = m_operatorInterface.getChassisYInput() * REMOTE_SENSITIVITY;
+        Vector2f moveVector(rawInpX, rawInpY);
+        float inputLength = moveVector.getLength();
+
+        if (inputLength > 1.0f)
+        {
+            moveVector = moveVector / inputLength;
+        }
+
+        Vector2f scaledMove = moveVector * m_maxSpeed;
+
+        float xInp = scaledMove.x;
+        float yInp = scaledMove.y;
         float yawAngle = m_turret.getYaw();
         
         //compute rotation transformation
         float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);
         float v_x = yInp * std::sin(-yawAngle) + xInp * std::cos(-yawAngle);
-        float w = CHASSIS_ROT_SPEED_RAD * m_operatorInterface.getChassisBeyblade();
+        float w = m_chassisRotSpeed * m_operatorInterface.getChassisBeyblade();
         
         float leftFront  = (v_x + v_y + w);
         float leftBack   = (v_x - v_y + w);

@@ -67,13 +67,43 @@ void ControlOperatorInterface::pollKeyboardMouse()
     float moveSpeedMultiplier = m_remote.keyPressed(Remote::Key::SHIFT) ? 4.0f : 1.5f;
 
     // WASD mapping
-    m_chassisXInput = (m_remote.keyPressed(Remote::Key::W) - m_remote.keyPressed(Remote::Key::S)) * moveSpeedMultiplier;
-    m_chassisYInput = (m_remote.keyPressed(Remote::Key::D) - m_remote.keyPressed(Remote::Key::A)) * moveSpeedMultiplier;
+    float rawX = (m_remote.keyPressed(Remote::Key::W) - m_remote.keyPressed(Remote::Key::S));
+    float rawY = (m_remote.keyPressed(Remote::Key::D) - m_remote.keyPressed(Remote::Key::A));
 
-    // mouse mapping
-    m_turretPitchInput = -normalizeMouseTanh(m_remote.getMouseY());
-    m_turretYawInput = normalizeMouseTanh(m_remote.getMouseX());
+    Vector2f rawMoveInput(rawX, rawY);
+    float rawInputLen = rawMoveInput.getLength();
 
+    constexpr float KEYBOARD_ACCEL = 3.0f;  
+    constexpr float KEYBOARD_DECEL = 4.0f;  
+    constexpr float DT = 0.002f;            
+
+    Vector2f currentMove(m_chassisXInput, m_chassisYInput);
+
+    if (rawInputLen > 0.0f)
+    {
+        Vector2f moveDir = rawMoveInput / rawInputLen;      //normalize
+        currentMove += moveDir * KEYBOARD_ACCEL * DT;       //acclerate when holding
+    }
+    else
+    {
+        float len = currentMove.getLength();
+        if (len > 0.0f)
+        {
+            float decelerationFactor = 1.0f - (KEYBOARD_DECEL * DT / len);
+            currentMove *= std::max(decelerationFactor, 0.0f);
+        }
+    }
+
+    float currentLen = currentMove.getLength();
+    if (currentLen > moveSpeedMultiplier)
+    {
+        currentMove = (currentMove / currentLen) * moveSpeedMultiplier;
+    }
+
+    m_chassisXInput = currentMove.x;
+    m_chassisYInput = currentMove.y;
+
+    //beyblade
     bool currEPressed = m_remote.keyPressed(Remote::Key::E);
     bool currQPressed = m_remote.keyPressed(Remote::Key::Q);
 

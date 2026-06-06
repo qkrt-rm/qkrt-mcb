@@ -48,7 +48,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_isChassisRot(false),
       m_mcbHoriz(config.mcbHoriz),
       m_isYawZeroed(config.isYawZeroed),
-      m_sensitivity(1.0f),
+      m_yawSetWeight(config.yawSetWeight),
       m_yawOffset(config.yawForwardOffset),
       m_pitchOffset(config.pitchHorizontalOffset),
       m_pitchUpLim(config.pitchUpLim),
@@ -148,7 +148,7 @@ void TurretSubsystem::refresh()
         //yaw velocity loop 
         float imuYawRps = (m_mcbHoriz ? m_imu.getGz() * -1 : m_imu.getGx());
 
-        float yawRpsError = m_desiredYawRps - imuYawRps;
+        float yawRpsError = (m_desiredYawRps * m_yawSetWeight) - imuYawRps;
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);
         m_desiredYawVoltage = m_yawVelPid.getOutput() + yawFF;
 
@@ -170,7 +170,7 @@ void TurretSubsystem::setPitchRps(float pitchRps)
 {
     {
         m_desiredPitchRps = std::clamp(
-            pitchRps * (2.0f * static_cast<float>(M_PI)) * m_sensitivity, 
+            pitchRps * (2.0f * static_cast<float>(M_PI)), 
             -m_maxRps, m_maxRps
         );
     }
@@ -179,7 +179,7 @@ void TurretSubsystem::setPitchRps(float pitchRps)
 void TurretSubsystem::setYawRps(float yawRps)
 {
     m_desiredYawRps = std::clamp(
-        yawRps * (2.0f * static_cast<float>(M_PI)) * m_sensitivity, 
+        yawRps * (2.0f * static_cast<float>(M_PI)), 
         -m_maxRps, m_maxRps
     );
 }

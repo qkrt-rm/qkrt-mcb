@@ -59,6 +59,7 @@ struct TurretConfig
     PidGains yawPosGains;
     PidGains yawVelGains;
     float yawFF, pitchFF;
+    float yawSetWeight = 1.0f;
 };
 
 class TurretSubsystem : public tap::control::Subsystem
@@ -171,7 +172,7 @@ private:
     bool m_isChassisRot;
     bool m_mcbHoriz;
     bool m_isYawZeroed;
-    float m_sensitivity;
+    float m_yawSetWeight;
     
     float m_yawOffset, m_pitchOffset;
     float m_maxPitchPower, m_maxYawPower;
