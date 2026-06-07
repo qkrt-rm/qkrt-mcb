@@ -8,14 +8,28 @@
 
 namespace control::agitator::m3508
 {
-    M3508AgitatorCommand::M3508AgitatorCommand(M3508AgitatorSubsystem& agitator, float speed)
-    : m_agitator(agitator),
-      m_agitatorSpeed(speed)
+    M3508AgitatorCommand::M3508AgitatorCommand(
+        Drivers& drivers, M3508AgitatorSubsystem& agitator, 
+        float speed, tap::control::Command* flywheelsCommand)
+        :   m_drivers(&drivers),
+            m_agitator(agitator),
+            m_agitatorSpeed(speed),      
+            m_flywheelsCommand(flywheelsCommand)
     {
         addSubsystemRequirement(&agitator);
     }
 
-    void M3508AgitatorCommand::initialize() {}
+    bool M3508AgitatorCommand::isReady() 
+    {
+        //check flywheels are on before agitator command
+        return m_drivers->commandScheduler.isCommandScheduled(m_flywheelsCommand);
+    }
+
+    bool M3508AgitatorCommand::isFinished() const
+    {
+        //trigger end command when flywheels are off
+        return !m_drivers->commandScheduler.isCommandScheduled(m_flywheelsCommand);
+    }
 
     void M3508AgitatorCommand::execute() 
     {

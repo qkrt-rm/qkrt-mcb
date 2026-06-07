@@ -77,7 +77,8 @@ void TurretSubsystem::initialize()
 void TurretSubsystem::refresh()
 {
 
-    if(m_drivers->isEmergencyStopActive() || m_imu.getImuState() == ImuState::IMU_CALIBRATING) 
+    if(m_drivers->isEmergencyStopActive() || m_imu.getImuState() == ImuState::IMU_CALIBRATING ||
+        !m_yawMotor.isMotorOnline() || !m_pitchMotor.isMotorOnline()) 
     {
         m_pitchPosPid.reset();
         m_yawPosPid.reset();

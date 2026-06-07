@@ -18,36 +18,48 @@
  */
 
 #include "m2006_agitator_command.hpp"
-#include "tap/algorithms/math_user_utils.hpp"
-#include "control/control_operator_interface.hpp"
-#include "m2006_velocity_agitator_subsystem.hpp"
 
 using tap::algorithms::limitVal;
 
 namespace control::agitator::m2006
 {
 AgitatorCommand::AgitatorCommand(
-    VelocityAgitatorSubsystem &agitator, float indexerSpeed)
-    : m_agitator(agitator),
-      m_indexerSpeed(indexerSpeed)
+    Drivers &drivers, VelocityAgitatorSubsystem &agitator, float indexerSpeed,
+    tap::control::Command* flywheelsCommand)
+    :   m_drivers(&drivers),
+        m_agitator(agitator),
+        m_indexerSpeed(indexerSpeed),
+        m_flywheelsCommand(flywheelsCommand)
 {
     addSubsystemRequirement(&agitator);
+}
+
+bool AgitatorCommand::isReady() 
+{
+    //check flywheels are on before agitator command
+    return m_drivers->commandScheduler.isCommandScheduled(m_flywheelsCommand);
+}
+
+bool AgitatorCommand::isFinished() const
+{
+    //trigger end command when flywheels are off
+    return !m_drivers->commandScheduler.isCommandScheduled(m_flywheelsCommand);
 }
 
 void AgitatorCommand::execute()
 {
     /**
      * TODO:
-     * - Jammed Timer
      * - Barrel Overheat Limiting
      * - Use Balls Per Second instead of rpm
-     * - UNIT FIX reading radians per second now
      */
 
-    float newIndexerSpeed = isBOOST ? m_indexerSpeed  + 20.0f : m_indexerSpeed;
-    m_agitator.setSetpoint(newIndexerSpeed);
+     m_agitator.setSetpoint(m_indexerSpeed);
 }
 
-void AgitatorCommand::end(bool) { m_agitator.setSetpoint(0); }
+void AgitatorCommand::end(bool) 
+{ 
+    m_agitator.setSetpoint(0.0f); 
+}
 
-};  // namespace control::chassis
+};  // namespace control::agitator::m2006

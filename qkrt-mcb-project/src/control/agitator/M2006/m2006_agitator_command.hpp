@@ -20,6 +20,10 @@
 #pragma once
 
 #include "tap/control/command.hpp"
+#include "tap/algorithms/math_user_utils.hpp"
+#include "control/control_operator_interface.hpp"
+#include "m2006_velocity_agitator_subsystem.hpp"
+#include "drivers.hpp"
 
 namespace control::agitator::m2006
 {
@@ -28,25 +32,23 @@ class VelocityAgitatorSubsystem;
 class AgitatorCommand : public tap::control::Command
 {
 public:
-    AgitatorCommand(VelocityAgitatorSubsystem &agitator, float indexerSpeed);
+    AgitatorCommand(Drivers& drivers, VelocityAgitatorSubsystem &agitator, float indexerSpeed, 
+        tap::control::Command* flywheelsCommand);
 
-    const char *getName() const override { return "Chassis omni drive"; }
+    const char *getName() const override { return "agitator command"; }
 
+    bool isReady() override;
     void initialize() override {}
-
     void execute() override;
-
     void end(bool interrupted) override;
-
-    bool isFinished() const { return false; }
+    bool isFinished() const override;
 
 private:
-    
-    static inline bool isBOOST = false;
-
+        
+    Drivers* m_drivers;
     VelocityAgitatorSubsystem &m_agitator;
-
     float m_indexerSpeed;
+    tap::control::Command* m_flywheelsCommand;
 };
 
-}  // namespace control::chassis
+}  // namespace control::agitator::m2006

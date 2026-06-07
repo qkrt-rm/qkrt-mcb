@@ -28,6 +28,7 @@
 #include "tap/control/hold_command_mapping.hpp"
 #include "tap/control/hold_repeat_command_mapping.hpp"
 #include "tap/control/setpoint/commands/move_integral_command.hpp"
+#include <tap/control/toggle_command_mapping.hpp>
 
 
 namespace control
@@ -92,10 +93,13 @@ private:
     )
     };
 
-    tap::control::HoldCommandMapping m_rightMouseFlywheel{
+    tap::control::ToggleCommandMapping m_ToggleFlyX{
         &m_drivers,
         {&m_flywheelsCommand},
-        tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::RIGHT)
+        tap::control::RemoteMapState(
+        std::list<tap::communication::serial::Remote::Key>{
+            tap::communication::serial::Remote::Key::X
+        })
     };
 
     tap::control::HoldCommandMapping m_leftMouseIndex{

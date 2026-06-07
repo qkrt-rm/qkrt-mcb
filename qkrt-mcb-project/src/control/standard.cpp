@@ -57,14 +57,14 @@ Robot::Robot(Drivers& drivers)
             .canBus = CanBus::CAN_BUS2,
             .flyVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000)
         }),
-      m_flywheelsCommand(m_flywheels, 0.39f),
+      m_flywheelsCommand(m_flywheels, 0.042f),
       m_agitator(drivers,
                 agitator::m2006::agitatorConfig {
                     .agitatorId = MotorId::MOTOR3,
                     .canBus = CanBus::CAN_BUS2,
                     .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
                 }),
-     m_agitatorCommand(m_agitator, -5.0)
+     m_agitatorCommand(drivers, m_agitator, -5.0, &m_flywheelsCommand)      //TUNE FIRE RATE
 {
 }
 
@@ -113,7 +113,7 @@ void Robot::registerIoMappings()
     m_drivers.commandMapper.addMap(& m_rightSwitchUP);
 
     //mouse
-    m_drivers.commandMapper.addMap(& m_rightMouseFlywheel);
+    m_drivers.commandMapper.addMap(& m_ToggleFlyX);
     m_drivers.commandMapper.addMap(& m_leftMouseIndex);
 
 }
