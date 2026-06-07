@@ -9,8 +9,8 @@ namespace control
 {
 
 Robot::Robot(Drivers& drivers)
-    : m_drivers(drivers),
-      m_chassis(drivers,
+    :   m_drivers(drivers),
+        m_chassis(drivers,
                  chassis::ChassisConfig {
                      .leftFrontId  = MotorId::MOTOR1,
                      .leftBackId   = MotorId::MOTOR2,
@@ -19,12 +19,12 @@ Robot::Robot(Drivers& drivers)
                      .canBus       = CanBus::CAN_BUS1,
                      .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
                  }),
-      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface,
+        m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface,
                  chassis::chassisCommandConfig {
                      .maxChassisSpeed = 0.5f,
                      .maxRotSpeed = 0.35f
                 }),
-      m_turret(drivers,
+        m_turret(drivers,
                 turret::TurretConfig {
                     .pitchId = MotorId::MOTOR6,
                     .yawId   = MotorId::MOTOR5,
@@ -50,21 +50,22 @@ Robot::Robot(Drivers& drivers)
                     .pitchFF = 1000.0f,  
                     .yawSetWeight = 0.8f         
                 }),
-      m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
-      m_flywheels(drivers, 
+        m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
+        m_flywheels(drivers, 
             flywheel::m3508::FlywheelConfig {
             .leftFlyId = MotorId::MOTOR1, 
             .rightFlyId = MotorId::MOTOR2, 
             .canBus = CanBus::CAN_BUS2,
             .flyVelocityPidConfig = modm::Pid<float>::Parameter(180, 10, 0, 1000, 10000)
-        }),      m_flywheelsCommand(m_flywheels, 0.0364f),
-      m_agitator(drivers,
+        }),      
+        m_flywheelsCommand(m_flywheels, 0.0364f),
+        m_agitator(drivers,
                 agitator::m3508::agitatorConfig{
                     .agitatorId = MotorId::MOTOR7,
                     .canBus = CanBus::CAN_BUS1,
                     .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(85, 10, 0, 1000, 10000), 
                 }),
-     m_agitatorCommand(m_agitator,65.5)
+        m_agitatorCommand(drivers, m_agitator, 65.5, &m_flywheelsCommand)
 {
 }
 
