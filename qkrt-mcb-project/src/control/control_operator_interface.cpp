@@ -60,6 +60,8 @@ void ControlOperatorInterface::pollController()
     m_turretYawInput = std::clamp(m_remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL), -1.0f, 1.0f);
 
     m_autoAimInput =  m_remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::DOWN;
+    m_autoNavInput = m_remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::DOWN;
+
 }
 
 void ControlOperatorInterface::pollKeyboardMouse()

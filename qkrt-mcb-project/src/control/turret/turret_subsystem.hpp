@@ -127,6 +127,9 @@ public:
         return rawWrappedAngle.getWrappedValue();
     }
 
+    float getYawVelocity() const { return m_yawMotor.getEncoder()->getVelocity(); }
+    float getPitchVelocity() const { return m_pitchMotor.getEncoder()->getVelocity(); }
+    
     /**
      * 
      * @brief Rotates the pitch motor at a specified revolutions per second.
