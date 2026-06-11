@@ -19,7 +19,7 @@ Robot::Robot(Drivers& drivers)
                      .canBus       = CanBus::CAN_BUS1,
                      .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
                  }),
-      m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface,
+      m_chassisCommand(drivers, m_chassis, m_turret, drivers.controlOperatorInterface,
                  chassis::chassisCommandConfig {
                      .maxChassisSpeed = 0.5f,
                      .maxRotSpeed = 0.35f,
@@ -78,6 +78,8 @@ void Robot::initializeSubsystems()
     m_turret.initialize();
     m_flywheels.initialize();
     m_agitator.initialize();
+    m_drivers.visionCoprocessor.setChassisSubsystem(&m_chassis);
+    m_drivers.visionCoprocessor.setTurretSubsystem(&m_turret);
 }
 
 void Robot::registerSubsystems()
