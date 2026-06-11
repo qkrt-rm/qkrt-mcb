@@ -134,4 +134,5 @@ static void updateIo(Drivers *drivers)
     drivers->remote.read();
     drivers->bmi088.read();
     drivers->visionCoprocessor.updateSerial();
+    drivers->visionCoprocessor.sendData();
 }

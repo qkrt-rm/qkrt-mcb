@@ -65,6 +65,8 @@ public:
      */
     void refresh() override;
 
+    float getWheelVelocity(int index) const { return m_motors[index].getEncoder()->getVelocity(); }
+
     const char* getName() const override { return "Chassis"; }
 private:
     inline float mpsToRps(float mps) const

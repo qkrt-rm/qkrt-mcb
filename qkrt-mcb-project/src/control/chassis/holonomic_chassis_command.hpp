@@ -3,6 +3,7 @@
 #include <tap/control/command.hpp>
 
 #include "control/chassis/holonomic_chassis_subsystem.hpp"
+#include "communication/vision_coprocessor.hpp"
 #include "control/control_operator_interface.hpp"
 
 namespace control::turret {
@@ -20,7 +21,8 @@ struct chassisCommandConfig {
 class HolonomicChassisCommand : public tap::control::Command
 {
 public:
-    HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
+    HolonomicChassisCommand(Drivers &drivers,
+                            HolonomicChassisSubsystem& chassis,
                             turret::TurretSubsystem& turret,
                             ControlOperatorInterface& m_operatorInterface, chassisCommandConfig config);
 
@@ -39,6 +41,8 @@ private:
     HolonomicChassisSubsystem& m_chassis;
     turret::TurretSubsystem& m_turret;
     ControlOperatorInterface& m_operatorInterface;
+    communication::VisionCoprocessor& m_visionCoprocessor;
+    communication::logger::Logger& m_logger;
 
     float m_maxSpeed;
     float m_chassisRotSpeed;

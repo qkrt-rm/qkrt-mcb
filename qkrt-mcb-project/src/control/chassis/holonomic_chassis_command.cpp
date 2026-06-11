@@ -4,7 +4,7 @@
 namespace control::chassis
 {
 
-HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chassis,
+HolonomicChassisCommand::HolonomicChassisCommand(Drivers &drivers, HolonomicChassisSubsystem& chassis,
                                                  turret::TurretSubsystem& turret,
                                                  ControlOperatorInterface& m_operatorInterface,
                                                  chassisCommandConfig config)
@@ -12,7 +12,10 @@ HolonomicChassisCommand::HolonomicChassisCommand(HolonomicChassisSubsystem& chas
       m_turret(turret),
       m_operatorInterface(m_operatorInterface),
       m_maxSpeed(config.maxChassisSpeed),
-      m_chassisRotSpeed(config.maxRotSpeed)
+      m_chassisRotSpeed(config.maxRotSpeed),
+      m_visionCoprocessor(drivers.visionCoprocessor),
+      m_logger(drivers.logger)
+
 {
     addSubsystemRequirement(&chassis);
 }

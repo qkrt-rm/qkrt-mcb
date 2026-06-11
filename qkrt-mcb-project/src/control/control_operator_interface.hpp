@@ -23,7 +23,6 @@ public:
         SENTRY,
     };
 
-    
     ControlOperatorInterface(tap::communication::serial::Remote& remote);
     DISALLOW_COPY_AND_ASSIGN(ControlOperatorInterface)
     ~ControlOperatorInterface() = default;
@@ -40,6 +39,7 @@ public:
     float getTurretYawInput() const { return m_turretYawInput; };
 
     bool isAutoAim () const { return m_autoAimInput; };
+    bool getAutoNavInput() const { return m_autoNavInput; };
     
 private:
     void pollController();
@@ -54,6 +54,7 @@ private:
     DeviceType m_activeDevice = DeviceType::CONTROLLER;
     bool m_toggledDevice = false;
     bool m_autoAimInput = false;
+    bool m_autoNavInput = false;
 
     //control states
     float m_chassisXInput = 0.0f;
