@@ -35,7 +35,7 @@ Robot::Robot(Drivers& drivers)
                     .isYawZeroed = true,
                     .mcbHoriz = true,
                     .canBus  = CanBus::CAN_BUS1,
-                    .yawForwardOffset = -6.27091f,
+                    .yawForwardOffset = -5.242f,
                     .pitchHorizontalOffset = -0.7739f, 
                     .pitchUpLim = 0.3758,
                     .pitchDownLim = -0.4441,
