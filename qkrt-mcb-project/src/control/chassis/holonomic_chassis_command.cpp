@@ -28,8 +28,14 @@ void HolonomicChassisCommand::execute()
 {       
         m_operatorInterface.pollInputDevices();
 
-        float rawInpX = m_operatorInterface.getChassisXInput();
-        float rawInpY = m_operatorInterface.getChassisYInput();
+        volatile communication::NavData data = m_visionCoprocessor.getNavData();
+        bool isAutoNav = m_operatorInterface.getAutoNavInput();
+
+        float rawInpX = isAutoNav ? data.xVel * 1.5f : m_operatorInterface.getChassisXInput();
+        float rawInpY = isAutoNav ? data.yVel * 1.5f :  m_operatorInterface.getChassisYInput();
+
+        // m_logger.p`rintf("Message Recieved: x=%.3f y= %.3f\n", static_cast<double>(xInp), static_cast<double>(yInp));
+        // m_logger.delay(200);
 
         Vector2f moveVector(rawInpX, rawInpY);
         float inputLength = moveVector.getLength();
