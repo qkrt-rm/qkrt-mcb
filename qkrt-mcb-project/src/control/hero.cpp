@@ -21,8 +21,8 @@ Robot::Robot(Drivers& drivers)
                  }),
         m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface,
                  chassis::chassisCommandConfig {
-                     .maxChassisSpeed = 0.5f,
-                     .maxRotSpeed = 0.35f
+                     .maxChassisSpeed = 0.78f,
+                     .maxRotSpeed = 0.65f
                 }),
         m_turret(drivers,
                 turret::TurretConfig {
@@ -46,7 +46,7 @@ Robot::Robot(Drivers& drivers)
                     .pitchVelGains = { .kp = 6000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = M3508::MAX_CURRENT },
                     .yawVelGains   = { .kp = 2500.0f, .ki = 100.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = M3508::MAX_CURRENT },
-                    .yawFF = 1360.0f,
+                    .yawFF = 1435.0f,
                     .pitchFF = 1000.0f,  
                     .yawSetWeight = 0.8f         
                 }),
@@ -58,14 +58,14 @@ Robot::Robot(Drivers& drivers)
             .canBus = CanBus::CAN_BUS2,
             .flyVelocityPidConfig = modm::Pid<float>::Parameter(180, 10, 0, 1000, 10000)
         }),      
-        m_flywheelsCommand(m_flywheels, 0.0364f),
+        m_flywheelsCommand(m_flywheels, 0.036f),
         m_agitator(drivers,
                 agitator::m3508::agitatorConfig{
                     .agitatorId = MotorId::MOTOR7,
                     .canBus = CanBus::CAN_BUS1,
-                    .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(85, 10, 0, 1000, 10000), 
+                    .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(180, 10, 0, 1000, 10000), 
                 }),
-        m_agitatorCommand(drivers, m_agitator, 65.5, &m_flywheelsCommand)
+        m_agitatorCommand(drivers, m_agitator, 45.5, &m_flywheelsCommand)
 {
 }
 
