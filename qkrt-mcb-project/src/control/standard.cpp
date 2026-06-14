@@ -21,8 +21,8 @@ Robot::Robot(Drivers& drivers)
                  }),
       m_chassisCommand(m_chassis, m_turret, drivers.controlOperatorInterface,
                  chassis::chassisCommandConfig {
-                     .maxChassisSpeed = 0.75f,
-                     .maxRotSpeed = 0.35f
+                     .maxChassisSpeed = 0.70f,
+                     .maxRotSpeed = 0.65f
                  }),
       m_turret(drivers,
                 turret::TurretConfig {
@@ -45,8 +45,8 @@ Robot::Robot(Drivers& drivers)
                     .pitchPosGains = { .kp = 10.8f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .pitchVelGains = { .kp = 4500.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-                    .yawVelGains   = { .kp = 9500.0f, .ki = 100.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-                    .yawFF = 5160.0f,
+                    .yawVelGains   = { .kp = 9800.0f, .ki = 100.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+                    .yawFF = 6360.0f,
                     .pitchFF = 1000.0f
                 }),
       m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
