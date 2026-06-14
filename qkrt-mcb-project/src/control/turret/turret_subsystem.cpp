@@ -87,13 +87,20 @@ void TurretSubsystem::refresh()
 
         m_desiredPitchVoltage = 0.0f;
         m_desiredYawVoltage = 0.0f;
+        m_pitchMotor.setDesiredOutput(0.0f);
+        m_yawMotor.setDesiredOutput(0.0f);
+
+        return;
     }
+
+    //only for hero, zeroing M3508 gear motor encoder on startup
     if(!m_isYawZeroed && m_yawMotor.getEncoder()->isOnline())    
     {    
-        m_yawMotor.getEncoder()->resetEncoderValue();   //zero yaw encoder once motor is powered up
+        m_yawMotor.getEncoder()->resetEncoderValue();   
         m_isYawZeroed=true;
     }
-    else if (m_aimLock)     
+
+    if (m_aimLock)     
     {
         /**
          * AUTO AIM Position Control

@@ -76,7 +76,7 @@ void ControlOperatorInterface::pollKeyboardMouse()
     Vector2f rawMoveInput(rawX, rawY);
     float rawInputLen = rawMoveInput.getLength();
 
-    constexpr float KEYBOARD_ACCEL = 5.0f;  
+    constexpr float KEYBOARD_ACCEL = 3.0f;  
     constexpr float KEYBOARD_DECEL = 5.0f;  
     constexpr float DT = 0.002f;            
 
