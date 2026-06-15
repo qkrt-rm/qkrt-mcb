@@ -65,7 +65,14 @@ Robot::Robot(Drivers& drivers)
                     .canBus = CanBus::CAN_BUS1,
                     .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(180, 10, 0, 1000, 10000), 
                 }),
-        m_agitatorCommand(drivers, m_agitator, 45.5, &m_flywheelsCommand)
+        m_agitatorCommand(drivers, m_agitator, 45.5, &m_flywheelsCommand),
+        m_wheelAgitator(drivers,
+                agitator::m2006::agitatorConfig{
+                    .agitatorId = MotorId::MOTOR3,
+                    .canBus = CanBus::CAN_BUS2,
+                    .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
+                }),
+        m_wheelAgitatorCommand(drivers, m_wheelAgitator, 15.0, &m_flywheelsCommand)  
 {
 }
 
@@ -85,6 +92,7 @@ void Robot::initializeSubsystems()
     m_turret.initialize();
     m_flywheels.initialize();
     m_agitator.initialize();
+    m_wheelAgitator.initialize();
 }
 
 void Robot::registerSubsystems()
@@ -93,6 +101,7 @@ void Robot::registerSubsystems()
     m_drivers.commandScheduler.registerSubsystem(&m_turret);
     m_drivers.commandScheduler.registerSubsystem(&m_flywheels);
     m_drivers.commandScheduler.registerSubsystem(&m_agitator);
+    m_drivers.commandScheduler.registerSubsystem(&m_wheelAgitator);
 }
 
 void Robot::setDefaultCommands()
