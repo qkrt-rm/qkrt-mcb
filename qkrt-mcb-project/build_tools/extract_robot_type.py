@@ -19,7 +19,7 @@ from SCons.Script import *
 
 ROBOT_TYPE_FILE     = "robot-type/robot_type.hpp"
 VALID_ROBOT_TYPES   = [ "TARGET_STANDARD",
-                        "TARGET_DRONE",
+                        "TARGET_STANDARDISO",
                         "TARGET_ENGINEER",
                         "TARGET_SENTRY",
                         "TARGET_HERO" ]
