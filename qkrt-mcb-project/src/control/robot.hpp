@@ -2,6 +2,8 @@
 
 #if defined(TARGET_STANDARD)
     #include "standard.hpp"
+#elif defined(TARGET_STANDARDISO)
+    #include "standard_1v1.hpp"
 #elif defined(TARGET_HERO)
     #include "hero.hpp"
 #elif defined(TARGET_SENTRY)
