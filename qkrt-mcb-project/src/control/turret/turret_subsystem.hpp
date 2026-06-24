@@ -49,6 +49,7 @@ struct TurretConfig
     float MAX_PITCH_POWER;
     float MAX_YAW_POWER;
     float MAX_RPS;
+    float pitchAxisOffsetMeters = 0.0f;
 
     //PID gains
     PidGains pitchPosGains;
@@ -129,6 +130,11 @@ public:
         return m_pitchOffset;
     }
 
+    inline float getPitchAxisOffsetMeters() const
+    {
+        return m_pitchAxisOffsetMeters;
+    }
+
     void lock() { m_aimLock = true; }
 
     void unlock() { m_aimLock = false; }
@@ -162,6 +168,7 @@ private:
     
     float m_yawOffset;
     float m_pitchOffset;
+    float m_pitchAxisOffsetMeters;
 
     float m_maxPitchPower;
     float m_maxYawPower;

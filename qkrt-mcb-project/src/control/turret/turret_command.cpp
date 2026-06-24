@@ -1,14 +1,19 @@
 #include "turret_command.hpp"
 #include "turret_kalman_constants.hpp"
 
+
 namespace control::turret
 {
 
 TurretCommand::TurretCommand(Drivers & drivers, TurretSubsystem& turret,
-                             ControlOperatorInterface& m_operatorInterface)
+                             ControlOperatorInterface& m_operatorInterface,
+                             tap::control::Command* flywheelsCommand, ///
+                             tap::control::Command* agitatorCommand) ///
     : m_drivers(drivers),
       m_turret(turret),
       m_operatorInterface(m_operatorInterface),
+      m_flywheelsCommand(flywheelsCommand), ///
+      m_agitatorCommand(agitatorCommand), ///
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
       isAutoAim(true),
@@ -16,16 +21,21 @@ TurretCommand::TurretCommand(Drivers & drivers, TurretSubsystem& turret,
       m_pitchCommand(0.0f), m_yawCommand(0.0f),
       m_pitchSensitivity(1.0f), m_yawSensitivity(1.0f),
       m_globalYawTarget(0.0f), m_globalPitchTarget(0.0f),
+      m_pitchBoresightTrim(0.0f),
+      m_yawBoresightTrim(0.05f),
       m_lastTarget{NAN, NAN, NAN},
       m_currentState(SentryState::SCANNING), 
       m_targetLostTicks(0),
+      m_targetStartTicks(0),
+      m_targetAcquireTicks(0),
       m_scanDirection(1.0f),
       m_kalmanFilter(kalman_config::KALMAN_A, 
                      kalman_config::KALMAN_C, 
                      kalman_config::KALMAN_Q, 
                      kalman_config::KALMAN_R, 
                      kalman_config::KALMAN_P0), 
-      m_kalInit(false)
+      m_kalInit(false),
+      m_pitchFilter(0.05f, 1.0f)
 {
     addSubsystemRequirement(&turret);
 }
@@ -47,19 +57,32 @@ void TurretCommand::execute()
     // -----------------------------------------
     if (m_operatorInterface.isAutoAim())
     {
-        m_logger.printf("Current State: %f \n", m_turret.getPitch());
-        m_logger.delay(400);
+        
         switch (m_currentState)
         {
             case SentryState::SCANNING:
                 if (isNewData)
                 {
-                    m_currentState = SentryState::SHOOTING;
-                    m_targetLostTicks = 0; 
+                    m_targetAcquireTicks++;
+                    if (m_targetAcquireTicks >= TARGET_ACQUIRE_TICKS)
+                    {
+                        m_currentState = SentryState::SHOOTING;
+                        m_targetLostTicks = 0;
+                        m_targetStartTicks = 0;
+                        m_targetAcquireTicks = 0;
+                        m_pitchFilter.reset();
+                    }
+                }
+                else
+                {
+                    m_targetAcquireTicks = 0;
                 }
                 break;
 
             case SentryState::SHOOTING:
+                m_targetStartTicks++;
+
+
                 if (!isNewData)
                 {
                     m_targetLostTicks++;
@@ -71,7 +94,7 @@ void TurretCommand::execute()
                 }
                 else
                 {
-                    m_targetLostTicks = 0; 
+                    m_targetLostTicks = 0;
                 }
                 break;
         }
@@ -88,7 +111,11 @@ void TurretCommand::execute()
     {
         if (m_currentState == SentryState::SHOOTING)
         {
-            m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, true);
+            if (m_targetStartTicks >= TARGET_START_SHOOTING_TICKS)
+            {
+                m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, true); ///
+                m_drivers.commandScheduler.addCommand(m_agitatorCommand); ///
+            }
             m_turret.lock();
 
             static uint32_t loopsWithoutData = 0;
@@ -99,16 +126,23 @@ void TurretCommand::execute()
 
                 float cvX = currentTarget.xPos;
                 float cvY = currentTarget.yPos - 0.045f; 
-                float cvZ = currentTarget.zPos - 0.075f; 
+                float cvZ = currentTarget.zPos + 0.75f; 
 
                 float flatDist = std::hypot(cvX, cvY);
 
                 // FIX: Assign direct relative aim, NO compounded turret angle
-                float aimPitchRelative = std::atan2(cvZ, flatDist);
-                m_globalPitchTarget = aimPitchRelative; 
+                float aimPitchRelative = std::atan2(cvZ, flatDist) + m_pitchBoresightTrim;
+                float aimPitchAbsoluteMeasured = m_turret.getPitch() + aimPitchRelative;
+                float filteredPitch = m_pitchFilter.filterData(aimPitchAbsoluteMeasured);
+
+                m_globalPitchTarget = std::clamp(
+                    filteredPitch,
+                    m_globalPitchTarget - MAX_PITCH_STEP_PER_UPDATE,
+                    m_globalPitchTarget + MAX_PITCH_STEP_PER_UPDATE
+                );
 
                 // Yaw relative calculation
-                float relYaw = std::atan2(-cvY, cvX);  
+                float relYaw = std::atan2(-cvY, cvX) + m_yawBoresightTrim; 
                 float mathTurretYaw = m_turret.getYaw();      
                 float absYaw = mathTurretYaw + relYaw; 
 
@@ -177,14 +211,12 @@ void TurretCommand::execute()
                     &aimPitchAbsolute,
                     &aimYawAbsolute,
                     &projectedTravelTime,
-                    m_turret.getPitchOffset()
+                    m_turret.getPitchAxisOffsetMeters()
                 );
 
                 if (solutionFound)
                 {
                     m_globalYawTarget = aimYawAbsolute;
-                    m_globalPitchTarget = aimPitchAbsolute;
-                    
                     m_lastTarget.xPos = currentTarget.xPos;
                     m_lastTarget.yPos = currentTarget.yPos;
                     m_lastTarget.zPos = currentTarget.zPos;  
@@ -206,14 +238,21 @@ void TurretCommand::execute()
             m_scanDirection = -1.0f;
 
             m_turret.setYawRps(SCAN_SPEED_RPS * m_scanDirection);
-            m_turret.setPitch(-0.05f);
+            m_turret.setPitch(-0.17f);
+
+            m_drivers.commandScheduler.addCommand(m_flywheelsCommand); ///
+            m_drivers.commandScheduler.removeCommand(m_agitatorCommand, true);
         }
     }
     else
     {
+        m_logger.printf("Current State: %f \n", m_turret.getPitch());
+        m_logger.delay(400);
         m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, false);
 
+        //Manual Velocity Control 
         m_operatorInterface.pollInputDevices();
+
         m_turret.unlock(); 
 
         float pitchInp = m_operatorInterface.getTurretPitchInput();
@@ -228,6 +267,11 @@ void TurretCommand::execute()
         m_turret.setYawRps(yawInp);
 
         m_turret.ChassisRot(m_operatorInterface.isChassisBeyblade());
+
+        m_currentState = SentryState::SCANNING;
+
+        m_drivers.commandScheduler.removeCommand(m_flywheelsCommand, true); ///
+        m_drivers.commandScheduler.removeCommand(m_agitatorCommand, true);
     }
 }
 

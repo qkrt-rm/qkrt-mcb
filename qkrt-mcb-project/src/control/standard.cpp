@@ -40,7 +40,6 @@ Robot::Robot(Drivers& drivers)
                     .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
                     .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE }
                 }),
-      m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
       m_flywheels(drivers, 
             flywheel::m3508::FlywheelConfig {
             .leftFlyId = MotorId::MOTOR1, 
@@ -49,13 +48,16 @@ Robot::Robot(Drivers& drivers)
             .flyVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000)
         }),
       m_flywheelsCommand(m_flywheels, 0.39f),
+      m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface, /// 
+                      &m_flywheelsCommand, &m_agitatorCommand), ///
       m_agitator(drivers,
                 agitator::m2006::agitatorConfig {
                     .agitatorId = MotorId::MOTOR3,
                     .canBus = CanBus::CAN_BUS2,
                     .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
                 }),
-     m_agitatorCommand(m_agitator, -5.0)
+      m_agitatorCommand(m_agitator, -5.0)
+
 {
 }
 

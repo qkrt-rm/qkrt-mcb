@@ -59,7 +59,6 @@ private:
      * @brief Turret subsystem for the sentry robot
      */
     turret::TurretSubsystem m_turret;
-    turret::TurretCommand m_turretCommand;
 
 
     /**
@@ -74,6 +73,8 @@ private:
      */
     agitator::m2006::VelocityAgitatorSubsystem m_agitator;
     agitator::m2006::AgitatorCommand m_agitatorCommand;
+    
+    turret::TurretCommand m_turretCommand;
 
     //Mappings
     tap::control::HoldCommandMapping m_leftSwitchUP{

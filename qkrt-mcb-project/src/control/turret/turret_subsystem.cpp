@@ -48,6 +48,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_sensitivity(1.0f),
       m_yawOffset(config.yawForwardOffset),
       m_pitchOffset(config.pitchHorizontalOffset),
+      m_pitchAxisOffsetMeters(config.pitchAxisOffsetMeters),
       m_pitchUpLim(config.pitchUpLim),
       m_pitchDownLim(config.pitchDownLim),
       m_maxPitchPower(config.MAX_PITCH_POWER),

@@ -62,7 +62,6 @@ private:
      * @brief Turret subsystem for the sentry robot
      */
     turret::TurretSubsystem m_turret;
-    turret::TurretCommand m_turretCommand;
 
 
     /**
@@ -70,6 +69,8 @@ private:
      */
     flywheel::snail::SnailFlywheelSubsystem m_flywheels;
     flywheel::snail::SnailFlywheelOnCommand m_flywheelsCommand;
+    
+    turret::TurretCommand m_turretCommand; ///
 
 
     /**
