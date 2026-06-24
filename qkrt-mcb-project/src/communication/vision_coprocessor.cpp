@@ -13,7 +13,6 @@ namespace communication {
 
     void VisionCoprocessor::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
     {
-        //TODO: Switchcase based on message type, seperate decode func
         offlineTimeout.restart(OFFLINE_TIMEOUT_MS);
 
         switch (completeMessage.messageType)
@@ -127,11 +126,17 @@ namespace communication {
         data->imuYaw = m_imu.getYaw();
         data->imuPitch = m_imu.getPitch();
         data->imuRoll = m_imu.getRoll();
+        //referee and robot data
+        //auto gameData = drivers->refSerial.getGameData();
+        //auto robotData = drivers->refSerial.getRobotData();
+        // data->gameStage = static_cast<uint8_t>(gameData.gameStage);
+        // data->currentHp = robotData.currentHp;
+        // data->isSupplyZone = (robotData.rfidStatus.value & (1 << 20)) != 0;
 
         message.setCRC16();
         drivers->uart.write(VISION_COPROCESSOR_UART_PORT, reinterpret_cast<uint8_t*>(&message), sizeof(message));
     }
-    
+
     //TOD0: SEND COLOUR DATA
 
 }

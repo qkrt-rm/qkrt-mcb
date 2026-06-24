@@ -43,7 +43,6 @@ namespace communication
 
             bool isOnline() const;
 
-
         private:
             static constexpr Uart::UartPort VISION_COPROCESSOR_UART_PORT = Uart::UartPort::Uart1;
 

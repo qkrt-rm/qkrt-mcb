@@ -56,6 +56,11 @@ namespace communication
         float imuYaw;
         float imuPitch;
         float imuRoll;
+        // Referee Info
+        // uint8_t gameStage;
+        // uint16_t currentHp;
+        // bool isSupplyZone;
+
     } modm_packed;
 
 }

@@ -32,7 +32,7 @@ public:
                   tap::control::Command* agitatorCommand); ///
 
     void initialize() override;
-
+    bool isReady() override;
     void execute() override;
 
     void end(bool interrupted) override;
