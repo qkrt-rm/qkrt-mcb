@@ -45,6 +45,14 @@ void AutoTurretCommand::initialize()
 {
 }
 
+bool AutoTurretCommand::isReady() 
+{
+    //only run aut aim command when match has started
+    auto gameData = m_drivers.refSerial.getGameData();
+    return (m_operatorInterface.isAutoAim() && 
+            gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME);
+}
+
 void AutoTurretCommand::execute()
 {
     volatile communication::TurretData currentTarget = m_visionCoprocessor.getTurretData();
@@ -56,6 +64,7 @@ void AutoTurretCommand::execute()
     communication::TargetColor detectedColor = currentTarget.color;
     communication::TargetColor enemyColor = communication::TargetColor::RED; //ASSIGN ENEMY COLOUR HERE!!!
     bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);
+
 
     // -----------------------------------------
     // Phase 1: State Transitions

@@ -43,6 +43,7 @@ private:
     ControlOperatorInterface& m_operatorInterface;
     communication::VisionCoprocessor& m_visionCoprocessor;
     communication::logger::Logger& m_logger;
+    Drivers* m_drivers;
 
     float m_maxSpeed;
     float m_chassisRotSpeed;
