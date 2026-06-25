@@ -71,7 +71,7 @@ public:
     float m_pitchUpLim;
     float m_pitchDownLim;
 
-    TurretSubsystem(Drivers& drivers, const TurretConfig& config);
+    TurretSubsystem(Drivers& drivers, const TurretConfig& config, const chassis::chassisCommandConfig driveConfig);
 
     void initialize() override;
     void refresh() override;
@@ -181,6 +181,7 @@ private:
     float m_maxPitchPower, m_maxYawPower;
     float m_maxRps;
     float m_yawGainFF, m_pitchGainFF;
+    float m_chassisRotSpeed;
 
     tap::communication::sensors::imu::bmi088::Bmi088& m_imu;
     Drivers* m_drivers;
