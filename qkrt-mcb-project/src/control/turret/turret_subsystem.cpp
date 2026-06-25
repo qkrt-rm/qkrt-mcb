@@ -5,7 +5,7 @@ using ImuState = tap::communication::sensors::imu::ImuInterface::ImuState;
 namespace control::turret
 {
 
-TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
+TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config, const chassis::chassisCommandConfig driveConfig)
     : tap::control::Subsystem(&drivers),
       m_pitchMotor(&drivers, config.pitchId, config.canBus, config.pitchInverted, "PITCH"),
       m_yawMotor  (&drivers, config.yawId,   config.canBus, config.yawInverted,   "YAW"),
@@ -58,6 +58,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config)
       m_maxRps(config.MAX_RPS),
       m_yawGainFF(config.yawFF),
       m_pitchGainFF(config.pitchFF),
+      m_chassisRotSpeed(driveConfig.maxRotSpeed),
       m_imu(drivers.bmi088),
       m_drivers(&drivers),
       m_logger(drivers.logger)
@@ -141,7 +142,7 @@ void TurretSubsystem::refresh()
 
         //feed forward terms
         float currPitch = getPitch();
-        float yawFF = (m_isChassisRot) ? (m_yawGainFF * -chassis::HolonomicChassisCommand::CHASSIS_ROT_SPEED_RAD) : 0.0f;
+        float yawFF = (m_isChassisRot) ? (m_yawGainFF * -m_chassisRotSpeed) : 0.0f;
         float pitchFF = m_pitchGainFF * cos(currPitch);
 
         //pitch position outer loop

@@ -30,7 +30,10 @@
 #include "tap/control/hold_command_mapping.hpp"
 #include "tap/control/hold_repeat_command_mapping.hpp"
 #include "tap/control/setpoint/commands/move_integral_command.hpp"
+#include <tap/control/toggle_command_mapping.hpp>
 
+using tap::can::CanBus;
+using tap::motor::MotorId;
 
 namespace control
 {
@@ -47,6 +50,70 @@ private:
     void startCommands();
     void registerIoMappings();
 private:
+
+    chassis::ChassisConfig m_chassisConfig{
+        .leftFrontId  = MotorId::MOTOR1,
+        .leftBackId   = MotorId::MOTOR2,
+        .rightBackId  = MotorId::MOTOR3,
+        .rightFrontId = MotorId::MOTOR4,
+        .canBus       = CanBus::CAN_BUS1,
+        .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
+    };
+
+    chassis::chassisCommandConfig m_chassisCmdConfig {
+        .maxChassisSpeed = 0.78f,
+        .maxRotSpeed = 0.70f
+    };
+
+    turret::TurretConfig m_turretConfig {
+        .pitchId = MotorId::MOTOR6,
+        .yawId   = MotorId::MOTOR5,
+        .pitchGearRatio = GM6020::GEAR_RATIO,
+        .yawGearRatio = M3508::GEAR_RATIO * BELT_GEAR_RATIO,
+        .pitchInverted = true,
+        .yawInverted = true,
+        .isYawZeroed = false,       // need to point turret north on startup 
+        .mcbHoriz = true,
+        .canBus  = CanBus::CAN_BUS1,
+        .yawForwardOffset = 0.0f,         
+        .pitchHorizontalOffset = -2.10232f,      
+        .pitchUpLim = 0.16951f,                  
+        .pitchDownLim = -0.49241f,               
+        .MAX_PITCH_POWER = M3508::MAX_CURRENT,
+        .MAX_YAW_POWER = M3508::MAX_CURRENT,
+        .MAX_RPS = GM6020::MAX_RPS,
+        .pitchPosGains = { .kp = 17.5f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .pitchVelGains = { .kp = 7600.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = M3508::MAX_CURRENT },
+        .yawVelGains   = { .kp = 2500.0f, .ki = 100.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = M3508::MAX_CURRENT },
+        .yawFF = 807.0f,
+        .pitchFF = 1000.0f,  
+        .yawSetWeight = 0.8f         
+    };
+
+    float m_flywheelSpeed = 0.0351f;
+    float m_agitatorIndexSpeed = 105.5f;
+    float m_agitatorWheelSpeed = 40.0f;
+
+    flywheel::m3508::FlywheelConfig m_flywheelConfig {
+        .leftFlyId = MotorId::MOTOR1, 
+        .rightFlyId = MotorId::MOTOR2, 
+        .canBus = CanBus::CAN_BUS2,
+        .flyVelocityPidConfig = modm::Pid<float>::Parameter(180, 10, 0, 1000, 10000)
+    };
+
+    agitator::m3508::agitatorConfig m_agitatorConfig {
+        .agitatorId = MotorId::MOTOR7,
+        .canBus = CanBus::CAN_BUS1,
+        .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(180, 10, 0, 1000, 10000), 
+    };
+
+    agitator::m2006::agitatorConfig m_agitatorWheelConfig {
+        .agitatorId = MotorId::MOTOR3,
+        .canBus = CanBus::CAN_BUS2,
+        .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
+    };
+
 
     Drivers& m_drivers;
 
@@ -103,11 +170,15 @@ private:
         tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::LEFT)
     };
 
-    tap::control::HoldCommandMapping m_rightMouseFlywheel{
+    tap::control::ToggleCommandMapping m_ToggleFlyX{
         &m_drivers,
         {&m_flywheelsCommand},
-        tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::RIGHT)
+        tap::control::RemoteMapState(
+        std::list<tap::communication::serial::Remote::Key>{
+        tap::communication::serial::Remote::Key::X
+        })
     };
+    
 };
   
 }  // namespace control
