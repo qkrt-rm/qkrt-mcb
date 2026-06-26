@@ -14,9 +14,9 @@ Robot::Robot(Drivers& drivers)
         m_flywheels(drivers, m_flywheelConfig),      
         m_flywheelsCommand(m_flywheels, m_flywheelSpeed),
         m_agitator(drivers, m_agitatorConfig),
-        m_agitatorCommand(drivers, m_agitator, m_agitatorIndexSpeed, &m_flywheelsCommand),
+        m_agitatorCommand(drivers, m_agitator, m_agitatorIndexSpeed, &m_flywheelsCommand, drivers.controlOperatorInterface),
         m_wheelAgitator(drivers, m_agitatorWheelConfig),
-        m_wheelAgitatorCommand(drivers, m_wheelAgitator, m_agitatorWheelSpeed, &m_flywheelsCommand)  
+        m_wheelAgitatorCommand(drivers, m_wheelAgitator, m_agitatorWheelSpeed, &m_flywheelsCommand, drivers.controlOperatorInterface)  
 {
 }
 

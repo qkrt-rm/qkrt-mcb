@@ -40,6 +40,7 @@ public:
 
     bool isAutoAim () const { return m_autoAimInput; };
     bool getAutoNavInput() const { return m_autoNavInput; };
+    bool isRevAgitator() const { return m_revAgitator; };
     
 private:
     void pollController();
@@ -62,6 +63,7 @@ private:
     float m_beybladeDirection = 0.0f;
     bool m_prevEState = false;       
     bool m_prevQState = false;
+    bool m_revAgitator = false;
 
     float m_turretPitchInput = 0.0f;
     float m_turretYawInput = 0.0f;

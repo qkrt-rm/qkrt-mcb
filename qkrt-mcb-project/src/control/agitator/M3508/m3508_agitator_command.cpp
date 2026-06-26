@@ -10,11 +10,12 @@ namespace control::agitator::m3508
 {
     M3508AgitatorCommand::M3508AgitatorCommand(
         Drivers& drivers, M3508AgitatorSubsystem& agitator, 
-        float speed, tap::control::Command* flywheelsCommand)
+        float speed, tap::control::Command* flywheelsCommand, ControlOperatorInterface& operatorInterface)
         :   m_drivers(&drivers),
             m_agitator(agitator),
             m_agitatorSpeed(speed),      
-            m_flywheelsCommand(flywheelsCommand)
+            m_flywheelsCommand(flywheelsCommand),
+            m_operatorInterface(operatorInterface)
     {
         addSubsystemRequirement(&agitator);
     }
@@ -33,7 +34,15 @@ namespace control::agitator::m3508
 
     void M3508AgitatorCommand::execute() 
     {
-        m_agitator.setAgitatorSpeed(m_agitatorSpeed);
+
+        float targetSetpoint = m_agitatorSpeed;
+
+        if (m_operatorInterface.isRevAgitator())
+        {
+        targetSetpoint = -m_agitatorSpeed * 0.2f; 
+        }
+
+        m_agitator.setAgitatorSpeed(targetSetpoint);
     } 
 
     void M3508AgitatorCommand::end(bool)

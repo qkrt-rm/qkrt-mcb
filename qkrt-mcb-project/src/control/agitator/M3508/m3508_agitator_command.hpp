@@ -12,7 +12,7 @@ namespace control::agitator::m3508
     public:
 
         M3508AgitatorCommand(Drivers& drivers, M3508AgitatorSubsystem& agitator, 
-                          float speed, tap::control::Command* flywheelsCommand);
+                          float speed, tap::control::Command* flywheelsCommand, ControlOperatorInterface& operatorInterface);
 
         bool isReady() override;
         void initialize() override {};
@@ -26,6 +26,7 @@ namespace control::agitator::m3508
         Drivers* m_drivers;
         M3508AgitatorSubsystem& m_agitator;
         tap::control::Command* m_flywheelsCommand;
+        ControlOperatorInterface& m_operatorInterface;
 
         float m_agitatorSpeed;
         static constexpr float OFF_SPEED = 0.0f;

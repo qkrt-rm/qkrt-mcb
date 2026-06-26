@@ -32,6 +32,8 @@
 #include "tap/control/hold_repeat_command_mapping.hpp"
 #include "tap/control/setpoint/commands/move_integral_command.hpp"
 
+using tap::can::CanBus;
+using tap::motor::MotorId;
 
 namespace control
 {
@@ -49,8 +51,55 @@ private:
     void registerIoMappings();
 private:
 
-    Drivers& m_drivers;
+    chassis::ChassisConfig m_chassisConfig {
+        .leftFrontId  = MotorId::MOTOR1,
+        .leftBackId   = MotorId::MOTOR2,
+        .rightBackId  = MotorId::MOTOR3,
+        .rightFrontId = MotorId::MOTOR4,
+        .canBus       = CanBus::CAN_BUS1,
+        .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
+    };
 
+    chassis::chassisCommandConfig m_chassisCmdConfig {
+        .maxChassisSpeed = 0.5f,
+        .maxRotSpeed = 0.35f,
+    };
+
+    turret::TurretConfig turretConfig {
+        .pitchId = MotorId::MOTOR6,
+        .yawId   = MotorId::MOTOR5,
+        .pitchGearRatio = GM6020::GEAR_RATIO,
+        .yawGearRatio = GM6020::GEAR_RATIO,
+        .pitchInverted = false,
+        .yawInverted = true,
+        .isYawZeroed = true,
+        .mcbHoriz = true,
+        .canBus  = CanBus::CAN_BUS1,
+        .yawForwardOffset = -5.242f,
+        .pitchHorizontalOffset = -0.7739f, 
+        .pitchUpLim = 0.3758,
+        .pitchDownLim = -0.4441,
+        .MAX_PITCH_POWER = GM6020::MAX_VOLTAGE,
+        .MAX_YAW_POWER = GM6020::MAX_VOLTAGE,
+        .MAX_RPS = GM6020::MAX_RPS,
+        .pitchPosGains = { .kp = 10.0f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .pitchVelGains = { .kp = 5000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE},
+        .yawFF = 6560.0f,
+        .pitchFF = 1000.0f
+    };
+
+    float m_flywheelSpeed = 0.39f;
+    float m_agitatorSpeed = -5.0f;
+
+    agitator::m2006::agitatorConfig m_agitatorConfig {
+        .agitatorId = MotorId::MOTOR7,
+        .canBus = CanBus::CAN_BUS1,
+        .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
+    };
+
+    Drivers& m_drivers;
 
     /**
     * @brief Chassis subsystem for the sentry robot
