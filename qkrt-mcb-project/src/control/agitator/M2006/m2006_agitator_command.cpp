@@ -25,11 +25,12 @@ namespace control::agitator::m2006
 {
 AgitatorCommand::AgitatorCommand(
     Drivers &drivers, VelocityAgitatorSubsystem &agitator, float indexerSpeed,
-    tap::control::Command* flywheelsCommand)
+    tap::control::Command* flywheelsCommand, ControlOperatorInterface& operatorInterface)
     :   m_drivers(&drivers),
         m_agitator(agitator),
         m_indexerSpeed(indexerSpeed),
-        m_flywheelsCommand(flywheelsCommand)
+        m_flywheelsCommand(flywheelsCommand),
+        m_operatorInterface(operatorInterface)
 {
     addSubsystemRequirement(&agitator);
 }
@@ -54,7 +55,14 @@ void AgitatorCommand::execute()
      * - Use Balls Per Second instead of rpm
      */
 
-     m_agitator.setSetpoint(m_indexerSpeed);
+    float targetSetpoint = m_indexerSpeed;
+
+    if (m_operatorInterface.isRevAgitator())
+    {
+        targetSetpoint = -m_indexerSpeed * 0.5f; 
+    }
+    
+    m_agitator.setSetpoint(targetSetpoint);
 }
 
 void AgitatorCommand::end(bool) 
