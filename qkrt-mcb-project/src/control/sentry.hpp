@@ -14,7 +14,7 @@
 
 //Turret Includes
 #include "control/turret/turret_subsystem.hpp"
-#include "control/turret/turret_command.hpp"
+#include "control/turret/auto/auto_turret_command.hpp"
 
 
 // Flywheel Includes
@@ -111,7 +111,7 @@ private:
      * @brief Turret subsystem for the sentry robot
      */
     turret::TurretSubsystem m_turret;
-    turret::TurretCommand m_turretCommand;
+    turret::AutoTurretCommand m_turretCommand;
 
 
     /**
