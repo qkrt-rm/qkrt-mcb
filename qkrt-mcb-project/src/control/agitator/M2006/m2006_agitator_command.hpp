@@ -33,7 +33,7 @@ class AgitatorCommand : public tap::control::Command
 {
 public:
     AgitatorCommand(Drivers& drivers, VelocityAgitatorSubsystem &agitator, float indexerSpeed, 
-        tap::control::Command* flywheelsCommand);
+        tap::control::Command* flywheelsCommand, ControlOperatorInterface& operatorInterface);
 
     const char *getName() const override { return "agitator command"; }
 
@@ -49,6 +49,8 @@ private:
     VelocityAgitatorSubsystem &m_agitator;
     float m_indexerSpeed;
     tap::control::Command* m_flywheelsCommand;
+    ControlOperatorInterface& m_operatorInterface;
+
 };
 
 }  // namespace control::agitator::m2006

@@ -30,6 +30,8 @@
 #include "tap/control/setpoint/commands/move_integral_command.hpp"
 #include <tap/control/toggle_command_mapping.hpp>
 
+using tap::can::CanBus;
+using tap::motor::MotorId;
 
 namespace control
 {
@@ -47,8 +49,63 @@ private:
     void registerIoMappings();
 private:
 
-    Drivers& m_drivers;
+    chassis::ChassisConfig m_chassisConfig {
+        .leftFrontId  = MotorId::MOTOR1,
+        .leftBackId   = MotorId::MOTOR2,
+        .rightBackId  = MotorId::MOTOR3,
+        .rightFrontId = MotorId::MOTOR4,
+        .canBus       = CanBus::CAN_BUS1,
+        .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
+    };
 
+    chassis::chassisCommandConfig m_chassisCommandConfig {
+        .maxChassisSpeed = 0.73f,     //POWER PROFILE
+        //.maxChassisSpeed = 0.61f,       //HP PROFILE
+        .maxRotSpeed = 0.70f
+    };
+
+    turret::TurretConfig m_turretConfig {
+        .pitchId = MotorId::MOTOR6,
+        .yawId   = MotorId::MOTOR5,
+        .pitchGearRatio = GM6020::GEAR_RATIO,
+        .yawGearRatio = GM6020::GEAR_RATIO,
+        .pitchInverted = true,
+        .yawInverted = true,
+        .isYawZeroed = true,
+        .mcbHoriz = false,
+        .canBus  = CanBus::CAN_BUS1,
+        .yawForwardOffset = -4.7155f,          
+        .pitchHorizontalOffset = -3.1523f,      
+        .pitchUpLim = 0.6200f,                  
+        .pitchDownLim = -0.3275f,               
+        .MAX_PITCH_POWER = GM6020::MAX_VOLTAGE,
+        .MAX_YAW_POWER = GM6020::MAX_VOLTAGE,
+        .MAX_RPS = GM6020::MAX_RPS,
+        .pitchPosGains = { .kp = 10.8f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .pitchVelGains = { .kp = 4500.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .yawVelGains   = { .kp = 9800.0f, .ki = 100.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .yawFF = 4618.0f,
+        .pitchFF = 1000.0f
+    };
+
+    float m_flyhweelSpeed = 0.0428f;
+    float m_agitatorSpeed = -8.5f;
+
+    flywheel::m3508::FlywheelConfig m_flywheelConfig {
+        .leftFlyId = MotorId::MOTOR1, 
+        .rightFlyId = MotorId::MOTOR2, 
+        .canBus = CanBus::CAN_BUS2,
+        .flyVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000)
+    };
+
+    agitator::m2006::agitatorConfig m_agitatorConfig {
+        .agitatorId = MotorId::MOTOR3,
+        .canBus = CanBus::CAN_BUS2,
+        .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
+    };
+
+    Drivers& m_drivers;
 
     /**
     * @brief Chassis subsystem for the standard robot

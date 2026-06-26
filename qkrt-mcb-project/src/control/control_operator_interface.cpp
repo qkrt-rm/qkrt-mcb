@@ -108,6 +108,9 @@ void ControlOperatorInterface::pollKeyboardMouse()
     m_chassisXInput = currentMove.x;
     m_chassisYInput = currentMove.y;
 
+    //agitator reversal
+    m_revAgitator = m_remote.getMouseR();
+
     //beyblade
     bool currEPressed = m_remote.keyPressed(Remote::Key::E);
     bool currQPressed = m_remote.keyPressed(Remote::Key::Q);

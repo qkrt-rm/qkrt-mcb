@@ -2,77 +2,21 @@
 
 #include "hero.hpp"
 
-using tap::can::CanBus;
-using tap::motor::MotorId;
-
 namespace control
 {
 
 Robot::Robot(Drivers& drivers)
     :   m_drivers(drivers),
-        m_chassis(drivers,
-                 chassis::ChassisConfig {
-                     .leftFrontId  = MotorId::MOTOR1,
-                     .leftBackId   = MotorId::MOTOR2,
-                     .rightBackId  = MotorId::MOTOR3,
-                     .rightFrontId = MotorId::MOTOR4,
-                     .canBus       = CanBus::CAN_BUS1,
-                     .wheelVelocityPidConfig = modm::Pid<float>::Parameter(15, 1, 0, 1000, 10000), // TODO: tune this
-                 }),
-        m_chassisCommand(drivers, m_chassis, m_turret, drivers.controlOperatorInterface,
-                 chassis::chassisCommandConfig {
-                     .maxChassisSpeed = 0.78f,
-                     .maxRotSpeed = 0.65f
-                }),
-        m_turret(drivers,
-                turret::TurretConfig {
-                    .pitchId = MotorId::MOTOR6,
-                    .yawId   = MotorId::MOTOR5,
-                    .pitchGearRatio = GM6020::GEAR_RATIO,
-                    .yawGearRatio = M3508::GEAR_RATIO * BELT_GEAR_RATIO,
-                    .pitchInverted = true,
-                    .yawInverted = true,
-                    .isYawZeroed = false,       // need to point turret north on startup 
-                    .mcbHoriz = true,
-                    .canBus  = CanBus::CAN_BUS1,
-                    .yawForwardOffset = 0.0f,         
-                    .pitchHorizontalOffset = -2.10232f,      
-                    .pitchUpLim = 0.16951f,                  
-                    .pitchDownLim = -0.49241f,               
-                    .MAX_PITCH_POWER = M3508::MAX_CURRENT,
-                    .MAX_YAW_POWER = M3508::MAX_CURRENT,
-                    .MAX_RPS = GM6020::MAX_RPS,
-                    .pitchPosGains = { .kp = 15.5f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-                    .pitchVelGains = { .kp = 6000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-                    .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = M3508::MAX_CURRENT },
-                    .yawVelGains   = { .kp = 2500.0f, .ki = 100.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = M3508::MAX_CURRENT },
-                    .yawFF = 1435.0f,
-                    .pitchFF = 1000.0f,  
-                    .yawSetWeight = 0.8f         
-                }),
+        m_chassis(drivers, m_chassisConfig),
+        m_chassisCommand(drivers, m_chassis, m_turret, drivers.controlOperatorInterface, m_chassisCmdConfig),
+        m_turret(drivers, m_turretConfig, m_chassisCmdConfig),
         m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
-        m_flywheels(drivers, 
-            flywheel::m3508::FlywheelConfig {
-            .leftFlyId = MotorId::MOTOR1, 
-            .rightFlyId = MotorId::MOTOR2, 
-            .canBus = CanBus::CAN_BUS2,
-            .flyVelocityPidConfig = modm::Pid<float>::Parameter(180, 10, 0, 1000, 10000)
-        }),      
-        m_flywheelsCommand(m_flywheels, 0.036f),
-        m_agitator(drivers,
-                agitator::m3508::agitatorConfig{
-                    .agitatorId = MotorId::MOTOR7,
-                    .canBus = CanBus::CAN_BUS1,
-                    .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(180, 10, 0, 1000, 10000), 
-                }),
-        m_agitatorCommand(drivers, m_agitator, 45.5, &m_flywheelsCommand),
-        m_wheelAgitator(drivers,
-                agitator::m2006::agitatorConfig{
-                    .agitatorId = MotorId::MOTOR3,
-                    .canBus = CanBus::CAN_BUS2,
-                    .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
-                }),
-        m_wheelAgitatorCommand(drivers, m_wheelAgitator, 15.0, &m_flywheelsCommand)  
+        m_flywheels(drivers, m_flywheelConfig),      
+        m_flywheelsCommand(m_flywheels, m_flywheelSpeed),
+        m_agitator(drivers, m_agitatorConfig),
+        m_agitatorCommand(drivers, m_agitator, m_agitatorIndexSpeed, &m_flywheelsCommand, drivers.controlOperatorInterface),
+        m_wheelAgitator(drivers, m_agitatorWheelConfig),
+        m_wheelAgitatorCommand(drivers, m_wheelAgitator, m_agitatorWheelSpeed, &m_flywheelsCommand, drivers.controlOperatorInterface)  
 {
 }
 
@@ -122,7 +66,7 @@ void Robot::registerIoMappings()
     m_drivers.commandMapper.addMap(& m_rightSwitchUP);
 
     //mouse
-    m_drivers.commandMapper.addMap(& m_rightMouseFlywheel);
+    m_drivers.commandMapper.addMap(& m_ToggleFlyX);
     m_drivers.commandMapper.addMap(& m_leftMouseIndex);
 }
 
