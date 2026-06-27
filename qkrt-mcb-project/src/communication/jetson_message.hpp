@@ -10,11 +10,19 @@ namespace communication
         MCB_MESSAGE_TYPE_ODOM = 3,
     };
 
+    enum class TargetColor : uint8_t{
+        BLUE = 0,
+        RED = 1,
+        NEUTRAL = 2,
+        PURPLE =3,
+    };
+
     struct TurretData
     {
         float xPos;
         float yPos;
         float zPos;
+        TargetColor color;
     } modm_packed;
 
     struct NavData
