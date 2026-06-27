@@ -61,8 +61,8 @@ private:
     };
 
     chassis::chassisCommandConfig m_chassisCmdConfig {
-        .maxChassisSpeed = 0.5f,
-        .maxRotSpeed = 0.35f,
+        .maxChassisSpeed = 0.6f,
+        .maxRotSpeed = 0.70f,
     };
 
     turret::TurretConfig turretConfig {
@@ -76,25 +76,27 @@ private:
         .mcbHoriz = true,
         .canBus  = CanBus::CAN_BUS1,
         .yawForwardOffset = -5.242f,
-        .pitchHorizontalOffset = -0.667f, 
-        .pitchUpLim = 0.3758,
-        .pitchDownLim = -0.4441,
+        .pitchHorizontalOffset = -1.91901f, 
+        .pitchUpLim = 0.14956,
+        .pitchDownLim = -0.08360,
         .MAX_PITCH_POWER = GM6020::MAX_VOLTAGE,
         .MAX_YAW_POWER = GM6020::MAX_VOLTAGE,
         .MAX_RPS = GM6020::MAX_RPS,
-        .pitchPosGains = { .kp = 8.0f, .ki = 0.2f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },        .pitchVelGains = { .kp = 5000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-        .yawPosGains   = { .kp = 4.5f,  .ki = 0.0f, .kd = 1.15f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE},        .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE},
-        .yawFF = 6560.0f,
+        .pitchPosGains = { .kp = 10.5f, .ki = 0.2f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },        
+        .pitchVelGains = { .kp = 6000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
+        .yawPosGains   = { .kp = 6.5f,  .ki = 0.0f, .kd = 1.15f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE},        
+        .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE},
+        .yawFF = 4618.0f,
         .pitchFF = 1000.0f
     };
 
     float m_flywheelSpeed = 0.39f;
-    float m_agitatorSpeed = -5.0f;
+    float m_agitatorSpeed = -3.5f;
 
     agitator::m2006::agitatorConfig m_agitatorConfig {
         .agitatorId = MotorId::MOTOR7,
         .canBus = CanBus::CAN_BUS1,
-        .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
+        .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1700, 0, 0, 0, 16000), 
     };
 
     Drivers& m_drivers;

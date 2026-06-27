@@ -12,7 +12,7 @@ TurretSubsystem::TurretSubsystem(Drivers& drivers, const TurretConfig& config, c
       m_pitchGearRatio(config.pitchGearRatio),
       m_yawGearRatio(config.yawGearRatio),
       m_desiredPitchVoltage(0.0f), m_desiredYawVoltage(0.0f),
-      m_desiredPitch(0.0f), m_desiredYaw(0.0f),
+      m_desiredPitch(0.0f), m_desiredYaw(0.0f), m_yaw(0.0f),
       m_pitchPosPid({
           .kp = config.pitchPosGains.kp,
           .ki = config.pitchPosGains.ki,
@@ -101,6 +101,8 @@ void TurretSubsystem::refresh()
         m_isYawZeroed=true;
     }
 
+    m_yaw += m_imu.getGz()*-1.0f * DT;
+
     if (m_aimLock)     
     {
         /**
@@ -123,10 +125,11 @@ void TurretSubsystem::refresh()
         m_pitchVelPid.runControllerDerivateError(desiredPitchRpm - currentPitchRpm, DT);
         m_desiredPitchVoltage = m_pitchVelPid.getOutput();
 
+        //float currentYaw = m_yaw;
         float currentYawRpm = m_imu.getGz() * -1;  //TODO: make sure this is filtered
         
         //Yaw Position Outer Loop
-        float azimuthError = getOptimalError(m_desiredYaw, getYaw());
+        float azimuthError = getOptimalError(m_desiredYaw, getImuYaw());
         float desiredYawRpm = m_yawPosPid.runController(azimuthError, currentYawRpm, DT);
 
         //Yaw Velocity Inner Loop
@@ -163,9 +166,6 @@ void TurretSubsystem::refresh()
 
         // m_logger.printf("PITCH: %.5f\n", static_cast<double>(getPitch()));
         // m_logger.delay(200);
-        // m_logger.printf("YAW: %.4f\n", static_cast<double>(yawFF));
-        // m_logger.delay(200);
-
     }
 
     m_desiredPitchVoltage = std::clamp(m_desiredPitchVoltage, -m_maxPitchPower, m_maxPitchPower);
