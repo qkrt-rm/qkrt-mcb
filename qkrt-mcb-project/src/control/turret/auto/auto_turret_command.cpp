@@ -246,8 +246,6 @@ void AutoTurretCommand::execute()
     }
     else
     {
-        m_logger.printf("Current State: %f \n", m_turret.getPitch());
-        m_logger.delay(400);
         m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, false);
 
         //Manual Velocity Control 
