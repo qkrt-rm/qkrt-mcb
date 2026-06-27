@@ -35,7 +35,8 @@ AutoTurretCommand::AutoTurretCommand(Drivers & drivers, TurretSubsystem& turret,
                      kalman_config::KALMAN_R, 
                      kalman_config::KALMAN_P0), 
       m_kalInit(false),
-      m_pitchFilter(0.05f, 1.0f)
+      m_pitchFilter(0.05f, 1.0f),
+      m_pitchFilterPrimed(false)
 {
     addSubsystemRequirement(&turret);
 }
@@ -53,7 +54,7 @@ void AutoTurretCommand::execute()
                         || currentTarget.zPos != m_lastTarget.zPos) && currentTarget.xPos != 0;
 
     communication::TargetColor detectedColor = currentTarget.color;
-    communication::TargetColor enemyColor = communication::TargetColor::RED; //ASSIGN COLOUR HERE!!!
+    communication::TargetColor enemyColor = communication::TargetColor::RED; //ASSIGN ENEMY COLOUR HERE!!!
     bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);
 
     // -----------------------------------------
@@ -61,7 +62,6 @@ void AutoTurretCommand::execute()
     // -----------------------------------------
     if (m_operatorInterface.isAutoAim())
     {
-        
         switch (m_currentState)
         {
             case SentryState::SCANNING:
@@ -75,6 +75,7 @@ void AutoTurretCommand::execute()
                         m_targetStartTicks = 0;
                         m_targetAcquireTicks = 0;
                         m_pitchFilter.reset();
+                        m_pitchFilterPrimed = false;
                     }
                 }
                 else
@@ -85,7 +86,6 @@ void AutoTurretCommand::execute()
 
             case SentryState::SHOOTING:
                 m_targetStartTicks++;
-
 
                 if (!hasValidTarget)
                 {
@@ -129,21 +129,40 @@ void AutoTurretCommand::execute()
                 loopsWithoutData = 0;
 
                 float cvX = currentTarget.xPos;
-                float cvY = currentTarget.yPos - 0.045f; 
-                float cvZ = currentTarget.zPos + 0.75f; 
+                float cvY = currentTarget.yPos - 0.045f;
+                float flatDist = std::hypot(cvX, cvY);  
 
-                float flatDist = std::hypot(cvX, cvY);
+                // --- MODIFIED FOR Z=0 PID PRIORITY ---
+                // Removed PITCH_OFFSET_SLOPE and PITCH_OFFSET_INTERCEPT.
+                // We directly target the vision error (currentTarget.zPos).
+                // This makes the PID priority driving the actual Z offset to 0.
+                float cvZ = currentTarget.zPos; 
+                
+                // WARNING: Calling delay() inside a control/execute loop will block the thread 
+                // and ruin your PID response times. Commenting this out for system stability.
+                // m_logger.printf("zPos: %f \n", cvZ);
+                // m_logger.delay(400); 
 
-                // FIX: Assign direct relative aim, NO compounded turret angle
+                // atan2 acts as a geometric proportional controller: it calculates the exact 
+                // absolute pitch needed to bring cvZ to 0 based on the current distance.
                 float aimPitchRelative = std::atan2(cvZ, flatDist) + m_pitchBoresightTrim;
                 float aimPitchAbsoluteMeasured = m_turret.getPitch() + aimPitchRelative;
-                float filteredPitch = m_pitchFilter.filterData(aimPitchAbsoluteMeasured);
-
-                m_globalPitchTarget = std::clamp(
-                    filteredPitch,
-                    m_globalPitchTarget - MAX_PITCH_STEP_PER_UPDATE,
-                    m_globalPitchTarget + MAX_PITCH_STEP_PER_UPDATE
-                );
+                
+                if (!m_pitchFilterPrimed)
+                {
+                    m_pitchFilter.filterData(aimPitchAbsoluteMeasured); 
+                    m_globalPitchTarget = aimPitchAbsoluteMeasured;      
+                    m_pitchFilterPrimed = true;
+                }
+                else
+                {
+                    float filteredPitch = m_pitchFilter.filterData(aimPitchAbsoluteMeasured);
+                    m_globalPitchTarget = std::clamp(
+                        filteredPitch,
+                        m_globalPitchTarget - MAX_PITCH_STEP_PER_UPDATE,
+                        m_globalPitchTarget + MAX_PITCH_STEP_PER_UPDATE
+                    );
+                }
 
                 // Yaw relative calculation
                 float relYaw = std::atan2(-cvY, cvX) + m_yawBoresightTrim; 
@@ -221,6 +240,9 @@ void AutoTurretCommand::execute()
                 if (solutionFound)
                 {
                     m_globalYawTarget = aimYawAbsolute;
+                    // Note: aimPitchAbsolute from ballistics is intentionally ignored here
+                    // to prioritize your geometric Z=0 PID target.
+                    
                     m_lastTarget.xPos = currentTarget.xPos;
                     m_lastTarget.yPos = currentTarget.yPos;
                     m_lastTarget.zPos = currentTarget.zPos;  
@@ -238,7 +260,6 @@ void AutoTurretCommand::execute()
             // Automatic sweeping logic
             const float SCAN_SPEED_RPS = 0.2f; 
             
-            // Re-implement your bounds check here if you need it to bounce back and forth
             m_scanDirection = -1.0f;
 
             m_turret.setYawRps(SCAN_SPEED_RPS * m_scanDirection);
