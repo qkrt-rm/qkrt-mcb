@@ -43,7 +43,7 @@
 /* control includes ---------------------------------------------------------*/
 #include "tap/architecture/clock.hpp"
 
-#include "control/robot.hpp"
+#include "control/robots/robot.hpp"
 
 static constexpr float IMU_SAMPLE_FREQUENCY = 500;
 static constexpr float MAHONY_KP = 0.5f;
