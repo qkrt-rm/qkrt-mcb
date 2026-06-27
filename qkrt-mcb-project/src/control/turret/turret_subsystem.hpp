@@ -135,6 +135,9 @@ public:
     {
         return m_pitchAxisOffsetMeters;
     }
+
+    inline float getImuYaw() const { return m_yaw; }
+
     /**
      * 
      * @brief Rotates the pitch motor at a specified revolutions per second.
@@ -181,6 +184,8 @@ private:
     bool m_mcbHoriz;
     bool m_isYawZeroed;
     float m_yawSetWeight;
+
+    float m_yaw;
     
     float m_yawOffset, m_pitchOffset;
     float m_pitchAxisOffsetMeters;

@@ -49,8 +49,11 @@ bool AutoTurretCommand::isReady()
 {
     //only run aut aim command when match has started
     auto gameData = m_drivers.refSerial.getGameData();
-    return (m_operatorInterface.isAutoAim() && 
+    bool aimStart = (m_operatorInterface.isAutoAim() && 
             gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME);
+
+    return aimStart;       //COMMENT OUT FOR DEBUG
+    //return true;         //DEBUG
 }
 
 void AutoTurretCommand::execute()
@@ -103,6 +106,8 @@ void AutoTurretCommand::execute()
                     {
                         m_currentState = SentryState::SCANNING;
                         m_kalInit = false; // Reset Kalman filter on target drop
+                        m_turret.setYaw(0.0f);
+                        //referenceScanningYaw = m_turret.getImuYaw();
                     }
                 }
                 else
@@ -128,6 +133,7 @@ void AutoTurretCommand::execute()
             {
                 m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, true); ///
                 m_drivers.commandScheduler.addCommand(m_agitatorCommand); ///
+                m_drivers.commandScheduler.addCommand(m_flywheelsCommand); ///
             }
             m_turret.lock();
 
@@ -175,8 +181,8 @@ void AutoTurretCommand::execute()
 
                 // Yaw relative calculation
                 float relYaw = std::atan2(-cvY, cvX) + m_yawBoresightTrim; 
-                float mathTurretYaw = m_turret.getYaw();      
-                float absYaw = mathTurretYaw + relYaw; 
+                float mathTurretYaw = m_turret.getImuYaw();     
+                float absYaw = mathTurretYaw + relYaw; //////////////////////////////////////////////////////////////////////////
 
                 // World coordinates
                 float worldX = flatDist * std::cos(absYaw);
@@ -258,6 +264,8 @@ void AutoTurretCommand::execute()
                 }
             }
 
+            m_globalPitchTarget = std::clamp(m_globalPitchTarget, m_turret.m_pitchDownLim, m_turret.m_pitchUpLim);
+
             m_turret.setYaw(m_globalYawTarget);
             m_turret.setPitch(m_globalPitchTarget);
         }
@@ -266,15 +274,31 @@ void AutoTurretCommand::execute()
             m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, false);
             m_turret.unlock();
 
+            SCAN_ANGLE_LIMIT_RAD = 0.4f; // 11.46 degrees when 0.2f
+
+            // float test = m_turret.getImuYaw();
+            // m_logger.printf("YAW: %.3f", static_cast<double>(test));
+            // m_logger.delay(200);
+
+            //if (m_turret.getImuYaw() > referenceScanningYaw + SCAN_ANGLE_LIMIT_RAD)
+            if (m_turret.getImuYaw() > SCAN_ANGLE_LIMIT_RAD)
+            {
+                m_scanDirection = -1.0f; 
+            }
+            else if (m_turret.getImuYaw() < -1.0f * SCAN_ANGLE_LIMIT_RAD)
+            {
+                m_scanDirection = 1.0f; 
+            }
+
             // Automatic sweeping logic
-            const float SCAN_SPEED_RPS = 0.2f; 
+            const float SCAN_SPEED_RPS = 0.1f; 
             
-            m_scanDirection = -1.0f;
+            //m_scanDirection = -1.0f;
 
             m_turret.setYawRps(SCAN_SPEED_RPS * m_scanDirection);
             m_turret.setPitch(-0.17f);
 
-            m_drivers.commandScheduler.addCommand(m_flywheelsCommand); ///
+            m_drivers.commandScheduler.removeCommand(m_flywheelsCommand, true); ///
             m_drivers.commandScheduler.removeCommand(m_agitatorCommand, true);
         }
     }
@@ -302,8 +326,8 @@ void AutoTurretCommand::execute()
 
         m_currentState = SentryState::SCANNING;
 
-        m_drivers.commandScheduler.removeCommand(m_flywheelsCommand, true); ///
-        m_drivers.commandScheduler.removeCommand(m_agitatorCommand, true);
+        // m_drivers.commandScheduler.removeCommand(m_flywheelsCommand, true); ///
+        // m_drivers.commandScheduler.removeCommand(m_agitatorCommand, true);
     }
 }
 

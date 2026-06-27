@@ -88,6 +88,9 @@ private:
 
     tap::algorithms::ExtendedKalman m_pitchFilter;
     bool m_pitchFilterPrimed;
+
+    float referenceScanningYaw;
+    float SCAN_ANGLE_LIMIT_RAD;
 };
 
 }  // namespace control::turret

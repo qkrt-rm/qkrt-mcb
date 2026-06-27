@@ -38,6 +38,10 @@ void HolonomicChassisCommand::execute()
         float rawInpY = (isAutoNav && gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME) ? 
                             data.yVel * 1.5f : m_operatorInterface.getChassisYInput();
 
+        // DEBUG
+        // float rawInpX = (isAutoNav) ? data.xVel * 1.5f : m_operatorInterface.getChassisXInput();
+        // float rawInpY = (isAutoNav) ? data.yVel * 1.5f : m_operatorInterface.getChassisYInput();
+        
         // m_logger.printf("Message Recieved: x=%.3f y= %.3f\n", static_cast<double>(xInp), static_cast<double>(yInp));
         // m_logger.delay(200);
 
