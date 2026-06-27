@@ -76,7 +76,7 @@ private:
         .mcbHoriz = true,
         .canBus  = CanBus::CAN_BUS1,
         .yawForwardOffset = -5.242f,
-        .pitchHorizontalOffset = -0.7739f, 
+        .pitchHorizontalOffset = -0.667f, 
         .pitchUpLim = 0.3758,
         .pitchDownLim = -0.4441,
         .MAX_PITCH_POWER = GM6020::MAX_VOLTAGE,
@@ -84,8 +84,7 @@ private:
         .MAX_RPS = GM6020::MAX_RPS,
         .pitchPosGains = { .kp = 10.0f, .ki = 0.0f, .kd = 0.0f, .maxICumulative = 500.0f, .maxOutput = GM6020::MAX_VOLTAGE },
         .pitchVelGains = { .kp = 5000.0f, .ki = 110.0f, .kd = 0.0f, .maxICumulative = 3000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-        .yawPosGains   = { .kp = 5.0f,  .ki = 0.0f, .kd = 0.0f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE },
-        .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE},
+        .yawPosGains   = { .kp = 4.5f,  .ki = 0.0f, .kd = 1.15f, .maxICumulative = 5000.0f, .maxOutput = GM6020::MAX_VOLTAGE},        .yawVelGains   = { .kp = 8000.0f, .ki = 10.0f,  .kd = 0.0f, .maxICumulative = 1000.0f, .maxOutput = GM6020::MAX_VOLTAGE},
         .yawFF = 6560.0f,
         .pitchFF = 1000.0f
     };

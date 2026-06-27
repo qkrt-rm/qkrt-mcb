@@ -52,6 +52,7 @@ struct TurretConfig
     float MAX_PITCH_POWER;
     float MAX_YAW_POWER;
     float MAX_RPS;
+    float pitchAxisOffsetMeters = 0.0f;
 
     //PID gains
     PidGains pitchPosGains;
@@ -130,6 +131,10 @@ public:
     float getYawVelocity() const { return m_yawMotor.getEncoder()->getVelocity(); }
     float getPitchVelocity() const { return m_pitchMotor.getEncoder()->getVelocity(); }
     
+    inline float getPitchAxisOffsetMeters() const
+    {
+        return m_pitchAxisOffsetMeters;
+    }
     /**
      * 
      * @brief Rotates the pitch motor at a specified revolutions per second.
@@ -178,6 +183,7 @@ private:
     float m_yawSetWeight;
     
     float m_yawOffset, m_pitchOffset;
+    float m_pitchAxisOffsetMeters;
     float m_maxPitchPower, m_maxYawPower;
     float m_maxRps;
     float m_yawGainFF, m_pitchGainFF;
