@@ -48,9 +48,13 @@ void AutoTurretCommand::execute()
 {
     volatile communication::TurretData currentTarget = m_visionCoprocessor.getTurretData();
 
-    bool isNewData = (currentTarget.xPos != m_lastTarget.xPos 
+    bool hasValidCoordinate = (currentTarget.xPos != m_lastTarget.xPos 
                         || currentTarget.yPos != m_lastTarget.yPos
                         || currentTarget.zPos != m_lastTarget.zPos) && currentTarget.xPos != 0;
+
+    communication::TargetColor detectedColor = currentTarget.color;
+    communication::TargetColor enemyColor = communication::TargetColor::RED; //ASSIGN COLOUR HERE!!!
+    bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);
 
     // -----------------------------------------
     // Phase 1: State Transitions
@@ -61,7 +65,7 @@ void AutoTurretCommand::execute()
         switch (m_currentState)
         {
             case SentryState::SCANNING:
-                if (isNewData)
+                if (hasValidTarget)
                 {
                     m_targetAcquireTicks++;
                     if (m_targetAcquireTicks >= TARGET_ACQUIRE_TICKS)
@@ -83,7 +87,7 @@ void AutoTurretCommand::execute()
                 m_targetStartTicks++;
 
 
-                if (!isNewData)
+                if (!hasValidTarget)
                 {
                     m_targetLostTicks++;
                     if (m_targetLostTicks >= TARGET_LOST_TIMEOUT_TICKS)
@@ -120,7 +124,7 @@ void AutoTurretCommand::execute()
 
             static uint32_t loopsWithoutData = 0;
 
-            if(isNewData)
+            if(hasValidTarget)
             {
                 loopsWithoutData = 0;
 
