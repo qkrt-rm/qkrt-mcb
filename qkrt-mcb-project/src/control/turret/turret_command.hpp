@@ -87,6 +87,7 @@ private:
     modm::Vector3f m_currentFilteredVel;
 
     tap::algorithms::ExtendedKalman m_pitchFilter;
+    bool m_pitchFilterPrimed;
 };
 
 }  // namespace control::turret
