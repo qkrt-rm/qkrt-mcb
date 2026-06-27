@@ -46,8 +46,8 @@ namespace communication {
         {
             memcpy(&lastTurretData, &completeMessage.data, sizeof(lastTurretData));
 
-            m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(lastTurretData.xPos), static_cast<double>(lastTurretData.yPos), static_cast<double>(lastTurretData.zPos));
-            m_logger.delay(200);
+            // m_logger.printf("Message Recieved: x=%.3f y= %.3f z=%.3f\n", static_cast<double>(lastTurretData.xPos), static_cast<double>(lastTurretData.yPos), static_cast<double>(lastTurretData.zPos));
+            // m_logger.delay(200);
 
             return true;
         }
