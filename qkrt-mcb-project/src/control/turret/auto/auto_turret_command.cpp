@@ -64,10 +64,23 @@ void AutoTurretCommand::execute()
                         || currentTarget.yPos != m_lastTarget.yPos
                         || currentTarget.zPos != m_lastTarget.zPos) && currentTarget.xPos != 0;
 
-    communication::TargetColor detectedColor = currentTarget.color;
-    communication::TargetColor enemyColor = communication::TargetColor::RED; //ASSIGN ENEMY COLOUR HERE!!!
-    bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);
 
+    communication::TargetColor enemyColor; 
+
+    auto robotData = m_drivers.refSerial.getRobotData();
+    tap::communication::serial::RefSerialData::RobotId robotID = robotData.robotId;
+    
+    if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
+    {
+        enemyColor = communication::TargetColor::BLUE;
+    }
+    else
+    {
+        enemyColor = communication::TargetColor::RED;
+    }
+    
+    communication::TargetColor detectedColor = currentTarget.color;
+    bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);
 
     // -----------------------------------------
     // Phase 1: State Transitions
