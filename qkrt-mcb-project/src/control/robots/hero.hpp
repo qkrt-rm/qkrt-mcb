@@ -91,9 +91,9 @@ private:
         .yawSetWeight = 0.8f         
     };
 
-    float m_flywheelSpeed = 0.0351f;
-    float m_agitatorIndexSpeed = 105.5f;
-    float m_agitatorWheelSpeed = 40.0f;
+    float m_flywheelSpeed = 0.034f;
+    float m_agitatorIndexSpeed = 84.0f;
+    float m_agitatorWheelSpeed = 34.0f;
 
     flywheel::m3508::FlywheelConfig m_flywheelConfig {
         .leftFlyId = MotorId::MOTOR1, 
