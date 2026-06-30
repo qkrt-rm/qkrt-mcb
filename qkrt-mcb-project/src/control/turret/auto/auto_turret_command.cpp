@@ -52,8 +52,8 @@ bool AutoTurretCommand::isReady()
     bool aimStart = (m_operatorInterface.isAutoAim() && 
             gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME);
 
-    //return aimStart;       //COMMENT OUT FOR DEBUG
-    return true;         //DEBUG
+    return aimStart;       //COMMENT OUT FOR DEBUG
+    //return true;         //DEBUG
 }
 
 void AutoTurretCommand::execute()
