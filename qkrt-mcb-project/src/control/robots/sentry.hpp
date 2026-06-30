@@ -90,7 +90,7 @@ private:
         .pitchFF = 1000.0f
     };
 
-    float m_flywheelSpeed = 0.39f;
+    float m_flywheelSpeed = 0.38f;
     float m_agitatorSpeed = -3.5f;
 
     agitator::m2006::agitatorConfig m_agitatorConfig {
