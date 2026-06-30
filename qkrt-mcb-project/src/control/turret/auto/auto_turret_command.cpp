@@ -47,13 +47,7 @@ void AutoTurretCommand::initialize()
 
 bool AutoTurretCommand::isReady() 
 {
-    //only run aut aim command when match has started
-    auto gameData = m_drivers.refSerial.getGameData();
-    bool aimStart = (m_operatorInterface.isAutoAim() && 
-            gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME);
-
-    return aimStart;       //COMMENT OUT FOR DEBUG
-    //return true;         //DEBUG
+    return true;      
 }
 
 void AutoTurretCommand::execute()
@@ -80,7 +74,7 @@ void AutoTurretCommand::execute()
     }
     
     communication::TargetColor detectedColor = currentTarget.color;
-    bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);
+    bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);    
 
     // -----------------------------------------
     // Phase 1: State Transitions
@@ -142,11 +136,20 @@ void AutoTurretCommand::execute()
     {
         if (m_currentState == SentryState::SHOOTING)
         {
+            m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, true); ///
+
             if (m_targetStartTicks >= TARGET_START_SHOOTING_TICKS)
             {
-                m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, true); ///
-                m_drivers.commandScheduler.addCommand(m_agitatorCommand); ///
-                m_drivers.commandScheduler.addCommand(m_flywheelsCommand); ///
+                auto gameData = m_drivers.refSerial.getGameData();
+                bool aimStart = (m_operatorInterface.isAutoAim() && 
+                    gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME);
+
+                if (aimStart)
+                {
+                    m_drivers.commandScheduler.addCommand(m_agitatorCommand); ///
+                    m_drivers.commandScheduler.addCommand(m_flywheelsCommand); ///
+                }
+      
             }
             m_turret.lock();
 
@@ -339,8 +342,8 @@ void AutoTurretCommand::execute()
 
         m_currentState = SentryState::SCANNING;
 
-        // m_drivers.commandScheduler.removeCommand(m_flywheelsCommand, true); ///
-        // m_drivers.commandScheduler.removeCommand(m_agitatorCommand, true);
+        m_drivers.commandScheduler.removeCommand(m_flywheelsCommand, true); ///
+        m_drivers.commandScheduler.removeCommand(m_agitatorCommand, true);
     }
 }
 
