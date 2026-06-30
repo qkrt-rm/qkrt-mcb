@@ -36,19 +36,21 @@ void AutoHolonomicChassisCommand::execute()
         volatile communication::NavData data = m_visionCoprocessor.getNavData();
         bool isAutoNav = m_operatorInterface.getAutoNavInput();
         auto gameData = m_drivers->refSerial.getGameData();
-
-        //wait 10 seconds for nav to settle
+        auto robotData = m_drivers->refSerial.getRobotData();
+        tap::communication::serial::RefSerialData::RobotId robotID = robotData.robotId;
+        //blue right
+        //red left
+        isNavReady = false;
+        //wait 3 seconds for nav to settle
         if (gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME && !isNavReady)
         {
             m_startTimer += 0.002f;
-            if (m_startTimer >= 10.0f)
+            if (m_startTimer >= 3.0f)
             {
                 isNavReady = true; 
             }
         }
         
-        //isNavReady = true;           //DEBUG
-
         float rawInpX = (isAutoNav && isNavReady) ? 
                             data.xVel * 2.0f : m_operatorInterface.getChassisXInput();
         float rawInpY = (isAutoNav && isNavReady) ? 
@@ -59,16 +61,24 @@ void AutoHolonomicChassisCommand::execute()
         {
              m_sequenceTimer += 0.002f;
 
-            float currImu = m_turret.getImuYaw();
-
             //track cycles of 10s
             //float currentCycleTime = std::fmod(m_sequenceTimer, 10.0f);
 
             // move left
-            if (m_sequenceTimer < 3.0f)
+            if (m_sequenceTimer < 5.0f)
             {
                 rawInpX = 0.0f;
-                rawInpY = -0.5f;        //CHANGE DIRECTION
+
+                if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
+                {
+                    rawInpY = -0.5f;     
+
+                }
+                else
+                {
+                    rawInpY = 0.5f;      
+
+                }
                 w = 0;
             }
             // Station in Corner
