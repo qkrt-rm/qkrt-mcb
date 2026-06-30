@@ -9,7 +9,7 @@
 
 // Chassis (Holonomic Drive) Includes
 #include "control/chassis/holonomic_chassis_subsystem.hpp"
-#include "control/chassis/holonomic_chassis_command.hpp"
+#include "control/chassis/auto/auto_holonomic_chassis_command.hpp"
 
 
 //Turret Includes
@@ -105,7 +105,7 @@ private:
     * @brief Chassis subsystem for the sentry robot
     */
     chassis::HolonomicChassisSubsystem m_chassis;
-    chassis::HolonomicChassisCommand m_chassisCommand;
+    chassis::AutoHolonomicChassisCommand m_chassisCommand;
 
     /**
      * @brief Turret subsystem for the sentry robot

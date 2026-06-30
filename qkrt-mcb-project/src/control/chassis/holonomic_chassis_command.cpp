@@ -29,21 +29,8 @@ void HolonomicChassisCommand::execute()
 {       
         m_operatorInterface.pollInputDevices();
 
-        volatile communication::NavData data = m_visionCoprocessor.getNavData();
-        bool isAutoNav = m_operatorInterface.getAutoNavInput();
-        auto gameData = m_drivers->refSerial.getGameData();
-
-        float rawInpX = (isAutoNav && gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME) ? 
-                            data.xVel * 1.5f : m_operatorInterface.getChassisXInput();
-        float rawInpY = (isAutoNav && gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME) ? 
-                            data.yVel * 1.5f : m_operatorInterface.getChassisYInput();
-
-        // DEBUG
-        // float rawInpX = (isAutoNav) ? data.xVel * 1.5f : m_operatorInterface.getChassisXInput();
-        // float rawInpY = (isAutoNav) ? data.yVel * 1.5f : m_operatorInterface.getChassisYInput();
-        
-        // m_logger.printf("Message Recieved: x=%.3f y= %.3f\n", static_cast<double>(xInp), static_cast<double>(yInp));
-        // m_logger.delay(200);
+        float rawInpX = m_operatorInterface.getChassisXInput();
+        float rawInpY = m_operatorInterface.getChassisYInput();
 
         Vector2f moveVector(rawInpX, rawInpY);
         float inputLength = moveVector.getLength();
@@ -62,8 +49,7 @@ void HolonomicChassisCommand::execute()
         //compute rotation transformation
         float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);
         float v_x = yInp * std::sin(-yawAngle) + xInp * std::cos(-yawAngle);
-        float w = (isAutoNav && gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME) ? 
-                        m_chassisRotSpeed : m_chassisRotSpeed * m_operatorInterface.getChassisBeyblade();
+        float w = m_chassisRotSpeed * m_operatorInterface.getChassisBeyblade();
         
         float leftFront  = (v_x + v_y + w);
         float leftBack   = (v_x - v_y + w);
