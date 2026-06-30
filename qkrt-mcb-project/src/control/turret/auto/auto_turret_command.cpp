@@ -290,7 +290,7 @@ void AutoTurretCommand::execute()
             m_drivers.digital.set(tap::gpio::Digital::OutputPin::Laser, false);
             m_turret.unlock();
 
-            SCAN_ANGLE_LIMIT_RAD = 0.4f; // 11.46 degrees when 0.2f
+            SCAN_ANGLE_LIMIT_RAD = 1.2f; // 11.46 degrees when 0.2f
 
             // float test = m_turret.getImuYaw();
             // m_logger.printf("YAW: %.3f", static_cast<double>(test));
