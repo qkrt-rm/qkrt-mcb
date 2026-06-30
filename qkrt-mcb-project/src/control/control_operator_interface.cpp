@@ -68,7 +68,7 @@ void ControlOperatorInterface::pollKeyboardMouse()
 {
     float moveSpeedMultiplier = m_remote.keyPressed(Remote::Key::SHIFT) ? 4.0f : 1.5f;
     
-    m_turretPitchInput = -normalizeMouseTanh(m_remote.getMouseY());
+    m_turretPitchInput = normalizeMouseTanh(m_remote.getMouseY());
     m_turretYawInput = normalizeMouseTanh(m_remote.getMouseX());
 
     // WASD mapping
