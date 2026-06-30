@@ -341,9 +341,6 @@ void AutoTurretCommand::execute()
         m_turret.isChassisRot(m_operatorInterface.getChassisBeyblade());
 
         m_currentState = SentryState::SCANNING;
-
-        m_drivers.commandScheduler.removeCommand(m_flywheelsCommand, true); ///
-        m_drivers.commandScheduler.removeCommand(m_agitatorCommand, true);
     }
 }
 
