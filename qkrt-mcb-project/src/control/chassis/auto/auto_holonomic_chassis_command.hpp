@@ -32,6 +32,8 @@ public:
 
     const char* getName() const override { return "Chassis Omni Drive Command"; }
 
+    bool isDriveLockTurret() {return islockTurret; }
+
     static constexpr float CHASSIS_ROT_SPEED_RAD = 0.35f;
 private:
     HolonomicChassisSubsystem& m_chassis;
@@ -47,6 +49,7 @@ private:
     bool isNavReady = false;
     float m_sequenceTimer = 0.0f;
     bool isHardCode = false; 
+    bool islockTurret = true;
 };
 
 }  // namespace control::chassis

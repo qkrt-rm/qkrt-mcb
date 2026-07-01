@@ -19,7 +19,8 @@ AutoHolonomicChassisCommand::AutoHolonomicChassisCommand(Drivers &drivers, Holon
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
       m_drivers(&drivers),
-      isHardCode(true)
+      isHardCode(true),
+      islockTurret(true)
 
 {
     addSubsystemRequirement(&chassis);
@@ -41,7 +42,9 @@ void AutoHolonomicChassisCommand::execute()
         //blue right
         //red left
         isNavReady = false;
+        islockTurret = true;
         //wait 3 seconds for nav to settle
+        
         if (gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME && !isNavReady)
         {
             m_startTimer += 0.002f;
@@ -65,19 +68,17 @@ void AutoHolonomicChassisCommand::execute()
             //float currentCycleTime = std::fmod(m_sequenceTimer, 10.0f);
 
             // move left
-            if (m_sequenceTimer < 5.0f)
+            if (m_sequenceTimer < 5.5f)
             {
                 rawInpX = 0.0f;
 
                 if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
                 {
                     rawInpY = -0.5f;     
-
                 }
                 else
                 {
                     rawInpY = 0.5f;      
-
                 }
                 w = 0;
             }
@@ -87,6 +88,7 @@ void AutoHolonomicChassisCommand::execute()
                 rawInpX = 0.0f;
                 rawInpY = 0.0f;
                 w = m_chassisRotSpeed;
+                islockTurret = false;
             }
         }
        

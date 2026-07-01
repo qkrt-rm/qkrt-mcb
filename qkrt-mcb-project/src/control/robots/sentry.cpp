@@ -10,7 +10,7 @@ Robot::Robot(Drivers& drivers)
       m_chassis(drivers, m_chassisConfig),
       m_chassisCommand(drivers, m_chassis, m_turret, drivers.controlOperatorInterface, m_chassisCmdConfig),
       m_turret(drivers, turretConfig, m_chassisCmdConfig),
-      m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface, &m_flywheelsCommand, &m_agitatorCommand),
+      m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface, &m_flywheelsCommand, &m_agitatorCommand, m_chassisCommand),
       m_flywheels(drivers),
       m_flywheelsCommand(m_flywheels, m_flywheelSpeed),
       m_agitator(drivers, m_agitatorConfig),
