@@ -170,13 +170,10 @@ private:
         tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::LEFT)
     };
 
-    tap::control::ToggleCommandMapping m_ToggleFlyX{
+    tap::control::HoldCommandMapping m_rightMouseFlywheel{
         &m_drivers,
         {&m_flywheelsCommand},
-        tap::control::RemoteMapState(
-        std::list<tap::communication::serial::Remote::Key>{
-        tap::communication::serial::Remote::Key::X
-        })
+        tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::RIGHT)
     };
     
 };

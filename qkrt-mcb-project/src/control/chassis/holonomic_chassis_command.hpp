@@ -16,6 +16,7 @@ namespace control::chassis
 struct chassisCommandConfig {
     float maxChassisSpeed = 0.5f;
     float maxRotSpeed = 0.35f;
+    float boostMultiplier = 1.3f;
 };
 
 class HolonomicChassisCommand : public tap::control::Command
@@ -47,6 +48,7 @@ private:
 
     float m_maxSpeed;
     float m_chassisRotSpeed;
+    float m_boostMultiplier;
 };
 
 }  // namespace control::chassis

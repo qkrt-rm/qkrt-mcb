@@ -32,7 +32,7 @@ class VelocityAgitatorSubsystem;
 class AgitatorCommand : public tap::control::Command
 {
 public:
-    AgitatorCommand(Drivers& drivers, VelocityAgitatorSubsystem &agitator, float indexerSpeed, 
+    AgitatorCommand(Drivers& drivers, VelocityAgitatorSubsystem &agitator, float indexerSpeed, bool isHeroWheel, 
         tap::control::Command* flywheelsCommand, ControlOperatorInterface& operatorInterface);
 
     const char *getName() const override { return "agitator command"; }
@@ -50,6 +50,7 @@ private:
     float m_indexerSpeed;
     tap::control::Command* m_flywheelsCommand;
     ControlOperatorInterface& m_operatorInterface;
+    bool isHeroWheel = false;
 
 };
 

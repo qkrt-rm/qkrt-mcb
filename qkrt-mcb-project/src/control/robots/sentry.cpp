@@ -14,7 +14,7 @@ Robot::Robot(Drivers& drivers)
       m_flywheels(drivers),
       m_flywheelsCommand(m_flywheels, m_flywheelSpeed),
       m_agitator(drivers, m_agitatorConfig),
-      m_agitatorCommand(drivers, m_agitator, m_agitatorSpeed, &m_flywheelsCommand, drivers.controlOperatorInterface)      //TUNE RATE
+      m_agitatorCommand(drivers, m_agitator, m_agitatorSpeed, false, &m_flywheelsCommand, drivers.controlOperatorInterface)      //TUNE RATE
 {
 }
 
