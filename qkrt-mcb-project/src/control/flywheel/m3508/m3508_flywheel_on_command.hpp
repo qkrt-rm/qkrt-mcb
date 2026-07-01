@@ -10,8 +10,8 @@ namespace control::flywheel::m3508
     class M3508FlywheelOnCommand : public tap::control::Command
     {
     public:
-        M3508FlywheelOnCommand(M3508FlywheelSubsystem& flywheel, 
-                          float speed);
+        M3508FlywheelOnCommand(M3508FlywheelSubsystem& flywheel,
+                                float speed);
 
         void initialize() override;
 
