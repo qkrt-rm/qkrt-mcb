@@ -33,6 +33,7 @@ public:
     float getChassisXInput() const { return m_chassisXInput; };
     float getChassisYInput() const { return m_chassisYInput; };
     float getChassisBeyblade() const { return m_beybladeDirection; }; 
+    bool isChassisBoost() const { return m_isShiftBoost; };
 
     //turret outputs
     float getTurretPitchInput() const { return m_turretPitchInput; };
@@ -41,6 +42,7 @@ public:
     bool isAutoAim () const { return m_autoAimInput; };
     bool getAutoNavInput() const { return m_autoNavInput; };
     bool isRevAgitator() const { return m_revAgitator; };
+    bool isHeroRevAgitator() const { return m_revHeroAgitator; };
     
 private:
     void pollController();
@@ -64,6 +66,8 @@ private:
     bool m_prevEState = false;       
     bool m_prevQState = false;
     bool m_revAgitator = false;
+    bool m_revHeroAgitator = false;
+    bool m_isShiftBoost = false;
 
     float m_turretPitchInput = 0.0f;
     float m_turretYawInput = 0.0f;

@@ -75,6 +75,7 @@ void ControlOperatorInterface::pollKeyboardMouse()
     float rawX = (m_remote.keyPressed(Remote::Key::W) - m_remote.keyPressed(Remote::Key::S));
     float rawY = (m_remote.keyPressed(Remote::Key::D) - m_remote.keyPressed(Remote::Key::A));
 
+
     Vector2f rawMoveInput(rawX, rawY);
     float rawInputLen = rawMoveInput.getLength();
 
@@ -108,8 +109,11 @@ void ControlOperatorInterface::pollKeyboardMouse()
     m_chassisXInput = currentMove.x;
     m_chassisYInput = currentMove.y;
 
+    m_isShiftBoost = m_remote.keyPressed(Remote::Key::SHIFT);
+
     //agitator reversal
     m_revAgitator = m_remote.getMouseR();
+    m_revHeroAgitator = m_remote.keyPressed(Remote::Key::CTRL);
 
     //beyblade
     bool currEPressed = m_remote.keyPressed(Remote::Key::E);
@@ -121,7 +125,7 @@ void ControlOperatorInterface::pollKeyboardMouse()
     }
     else if (currQPressed && !m_prevQState) 
     {
-        m_beybladeDirection = (m_beybladeDirection == -1.0f) ? 0.0f : -1.0f;
+        m_beybladeDirection = (m_beybladeDirection == 1.0f) ? 0.0f : 1.0f;
     }
 
     m_prevEState = currEPressed;

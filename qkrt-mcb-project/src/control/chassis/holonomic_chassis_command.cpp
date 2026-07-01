@@ -15,7 +15,8 @@ HolonomicChassisCommand::HolonomicChassisCommand(Drivers &drivers, HolonomicChas
       m_chassisRotSpeed(config.maxRotSpeed),
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
-      m_drivers(&drivers)
+      m_drivers(&drivers),
+      m_boostMultiplier(config.boostMultiplier)
 
 {
     addSubsystemRequirement(&chassis);
@@ -40,7 +41,12 @@ void HolonomicChassisCommand::execute()
             moveVector = moveVector / inputLength;
         }
 
-        Vector2f scaledMove = moveVector * m_maxSpeed;
+        //check is boost bool
+        bool isBoost = m_operatorInterface.isChassisBoost();
+
+        float speedMultiplier = isBoost ? m_boostMultiplier : 1.0f;        //scale by a speed boost factor
+
+        Vector2f scaledMove = moveVector * (m_maxSpeed * speedMultiplier);
 
         float xInp = scaledMove.x;
         float yInp = scaledMove.y;

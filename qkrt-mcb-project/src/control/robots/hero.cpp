@@ -16,7 +16,7 @@ Robot::Robot(Drivers& drivers)
         m_agitator(drivers, m_agitatorConfig),
         m_agitatorCommand(drivers, m_agitator, m_agitatorIndexSpeed, &m_flywheelsCommand, drivers.controlOperatorInterface),
         m_wheelAgitator(drivers, m_agitatorWheelConfig),
-        m_wheelAgitatorCommand(drivers, m_wheelAgitator, m_agitatorWheelSpeed, &m_flywheelsCommand, drivers.controlOperatorInterface)  
+        m_wheelAgitatorCommand(drivers, m_wheelAgitator, m_agitatorWheelSpeed, true, &m_flywheelsCommand, drivers.controlOperatorInterface)  
 {
 }
 
@@ -66,7 +66,7 @@ void Robot::registerIoMappings()
     m_drivers.commandMapper.addMap(& m_rightSwitchUP);
 
     //mouse
-    m_drivers.commandMapper.addMap(& m_ToggleFlyX);
+    m_drivers.commandMapper.addMap(& m_rightMouseFlywheel);
     m_drivers.commandMapper.addMap(& m_leftMouseIndex);
 }
 
