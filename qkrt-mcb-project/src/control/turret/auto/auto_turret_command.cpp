@@ -8,12 +8,14 @@ namespace control::turret
 AutoTurretCommand::AutoTurretCommand(Drivers & drivers, TurretSubsystem& turret,
                              ControlOperatorInterface& m_operatorInterface,
                              tap::control::Command* flywheelsCommand, ///
-                             tap::control::Command* agitatorCommand) ///
+                             tap::control::Command* agitatorCommand,
+                             control::chassis::AutoHolonomicChassisCommand& autoChassisCmd) ///
     : m_drivers(drivers),
       m_turret(turret),
       m_operatorInterface(m_operatorInterface),
       m_flywheelsCommand(flywheelsCommand), ///
       m_agitatorCommand(agitatorCommand), ///
+      m_autoChassisCmd(autoChassisCmd),
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
       isAutoAim(true),
@@ -311,7 +313,15 @@ void AutoTurretCommand::execute()
             
             //m_scanDirection = -1.0f;
 
-            m_turret.setYawRps(SCAN_SPEED_RPS * m_scanDirection);
+            if(m_autoChassisCmd.isDriveLockTurret())
+            {
+                m_turret.setYawRps(0.0f);
+            }
+            else 
+            {
+                m_turret.setYawRps(SCAN_SPEED_RPS * m_scanDirection);
+            }
+
             m_turret.setPitch(-0.17f);
 
             m_drivers.commandScheduler.removeCommand(m_flywheelsCommand, true); ///

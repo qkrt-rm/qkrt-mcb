@@ -10,6 +10,7 @@
 #include "tap/algorithms/kalman_filter.hpp"
 #include "tap/algorithms/ballistics.hpp"
 #include "tap/algorithms/extended_kalman.hpp"
+#include "control/chassis/auto/auto_holonomic_chassis_command.hpp"
 
 namespace control::turret
 {
@@ -29,7 +30,8 @@ public:
     AutoTurretCommand(Drivers& drivers, TurretSubsystem& turret,
                   ControlOperatorInterface& m_operatorInterface,
                   tap::control::Command* flywheelsCommand, ///
-                  tap::control::Command* agitatorCommand); ///
+                  tap::control::Command* agitatorCommand,
+                  control::chassis::AutoHolonomicChassisCommand& autoChassisCmd); ///
 
     void initialize() override;
     bool isReady() override;
@@ -73,6 +75,7 @@ private:
 
     tap::control::Command* m_flywheelsCommand; ///
     tap::control::Command* m_agitatorCommand; ///
+    control::chassis::AutoHolonomicChassisCommand& m_autoChassisCmd;
 
     static constexpr float MAX_PITCH_STEP_PER_UPDATE = 0.03f;
 
