@@ -37,7 +37,7 @@ namespace control::agitator::m3508
 
         float targetSetpoint = m_agitatorSpeed;
 
-        if (m_operatorInterface.isHeroRevAgitator())
+        if (m_operatorInterface.isCtrlRevAgitator())
         {
             targetSetpoint = -m_agitatorSpeed * 0.2f; 
         }

@@ -50,7 +50,7 @@ private:
     float m_indexerSpeed;
     tap::control::Command* m_flywheelsCommand;
     ControlOperatorInterface& m_operatorInterface;
-    bool isHeroWheel = false;
+    bool m_isCtrlReversal;
 
 };
 

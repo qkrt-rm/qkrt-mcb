@@ -112,8 +112,8 @@ void ControlOperatorInterface::pollKeyboardMouse()
     m_isShiftBoost = m_remote.keyPressed(Remote::Key::SHIFT);
 
     //agitator reversal
-    m_revAgitator = m_remote.getMouseR();
-    m_revHeroAgitator = m_remote.keyPressed(Remote::Key::CTRL);
+    m_mouseRevAgitator = m_remote.getMouseR();
+    m_ctrlRevAgitator = m_remote.keyPressed(Remote::Key::CTRL);
 
     //beyblade
     bool currEPressed = m_remote.keyPressed(Remote::Key::E);
