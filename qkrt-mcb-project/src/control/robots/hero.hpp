@@ -92,7 +92,7 @@ private:
     };
 
     float m_flywheelSpeed = 0.034f;
-    float m_agitatorIndexSpeed = 84.0f;
+    float m_agitatorIndexSpeed = 90.0f;
     float m_agitatorWheelSpeed = 34.0f;
 
     flywheel::m3508::FlywheelConfig m_flywheelConfig {
