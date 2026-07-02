@@ -77,7 +77,7 @@ private:
         .canBus  = CanBus::CAN_BUS1,
         .yawForwardOffset = -5.242f,
         .pitchHorizontalOffset = -1.91901f, 
-        .pitchUpLim = 0.07,
+        .pitchUpLim = 0.16,
         .pitchDownLim = -0.155,
         .MAX_PITCH_POWER = GM6020::MAX_VOLTAGE,
         .MAX_YAW_POWER = GM6020::MAX_VOLTAGE,

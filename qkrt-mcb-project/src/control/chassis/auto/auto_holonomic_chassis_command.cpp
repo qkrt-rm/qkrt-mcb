@@ -44,8 +44,8 @@ void AutoHolonomicChassisCommand::execute()
         isNavReady = false;
         islockTurret = true;
         //wait 3 seconds for nav to settle
-        
-        if (gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME && !isNavReady)
+       
+        if ( gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME && !isNavReady)
         {
             m_startTimer += 0.002f;
             if (m_startTimer >= 3.0f)

@@ -283,9 +283,10 @@ void AutoTurretCommand::execute()
             }
 
             m_globalPitchTarget = std::clamp(m_globalPitchTarget, m_turret.m_pitchDownLim, m_turret.m_pitchUpLim);
-
+            m_globalPitchTarget = m_globalPitchTarget + 0.1f;
             m_turret.setYaw(m_globalYawTarget);
             m_turret.setPitch(m_globalPitchTarget);
+            m_globalPitchTarget = m_globalPitchTarget - 0.1f;
         }
         else if (m_currentState == SentryState::SCANNING)
         {
