@@ -8,11 +8,10 @@
 
 namespace control::flywheel::m3508
 {
-    M3508FlywheelOnCommand::M3508FlywheelOnCommand(M3508FlywheelSubsystem& flywheel,
-                                         float flywheel_speed)
+    M3508FlywheelOnCommand::M3508FlywheelOnCommand(M3508FlywheelSubsystem& flywheel, 
+                        float flywheel_speed)
     : m_flywheel(flywheel),
       m_flywheelSpeed(flywheel_speed)
-
     {
         addSubsystemRequirement(&flywheel);
     }

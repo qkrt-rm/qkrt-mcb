@@ -41,8 +41,8 @@ public:
 
     bool isAutoAim () const { return m_autoAimInput; };
     bool getAutoNavInput() const { return m_autoNavInput; };
-    bool isRevAgitator() const { return m_revAgitator; };
-    bool isHeroRevAgitator() const { return m_revHeroAgitator; };
+    bool isMouseRevAgitator() const { return m_mouseRevAgitator; };
+    bool isCtrlRevAgitator() const { return m_ctrlRevAgitator; };
     
 private:
     void pollController();
@@ -65,8 +65,8 @@ private:
     float m_beybladeDirection = 0.0f;
     bool m_prevEState = false;       
     bool m_prevQState = false;
-    bool m_revAgitator = false;
-    bool m_revHeroAgitator = false;
+    bool m_mouseRevAgitator = false;
+    bool m_ctrlRevAgitator = false;
     bool m_isShiftBoost = false;
 
     float m_turretPitchInput = 0.0f;

@@ -59,7 +59,7 @@ private:
     };
 
     chassis::chassisCommandConfig m_chassisCommandConfig {
-        .maxChassisSpeed = 0.92f,  //120W 
+        .maxChassisSpeed = 0.73f,  //120W 0.90
         .maxRotSpeed = 0.86f
     };
 
@@ -89,7 +89,7 @@ private:
     };
 
     float m_flyhweelSpeed = 0.0395f;
-    float m_agitatorSpeed = -8.5f;
+    float m_agitatorSpeed = -3.5f;
 
     flywheel::m3508::FlywheelConfig m_flywheelConfig {
         .leftFlyId = MotorId::MOTOR1, 
@@ -101,7 +101,7 @@ private:
     agitator::m2006::agitatorConfig m_agitatorConfig {
         .agitatorId = MotorId::MOTOR3,
         .canBus = CanBus::CAN_BUS2,
-        .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1000, 0, 0, 0, 16000), 
+        .agitatorVelocityPidConfig = modm::Pid<float>::Parameter(1700, 0, 0, 0, 16000), 
     };
 
     Drivers& m_drivers;
@@ -149,13 +149,10 @@ private:
     )
     };
 
-    tap::control::ToggleCommandMapping m_ToggleFlyX{
+    tap::control::HoldCommandMapping m_rightMouseFlywheel{
         &m_drivers,
         {&m_flywheelsCommand},
-        tap::control::RemoteMapState(
-        std::list<tap::communication::serial::Remote::Key>{
-            tap::communication::serial::Remote::Key::X
-        })
+        tap::control::RemoteMapState(tap::control::RemoteMapState::MouseButton::RIGHT)
     };
 
     tap::control::HoldCommandMapping m_leftMouseIndex{

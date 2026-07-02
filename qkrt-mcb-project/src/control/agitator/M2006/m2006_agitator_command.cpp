@@ -24,14 +24,14 @@ using tap::algorithms::limitVal;
 namespace control::agitator::m2006
 {
 AgitatorCommand::AgitatorCommand(
-    Drivers &drivers, VelocityAgitatorSubsystem &agitator, float indexerSpeed, bool isHeroWheel,
+    Drivers &drivers, VelocityAgitatorSubsystem &agitator, float indexerSpeed, bool isCtrlReversal,
     tap::control::Command* flywheelsCommand, ControlOperatorInterface& operatorInterface)
     :   m_drivers(&drivers),
         m_agitator(agitator),
         m_indexerSpeed(indexerSpeed),
         m_flywheelsCommand(flywheelsCommand),
         m_operatorInterface(operatorInterface),
-        isHeroWheel(isHeroWheel)
+        m_isCtrlReversal(isCtrlReversal)
 
 {
     addSubsystemRequirement(&agitator);
@@ -59,12 +59,12 @@ void AgitatorCommand::execute()
 
     float targetSetpoint = m_indexerSpeed;
 
-    if ((m_operatorInterface.isHeroRevAgitator() && isHeroWheel))
+    if ((m_operatorInterface.isCtrlRevAgitator() && m_isCtrlReversal))
     {
         targetSetpoint = -m_indexerSpeed * 0.5f; 
 
     }
-    else if (m_operatorInterface.isRevAgitator() && !isHeroWheel)
+    else if (m_operatorInterface.isMouseRevAgitator() && !m_isCtrlReversal)
     {
         targetSetpoint = -m_indexerSpeed * 0.5f; 
     }
