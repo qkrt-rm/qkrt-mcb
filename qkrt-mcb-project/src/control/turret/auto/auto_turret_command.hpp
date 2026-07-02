@@ -93,7 +93,8 @@ private:
     bool m_pitchFilterPrimed;
 
     float referenceScanningYaw;
-    float SCAN_ANGLE_LIMIT_RAD;
+    float SCAN_ANGLE_LIMIT_RAD_LEFT;
+    float SCAN_ANGLE_LIMIT_RAD_RIGHT;
 };
 
 }  // namespace control::turret
