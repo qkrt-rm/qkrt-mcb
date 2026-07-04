@@ -50,6 +50,7 @@ private:
     float m_sequenceTimer = 0.0f;
     bool isHardCode = false; 
     bool islockTurret = true;
+    int m_scriptStage = 0;
 };
 
 }  // namespace control::chassis

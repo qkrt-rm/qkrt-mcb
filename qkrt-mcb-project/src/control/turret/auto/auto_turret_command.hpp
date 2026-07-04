@@ -67,9 +67,11 @@ private:
     SentryState m_currentState; 
     uint32_t m_targetLostTicks; 
     uint32_t m_targetStartTicks;
+    uint32_t m_targetAgitatorTicks;
     static constexpr uint32_t TARGET_LOST_TIMEOUT_TICKS = 500; 
     static constexpr uint32_t TARGET_START_SHOOTING_TICKS = 100; 
     static constexpr uint32_t TARGET_ACQUIRE_TICKS = 5;
+    static constexpr uint32_t TARGET_AGITATOR_TICKS = 100;
     uint32_t m_targetAcquireTicks;
     float m_scanDirection; 
 
