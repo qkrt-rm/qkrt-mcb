@@ -19,7 +19,7 @@ AutoHolonomicChassisCommand::AutoHolonomicChassisCommand(Drivers &drivers, Holon
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
       m_drivers(&drivers),
-      isHardCode(true),
+      isHardCode(false),
       islockTurret(true)
 
 {
@@ -54,10 +54,8 @@ void AutoHolonomicChassisCommand::execute()
             }
         }
         
-        float rawInpX = (isAutoNav && isNavReady) ? 
-                            data.xVel * 2.0f : m_operatorInterface.getChassisXInput();
-        float rawInpY = (isAutoNav && isNavReady) ? 
-                            data.yVel * 2.0f : m_operatorInterface.getChassisYInput();
+        float rawInpX = data.xVel * 2.0f;
+        float rawInpY = data.yVel * 2.0f;
         float w = 0;
 
         if (isNavReady && isHardCode)

@@ -128,9 +128,9 @@ namespace communication {
         data->imuRoll = m_imu.getRoll();
         //referee and robot data
         //auto gameData = drivers->refSerial.getGameData();
-        //auto robotData = drivers->refSerial.getRobotData();
+        auto robotData = drivers->refSerial.getRobotData();
         // data->gameStage = static_cast<uint8_t>(gameData.gameStage);
-        // data->currentHp = robotData.currentHp;
+        data->currentHp = robotData.currentHp;
         // data->isSupplyZone = (robotData.rfidStatus.value & (1 << 20)) != 0;
 
         message.setCRC16();
