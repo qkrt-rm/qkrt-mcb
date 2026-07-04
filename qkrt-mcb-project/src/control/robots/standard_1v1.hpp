@@ -60,7 +60,8 @@ private:
 
     chassis::chassisCommandConfig m_chassisCommandConfig {
         .maxChassisSpeed = 0.73f,  //120W 0.90
-        .maxRotSpeed = 0.86f
+        .maxRotSpeed = 0.86f,
+        .boostMultiplier = 1.4f
     };
 
     turret::TurretConfig m_turretConfig {
