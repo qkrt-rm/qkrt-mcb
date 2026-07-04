@@ -25,6 +25,14 @@ namespace communication
         TargetColor color;
     } modm_packed;
 
+    struct AprilTagData
+    {
+        uint8_t tagId;
+        float xDist;
+        float yDist;
+        float zDist;
+    } modm_packed;
+
     struct NavData
     {
         float xVel;
@@ -58,7 +66,7 @@ namespace communication
         float imuRoll;
         // Referee Info
         // uint8_t gameStage;
-        // uint16_t currentHp;
+        uint16_t currentHp;
         // bool isSupplyZone;
 
     } modm_packed;

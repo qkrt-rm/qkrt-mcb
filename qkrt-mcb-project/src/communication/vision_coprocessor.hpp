@@ -30,6 +30,10 @@ namespace communication
 
             bool decodeNavData(const ReceivedSerialMessage& completeMessage);
 
+            bool decodeAprilTagData(const ReceivedSerialMessage& completeMessage);
+
+            const AprilTagData& getAprilTagData() const;
+
             const TurretData& getTurretData() const;
 
             const NavData& getNavData() const;
@@ -53,6 +57,8 @@ namespace communication
             tap::arch::MilliTimeout offlineTimeout;
 
             logger::Logger& m_logger;         //member that references logger object
+
+            AprilTagData lastAprilTagData;
 
             TurretData lastTurretData;          //struct with turret data from jetson
 

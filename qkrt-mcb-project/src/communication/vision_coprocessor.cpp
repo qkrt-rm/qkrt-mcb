@@ -14,21 +14,20 @@ namespace communication {
     void VisionCoprocessor::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
     {
         offlineTimeout.restart(OFFLINE_TIMEOUT_MS);
-
         switch (completeMessage.messageType)
         {
         case JETSON_MESSAGE_TYPE_AIM:
             decodeTurretData(completeMessage);
             break;
-        
         case JETSON_MESSAGE_TYPE_NAV:
             decodeNavData(completeMessage);
             break;
-            
+        case 0x03: // MUST MATCH THE getID() FROM PYTHON
+            decodeAprilTagData(completeMessage);
+            break;
         default:
             break;
         }
-
     }
 
     void VisionCoprocessor::initialize()
@@ -38,6 +37,20 @@ namespace communication {
     }
 
     bool VisionCoprocessor::isOnline() const { return !offlineTimeout.isExpired(); }
+
+    bool VisionCoprocessor::decodeAprilTagData(const ReceivedSerialMessage& completeMessage)
+    {
+        if (completeMessage.header.dataLength == sizeof(lastAprilTagData))
+        {
+            memcpy(&lastAprilTagData, &completeMessage.data, sizeof(lastAprilTagData));
+
+            m_logger.printf("AprilTag Message Recieved: id=%d x=%.3f y= %.3f z=%.3f\n", static_cast<int>(lastAprilTagData.tagId), static_cast<double>(lastAprilTagData.xDist), static_cast<double>(lastAprilTagData.yDist), static_cast<double>(lastAprilTagData.zDist));
+            m_logger.delay(200);
+
+            return true;
+        }
+        return false;
+    }
 
     bool VisionCoprocessor::decodeTurretData(const ReceivedSerialMessage& completeMessage)
     {
@@ -66,6 +79,8 @@ namespace communication {
         }
         return false;
     }
+
+    const AprilTagData& VisionCoprocessor::getAprilTagData() const { return lastAprilTagData; }
 
     const TurretData& VisionCoprocessor::getTurretData() const { return lastTurretData; }
 
@@ -128,9 +143,9 @@ namespace communication {
         data->imuRoll = m_imu.getRoll();
         //referee and robot data
         //auto gameData = drivers->refSerial.getGameData();
-        //auto robotData = drivers->refSerial.getRobotData();
+        auto robotData = drivers->refSerial.getRobotData();
         // data->gameStage = static_cast<uint8_t>(gameData.gameStage);
-        // data->currentHp = robotData.currentHp;
+        data->currentHp = robotData.currentHp;
         // data->isSupplyZone = (robotData.rfidStatus.value & (1 << 20)) != 0;
 
         message.setCRC16();

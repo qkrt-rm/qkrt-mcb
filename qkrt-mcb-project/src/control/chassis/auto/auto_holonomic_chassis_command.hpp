@@ -50,6 +50,33 @@ private:
     float m_sequenceTimer = 0.0f;
     bool isHardCode = false; 
     bool islockTurret = true;
+
+
+    float m_globalX = 0.0f;
+    float m_globalY = 0.0f;
+    float m_globalYaw = 0.0f;
+
+    // Struct to hold absolute field coordinates of the tags
+    struct TagLocation {
+        float x;
+        float y;
+    };
+
+    TagLocation getTagLocation(uint8_t id) {
+        switch (id) {
+            case 0: return {2.295f, 3.7f}; // Red Spawn (Example)
+            case 1: return {2.33f,  2.72f}; // Red Middle Wall
+            case 2: return {5.0f,  1.18f}; // Red Block
+            case 3: return { 7.01f,  1.20f}; // Blue Block
+            case 4: return { 9.62f,  2.68f}; // Blue Middle Wall
+            case 5: return { 9.75f,  3.7f}; // Blue Spawn
+            case 6: return {11.0f,  8.0f}; // Blue Ramp
+            case 7: return { 5.97f,  1.7f}; // Middle Block
+            case 8: return { 6.0f,  6.96f}; // Middle Ramp
+            case 9: return {1.0f, 8.0f};  // Red Ramp
+            default: return {0.0f,  0.0f};
+        }
+    }
 };
 
 }  // namespace control::chassis

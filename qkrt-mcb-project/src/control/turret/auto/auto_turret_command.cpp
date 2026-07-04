@@ -55,6 +55,7 @@ bool AutoTurretCommand::isReady()
 void AutoTurretCommand::execute()
 {
     volatile communication::TurretData currentTarget = m_visionCoprocessor.getTurretData();
+    
 
     bool hasValidCoordinate = (currentTarget.xPos != m_lastTarget.xPos 
                         || currentTarget.yPos != m_lastTarget.yPos
@@ -76,7 +77,7 @@ void AutoTurretCommand::execute()
     }
     
     communication::TargetColor detectedColor = currentTarget.color;
-    bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);    
+    bool hasValidTarget = hasValidCoordinate; //&& (detectedColor == enemyColor);    
 
     // -----------------------------------------
     // Phase 1: State Transitions
@@ -146,11 +147,15 @@ void AutoTurretCommand::execute()
                 bool aimStart = (m_operatorInterface.isAutoAim() && 
                     gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME);
 
-                if (aimStart)
-                {
-                    m_drivers.commandScheduler.addCommand(m_agitatorCommand); ///
-                    m_drivers.commandScheduler.addCommand(m_flywheelsCommand); ///
-                }
+                // if(aimStart) {
+                    // m_drivers.commandScheduler.addCommand(m_flywheelsCommand); ///
+                    // m_targetAgitatorTicks++;
+
+                    // if (m_targetAgitatorTicks >= TARGET_AGITATOR_TICKS)
+                    // {
+                    //     m_drivers.commandScheduler.addCommand(m_agitatorCommand); ///
+                    // }
+                //}
       
             }
             m_turret.lock();
@@ -303,7 +308,7 @@ void AutoTurretCommand::execute()
             //if (m_turret.getImuYaw() > referenceScanningYaw + SCAN_ANGLE_LIMIT_RAD)
             if (m_turret.getImuYaw() > SCAN_ANGLE_LIMIT_RAD_LEFT)
             {
-                m_scanDirection = -3.0f; 
+                m_scanDirection = 1.25f; 
             }
 
             else if (m_turret.getImuYaw() < -1.0f * SCAN_ANGLE_LIMIT_RAD_RIGHT)
