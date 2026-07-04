@@ -77,7 +77,7 @@ void AutoTurretCommand::execute()
     }
     
     communication::TargetColor detectedColor = currentTarget.color;
-    bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);    
+    bool hasValidTarget = hasValidCoordinate; //&& (detectedColor == enemyColor);    
 
     // -----------------------------------------
     // Phase 1: State Transitions
@@ -148,15 +148,15 @@ void AutoTurretCommand::execute()
                 bool aimStart = (m_operatorInterface.isAutoAim() && 
                     gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME);
 
-                if(aimStart) {
-                    m_drivers.commandScheduler.addCommand(m_flywheelsCommand); ///
-                    m_targetAgitatorTicks++;
+                // if(aimStart) {
+                    // m_drivers.commandScheduler.addCommand(m_flywheelsCommand); ///
+                    // m_targetAgitatorTicks++;
 
-                    if (m_targetAgitatorTicks >= TARGET_AGITATOR_TICKS)
-                    {
-                        m_drivers.commandScheduler.addCommand(m_agitatorCommand); ///
-                    }
-                }
+                    // if (m_targetAgitatorTicks >= TARGET_AGITATOR_TICKS)
+                    // {
+                    //     m_drivers.commandScheduler.addCommand(m_agitatorCommand); ///
+                    // }
+                //}
       
             }
             m_turret.lock();

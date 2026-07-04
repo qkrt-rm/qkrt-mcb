@@ -45,7 +45,8 @@ void AutoHolonomicChassisCommand::execute()
         isNavReady = false;
         islockTurret = true;
         //wait 3 seconds for nav to settle
-        if (gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME && !isNavReady)
+        //gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME &&
+        if (!isNavReady)
         {
             m_startTimer += 0.002f;
             if (m_startTimer >= 3.0f)
@@ -60,6 +61,15 @@ void AutoHolonomicChassisCommand::execute()
                             data.yVel * 2.0f : m_operatorInterface.getChassisYInput();
         float w = 0;
 
+        // if (isNavReady && isHardCode)
+        // {
+        //     m_sequenceTimer += 0.002f;
+
+            //track cycles of 10s
+            //float currentCycleTime = std::fmod(m_sequenceTimer, 10.0f);
+
+            // move left
+
         if (isNavReady && isHardCode)
         {
              m_sequenceTimer += 0.002f;
@@ -68,24 +78,8 @@ void AutoHolonomicChassisCommand::execute()
             //float currentCycleTime = std::fmod(m_sequenceTimer, 10.0f);
 
             // move left
-            if (m_sequenceTimer < 5.5f && m_scriptStage == 0)
+            if (m_sequenceTimer < 5.5f)
             {
-                rawInpX = 0.0f;
-
-                if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
-                {
-                    rawInpY = 0.5f;     
-                }
-                else
-                {
-                    rawInpY = -0.5f;      
-                }
-                w = 0;
-            } else if (m_sequenceTimer < 8.0 && m_scriptStage == 1){
-                rawInpY = 0.0f;
-                rawInpX = 0.5;
-                w = 0;
-            } else if (m_sequenceTimer < 5.0 && m_scriptStage == 2){
                 rawInpX = 0.0f;
 
                 if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
@@ -97,23 +91,67 @@ void AutoHolonomicChassisCommand::execute()
                     rawInpY = 0.5f;      
                 }
                 w = 0;
-            } else if (m_sequenceTimer < 2.5 && m_scriptStage == 3){
-                rawInpY = 0.0f;
-                rawInpX = 0.5;
-                w = 0;
-            } else if (m_scriptStage == 4){
-                rawInpX = 0.0f;
-                rawInpY = 0.0f;
-                w = 0;
-                islockTurret = false;
             }
             // Station in Corner
             else
             {
-                m_scriptStage++;
-                m_sequenceTimer = 0;
+                rawInpX = 0.0f;
+                rawInpY = 0.0f;
+                w = m_chassisRotSpeed;
+                islockTurret = false;
             }
         }
+
+            // if (m_sequenceTimer < 5.5f)
+            // {
+            //     rawInpX = 0.0f;
+
+            //     if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
+            //     {
+            //         rawInpY = 0.5f;     
+            //     }
+            //     else
+            //     {
+            //         rawInpY = -0.5f;      
+            //     }
+            //     w = 0;
+            // }
+            // } else if (m_sequenceTimer < 8.0 && m_scriptStage == 1){
+            //     rawInpY = 0.0f;
+            //     rawInpX = 0.5;
+            //     w = 0;
+            // } else if (m_sequenceTimer < 5.0 && m_scriptStage == 2){
+            //     rawInpX = 0.0f;
+
+            //     if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
+            //     {
+            //         rawInpY = -0.5f;     
+            //     }
+            //     else
+            //     {
+            //         rawInpY = 0.5f;      
+            //     }
+            //     w = 0;
+            // } else if (m_sequenceTimer < 2.5 && m_scriptStage == 3){
+            //     rawInpY = 0.0f;
+            //     rawInpX = 0.5;
+            //     w = 0;
+            // } else if (m_scriptStage == 4){
+            //     rawInpX = 0.0f;
+            //     rawInpY = 0.0f;
+            //     w = 0;
+            //     islockTurret = false;
+            // }
+            // // Station in Corner
+        //     else
+        //     {
+        //         rawInpX = 0.0f;
+        //         rawInpY = 0.0f;
+        //         islockTurret = false;
+        //         isHardCode = false;
+        //         w = m_chassisRotSpeed;
+        //     }
+        // }
        
 
         Vector2f moveVector(rawInpX, rawInpY);
@@ -133,8 +171,8 @@ void AutoHolonomicChassisCommand::execute()
         //compute rotation transformation
         float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);
         float v_x = yInp * std::sin(-yawAngle) + xInp * std::cos(-yawAngle);
-        // float w = (isAutoNav && isNavReady) ? 
-        //                 m_chassisRotSpeed : m_chassisRotSpeed * m_operatorInterface.getChassisBeyblade();
+        //float w = (isAutoNav && isNavReady) ? 
+        //                m_chassisRotSpeed : m_chassisRotSpeed * m_operatorInterface.getChassisBeyblade();
         
         float leftFront  = (v_x + v_y + w);
         float leftBack   = (v_x - v_y + w);

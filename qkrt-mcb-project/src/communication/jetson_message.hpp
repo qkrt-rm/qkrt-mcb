@@ -58,7 +58,7 @@ namespace communication
         float imuRoll;
         // Referee Info
         // uint8_t gameStage;
-        // uint16_t currentHp;
+        uint16_t currentHp;
         // bool isSupplyZone;
 
     } modm_packed;
