@@ -90,7 +90,7 @@ private:
     };
 
     float m_flyhweelSpeed = 0.0355f;
-    float m_agitatorSpeed = -7.2f;
+    float m_agitatorSpeed = -8.6f;
 
     flywheel::m3508::FlywheelConfig m_flywheelConfig {
         .leftFlyId = MotorId::MOTOR1, 
