@@ -77,7 +77,7 @@ void AutoTurretCommand::execute()
     }
     
     communication::TargetColor detectedColor = currentTarget.color;
-    bool hasValidTarget = hasValidCoordinate; && (detectedColor == enemyColor);    
+    bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);    
 
     // -----------------------------------------
     // Phase 1: State Transitions
