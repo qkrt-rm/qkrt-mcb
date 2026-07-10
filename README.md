@@ -4,7 +4,7 @@ This repository contains the embedded programs running on the RoboMaster Type C 
 
 ## Getting Started
 1. Follow the [MCB Programming Notion Page](https://app.notion.com/p/Main-Controller-Board-Programming-1211ea6d75cd81c2884eda20a9877951?source=copy_link) or [New User Guide](https://github.com/uw-advanced-robotics/taproot-template-project#new-user-guide) for setting up your development enviornment.
-2. Clone the repository: \
+2. Clone the repository: 
 
 Run the following to clone this repository:
 ```bash
