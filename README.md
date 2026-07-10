@@ -27,7 +27,7 @@ scons run robot=TARGET_STANDARD   #TARGET_HERO, TARGET_SENTRY
 5. Read the [Taproot Command Subsystem Framework](https://gitlab.com/aruw/controls/taproot/-/wikis/Command-Subsystem-Framework)
 
 
-Our work is mainly found in the ```text qkrt-mcb/qkrt-mcb-project-src``` directory. Review the subsystems and command code.
+Our work is mainly found in the ```qkrt-mcb/qkrt-mcb-project-src``` directory. Review the subsystems and command code.
 
 ## Resources and Manuals
 - [Taproot Wiki](https://gitlab.com/aruw/controls/taproot/-/wikis/home)
