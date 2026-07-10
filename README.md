@@ -4,7 +4,8 @@ This repository contains the embedded programs running on the RoboMaster Type C 
 
 ## Getting Started
 1. Follow the [MCB Programming Notion Page](https://app.notion.com/p/Main-Controller-Board-Programming-1211ea6d75cd81c2884eda20a9877951?source=copy_link) or [New User Guide](https://github.com/uw-advanced-robotics/taproot-template-project#new-user-guide) for setting up your development enviornment.
-2. Clone the repository 
+2. Clone the repository: \
+
 Run the following to clone this repository:
 ```bash
 git clone --recursive https://github.com/qkrt-rm/qkrt-mcb.git
@@ -23,8 +24,9 @@ scons build
 scons run robot=TARGET_STANDARD   #TARGET_HERO, TARGET_SENTRY
 ```
 
-4. Familiarize yourself with the build and flashing commands found in the [Building via Terminal](https://github.com/uw-advanced-robotics/taproot-template-project#building-and-running-via-the-terminal)
-5. Read the [Taproot Command Subsystem Framework](https://gitlab.com/aruw/controls/taproot/-/wikis/Command-Subsystem-Framework)
+4. Familarize yourself with the [ST-Link](https://gitlab.com/aruw/controls/taproot/-/wikis/Debugging-With-STLink) and [J-Link Debugger](https://gitlab.com/aruw/controls/taproot/-/wikis/Debugging-With-JLink). 
+5. Familiarize yourself with the build and flashing commands found in the [Building via Terminal](https://github.com/uw-advanced-robotics/taproot-template-project#building-and-running-via-the-terminal)
+6. Read the [Taproot Command Subsystem Framework](https://gitlab.com/aruw/controls/taproot/-/wikis/Command-Subsystem-Framework)
 
 
 Our work is mainly found in the ```qkrt-mcb/qkrt-mcb-project-src``` directory. Review the subsystems and command code.
