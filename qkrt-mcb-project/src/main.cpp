@@ -57,12 +57,12 @@ control::Robot robot(*DoNotUse_getDrivers());
 
 // Place any sort of input/output initialization here. For example, place
 // serial init stuff here.
-static void initializeIo(Drivers *drivers);
+static void initializeIo(Drivers* drivers);
 
 // Anything that you would like to be called place here. It will be called
 // very frequently. Use PeriodicMilliTimers if you don't want something to be
 // called as frequently.
-static void updateIo(Drivers *drivers);
+static void updateIo(Drivers* drivers);
 
 int main()
 {
@@ -105,7 +105,7 @@ int main()
     return 0;
 }
 
-static void initializeIo(Drivers *drivers)
+static void initializeIo(Drivers* drivers)
 {
     drivers->analog.init();
     drivers->pwm.init();
@@ -117,22 +117,22 @@ static void initializeIo(Drivers *drivers)
     drivers->bmi088.initialize(IMU_SAMPLE_FREQUENCY, MAHONY_KP, MAHONY_KI);
     drivers->bmi088.setCalibrationSamples(2000);
     drivers->bmi088.requestCalibration();
-    drivers->refSerial.initialize();            //COMMENT FOR UART SERIAL  
+    drivers->refSerial.initialize();            //COMMENT FOR UART SERIAL
     drivers->terminalSerial.initialize();
     drivers->schedulerTerminalHandler.init();
     drivers->djiMotorTerminalSerialHandler.init();
     drivers->visionCoprocessor.initialize();
 }
 
-static void updateIo(Drivers *drivers)
+static void updateIo(Drivers* drivers)
 {
 #ifdef PLATFORM_HOSTED
     tap::motorsim::SimHandler::updateSims();
 #endif
-    drivers->canRxHandler.pollCanData();        
+    drivers->canRxHandler.pollCanData();
     drivers->refSerial.updateSerial();          //COMMENT FOR UART SERIAL
-    drivers->remote.read();                     
-    drivers->bmi088.read();                     
-    drivers->visionCoprocessor.updateSerial();     
-    drivers->visionCoprocessor.sendData();          
+    drivers->remote.read();
+    drivers->bmi088.read();
+    drivers->visionCoprocessor.updateSerial();
+    drivers->visionCoprocessor.sendData();
 }
