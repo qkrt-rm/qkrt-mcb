@@ -47,6 +47,9 @@
     <module>modm:platform:flash</module>
     <module>modm:platform:gpio</module>
     <module>modm:platform:heap</module>
+
+    <module>modm:platform:i2c:2</module>   
+     
     <module>modm:platform:random</module>
     <module>modm:platform:timer:8</module>
     <module>modm:platform:uart:1</module>
