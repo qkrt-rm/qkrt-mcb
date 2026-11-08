@@ -12,7 +12,7 @@ class Ina260 : public modm::I2cDevice<I2cMaster, 4>
     {
         CURRENT = 0x1,
         BUS_VOLTAGE = 0x2,
-        POWER = 0x3,
+        //POWER = 0x3,
         MANUFACTURER_ID = 0xFE, 
     };
 
@@ -40,15 +40,15 @@ public:
         ok = RF_CALL(readRegister(Register::CURRENT, rawCurrent));
         if (!ok) { RF_RETURN(false); }
         ok = RF_CALL(readRegister(Register::BUS_VOLTAGE, rawVoltage));
-        if (!ok) { RF_RETURN(false); }
-        ok = RF_CALL(readRegister(Register::POWER, rawPower));
+        //if (!ok) { RF_RETURN(false); }
+        //ok = RF_CALL(readRegister(Register::POWER, rawPower));
         RF_END_RETURN(ok);    
     }
 
     bool checkConnected() const { return connected; }
     float currentMa() const { return static_cast<int16_t>(rawCurrent) * 1.25f; } //1 bit = 1.25 mA
     float busVoltageMv() const { return rawVoltage * 1.25f; } //1 bit = 1.25 mV
-    float powerMw() const { return rawPower * 10.0f; } //1 bit = 10 mW
+    //float powerMw() const { return rawPower * 10.0f; } //1 bit = 10 mW
 
 private:
     modm::ResumableResult<bool>
@@ -64,7 +64,8 @@ private:
 
     uint8_t txBuf[1];
     uint8_t rxBuf[2];
-    uint16_t rawID = 0, rawCurrent = 0, rawVoltage = 0, rawPower = 0;
+    uint16_t rawID = 0, rawCurrent = 0, rawVoltage = 0;
+    //rawPower = 0;
     bool ok = false, txOk = false, connected = false;    
 };
 } //namespace sensors

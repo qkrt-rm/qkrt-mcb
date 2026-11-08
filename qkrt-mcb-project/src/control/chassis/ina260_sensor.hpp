@@ -15,7 +15,7 @@ public:
     void update() override { run(); }
     float getCurrentMa() const override { return currentMa; }
     float getVoltageMv() const override { return busVoltageMv; }
-    float getPowerMw() const { return powerMw; }
+    //float getPowerMw() const { return powerMw; }
     bool isConnected() const { return ina.checkConnected(); }
 
 private:
@@ -33,7 +33,7 @@ private:
                 PT_CALL(ina.readAll());
                 currentMa = ina.currentMa();
                 busVoltageMv = ina.busVoltageMv();
-                powerMw = ina.powerMw();
+                //powerMw = ina.powerMw();
             }
             PT_YIELD();
         }
@@ -41,6 +41,7 @@ private:
     }
 
     Ina260<modm::platform::I2cMaster2> ina;
-    float currentMa = 0, busVoltageMv = 0, powerMw = 0;
+    float currentMa = 0, busVoltageMv = 0;
+    //powerMw = 0;
 };
 }  // namespace sensors
