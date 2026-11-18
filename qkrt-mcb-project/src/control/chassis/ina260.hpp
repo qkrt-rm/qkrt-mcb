@@ -1,3 +1,9 @@
+/*
+ * ina260.hpp
+ * register-level i2c driver for the ina260 sensor
+ * used by ina260_sensor.hpp
+ */
+
 #pragma once
 #include <cstdint>
 #include <modm/architecture/interface/i2c_device.hpp>

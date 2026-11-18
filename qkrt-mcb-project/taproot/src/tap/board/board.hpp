@@ -151,11 +151,9 @@ using PWMOutPins = SoftwareGpioPort<PWMOutPinC1, PWMOutPinC2, PWMOutPinC3, PWMOu
 
 // Initialize digital input pins
         
-using DigitalInPinPF1 = GpioF1;
-using DigitalInPinPF0 = GpioF0;
 using DigitalInPinB12 = GpioB12;
         
-using DigitalInPins = SoftwareGpioPort<DigitalInPinPF1, DigitalInPinPF0, DigitalInPinB12>;
+using DigitalInPins = SoftwareGpioPort<DigitalInPinB12>;
 
 // Initialize digital output pins
         

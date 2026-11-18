@@ -51,12 +51,6 @@ void Digital::configureInputPullMode(Digital::InputPin pin, Digital::InputPullMo
 #else
     switch (pin)
     {
-        case Digital::InputPin::PF1:
-            DigitalInPinPF1::configure(mode);
-            break;
-        case Digital::InputPin::PF0:
-            DigitalInPinPF0::configure(mode);
-            break;
         case Digital::InputPin::B12:
             DigitalInPinB12::configure(mode);
             break;
@@ -96,10 +90,6 @@ bool Digital::read(Digital::InputPin pin) const
 #else
     switch (pin)
     {
-        case Digital::InputPin::PF1:
-            return DigitalInPinPF1::read();
-        case Digital::InputPin::PF0:
-            return DigitalInPinPF0::read();
         case Digital::InputPin::B12:
             return DigitalInPinB12::read();
         default:

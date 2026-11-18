@@ -56,8 +56,6 @@ public:
      */
     enum InputPin
     {
-        PF1,
-        PF0,
         B12,
     };
 

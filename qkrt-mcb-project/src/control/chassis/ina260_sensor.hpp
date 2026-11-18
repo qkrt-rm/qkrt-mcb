@@ -1,3 +1,11 @@
+/*
+ * ina260_sensor.hpp
+ * taproot wrapper around the ina260 driver
+ * 
+ * implements CurrentSensorInterface and VoltageSensorInterface, 
+ * caches the latest readings, and advances the bus reads from update()
+ */
+
 #pragma once
 #include <modm/platform.hpp>
 #include <modm/processing/protothread.hpp>
