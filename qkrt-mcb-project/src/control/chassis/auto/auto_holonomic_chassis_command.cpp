@@ -1,13 +1,16 @@
 #include "auto_holonomic_chassis_command.hpp"
+
 #include "control/turret/turret_subsystem.hpp"
 
 namespace control::chassis
 {
 
-AutoHolonomicChassisCommand::AutoHolonomicChassisCommand(Drivers &drivers, HolonomicChassisSubsystem& chassis,
-                                                 turret::TurretSubsystem& turret,
-                                                 ControlOperatorInterface& m_operatorInterface,
-                                                 chassisCommandConfig config)
+AutoHolonomicChassisCommand::AutoHolonomicChassisCommand(
+    Drivers& drivers,
+    HolonomicChassisSubsystem& chassis,
+    turret::TurretSubsystem& turret,
+    ControlOperatorInterface& m_operatorInterface,
+    chassisCommandConfig config)
     : m_chassis(chassis),
       m_turret(turret),
       m_operatorInterface(m_operatorInterface),
@@ -19,104 +22,66 @@ AutoHolonomicChassisCommand::AutoHolonomicChassisCommand(Drivers &drivers, Holon
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
       m_drivers(&drivers),
-      isHardCode(false),
       islockTurret(true)
 
 {
     addSubsystemRequirement(&chassis);
 }
 
-void AutoHolonomicChassisCommand::initialize()
-{
-}
+void AutoHolonomicChassisCommand::initialize() {}
 
 void AutoHolonomicChassisCommand::execute()
-{       
-        m_operatorInterface.pollInputDevices();
+{
+    m_operatorInterface.pollInputDevices();
 
-        volatile communication::NavData data = m_visionCoprocessor.getNavData();
-        bool isAutoNav = m_operatorInterface.getAutoNavInput();
-        auto gameData = m_drivers->refSerial.getGameData();
-        auto robotData = m_drivers->refSerial.getRobotData();
-        tap::communication::serial::RefSerialData::RobotId robotID = robotData.robotId;
-        //blue right
-        //red left
-        isNavReady = false;
-        islockTurret = true;
-        //wait 3 seconds for nav to settle
-       
-        if ( gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME && !isNavReady)
-        {
-            m_startTimer += 0.002f;
-            if (m_startTimer >= 3.0f)
-            {
-                isNavReady = true; 
-            }
-        }
-        
-        float rawInpX = data.xVel * 2.0f;
-        float rawInpY = data.yVel * 2.0f;
-        float w = 0;
+    volatile communication::NavData data = m_visionCoprocessor.getNavData();
+    bool isAutoNav = m_operatorInterface.getAutoNavInput();
+    auto gameData = m_drivers->refSerial.getGameData();
+    auto robotData = m_drivers->refSerial.getRobotData();
+    tap::communication::serial::RefSerialData::RobotId robotID = robotData.robotId;
+    // blue right
+    // red left
+    islockTurret = true;
 
-        if (isNavReady && isHardCode)
-        {
-             m_sequenceTimer += 0.002f;
+    // take jetson message data and apply it (use autonav) if enabled, else take whatever comes
+    // through the remote
+    float rawInpX = isAutoNav ? data.xVel * 2.0f : m_operatorInterface.getChassisXInput();
+    float rawInpY = isAutoNav ? data.yVel * 2.0f : m_operatorInterface.getChassisYInput();
+    float w = m_chassisRotSpeed * m_operatorInterface.getChassisBeyblade();
 
-            //track cycles of 10s
-            //float currentCycleTime = std::fmod(m_sequenceTimer, 10.0f);
+    if (isAutoNav)
+        m_logger.printf("hello bool true");
+    else
+        m_logger.printf("hello bool false");
+    m_logger.delay(200);
 
-            // move left
-            if (m_sequenceTimer < 5.5f)
-            {
-                rawInpX = 0.0f;
+    Vector2f moveVector(rawInpX, rawInpY);
+    float inputLength = moveVector.getLength();
 
-                if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
-                {
-                    rawInpY = -0.5f;     
-                }
-                else
-                {
-                    rawInpY = 0.5f;      
-                }
-                w = 0;
-            }
-            // Station in Corner
-            else
-            {
-                rawInpX = 0.0f;
-                rawInpY = 0.0f;
-                w = m_chassisRotSpeed;
-                islockTurret = false;
-            }
-        }
-       
+    if (inputLength > 1.0f)
+    {
+        moveVector = moveVector / inputLength;
+    }
 
-        Vector2f moveVector(rawInpX, rawInpY);
-        float inputLength = moveVector.getLength();
+    Vector2f scaledMove = moveVector * m_maxSpeed;
 
-        if (inputLength > 1.0f)
-        {
-            moveVector = moveVector / inputLength;
-        }
+    float xInp = scaledMove.x;
+    float yInp = scaledMove.y;
+    float yawAngle = m_turret.getYaw();
 
-        Vector2f scaledMove = moveVector * m_maxSpeed;
+    // compute rotation transformation
+    float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);
+    float v_x = yInp * std::sin(-yawAngle) + xInp * std::cos(-yawAngle);
+    // float w = (isAutoNav && isNavReady) ?
+    //                 m_chassisRotSpeed : m_chassisRotSpeed *
+    //                 m_operatorInterface.getChassisBeyblade();
 
-        float xInp = scaledMove.x;
-        float yInp = scaledMove.y;
-        float yawAngle = m_turret.getYaw();
-        
-        //compute rotation transformation
-        float v_y = yInp * std::cos(-yawAngle) - xInp * std::sin(-yawAngle);
-        float v_x = yInp * std::sin(-yawAngle) + xInp * std::cos(-yawAngle);
-        // float w = (isAutoNav && isNavReady) ? 
-        //                 m_chassisRotSpeed : m_chassisRotSpeed * m_operatorInterface.getChassisBeyblade();
-        
-        float leftFront  = (v_x + v_y + w);
-        float leftBack   = (v_x - v_y + w);
-        float rightFront = (v_x - v_y - w);
-        float rightBack  = (v_x + v_y - w);
+    float leftFront = (v_x + v_y + w);
+    float leftBack = (v_x - v_y + w);
+    float rightFront = (v_x - v_y - w);
+    float rightBack = (v_x + v_y - w);
 
-        m_chassis.setWheelVelocities(leftFront, leftBack, rightBack, rightFront);
+    m_chassis.setWheelVelocities(leftFront, leftBack, rightBack, rightFront);
 }
 
 void AutoHolonomicChassisCommand::end(bool /* interrupted */)

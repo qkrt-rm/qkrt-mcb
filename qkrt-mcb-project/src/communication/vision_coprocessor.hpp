@@ -3,6 +3,7 @@
 #include <tap/communication/serial/dji_serial.hpp>
 #include <tap/communication/serial/uart.hpp>
 #include <tap/architecture/timeout.hpp>
+#include <tap/communication/sensors/imu/bmi088/bmi088.hpp>
 
 #include "jetson_message.hpp"
 #include "communication/logger/logger.hpp"
