@@ -101,7 +101,8 @@ void TurretSubsystem::refresh()
         m_isYawZeroed=true;
     }
 
-    m_yaw += m_imu.getGz()*-1.0f * DT;
+    float imuYawRps = (m_mcbHoriz ? m_imu.getGz() * -1.0f : m_imu.getGx());
+    m_yaw += imuYawRps * DT;
 
     if (m_aimLock)     
     {
@@ -126,7 +127,7 @@ void TurretSubsystem::refresh()
         m_desiredPitchVoltage = m_pitchVelPid.getOutput();
 
         //float currentYaw = m_yaw;
-        float currentYawRpm = m_imu.getGz() * -1;  //TODO: make sure this is filtered
+        float currentYawRpm = imuYawRps;  //TODO: make sure this is filtered
         
         //Yaw Position Outer Loop
         float azimuthError = getOptimalError(m_desiredYaw, getImuYaw());
@@ -158,7 +159,6 @@ void TurretSubsystem::refresh()
         m_desiredPitchVoltage = m_pitchVelPid.getOutput() + pitchFF;
 
         //yaw velocity loop 
-        float imuYawRps = (m_mcbHoriz ? m_imu.getGz() * -1 : m_imu.getGx());
 
         float yawRpsError = (m_desiredYawRps * m_yawSetWeight) - imuYawRps;
         m_yawVelPid.runControllerDerivateError(yawRpsError, DT);

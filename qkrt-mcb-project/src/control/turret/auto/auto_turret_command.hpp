@@ -33,6 +33,12 @@ public:
                   tap::control::Command* agitatorCommand,
                   control::chassis::AutoHolonomicChassisCommand& autoChassisCmd); ///
 
+    AutoTurretCommand(Drivers& drivers, TurretSubsystem& turret,
+                  ControlOperatorInterface& m_operatorInterface,
+                  tap::control::Command* flywheelsCommand,
+                  tap::control::Command* agitatorCommand,
+                  control::chassis::AutoHolonomicChassisCommand* autoChassisCmd = nullptr);
+
     void initialize() override;
     bool isReady() override;
     void execute() override;
@@ -75,7 +81,7 @@ private:
 
     tap::control::Command* m_flywheelsCommand; ///
     tap::control::Command* m_agitatorCommand; ///
-    control::chassis::AutoHolonomicChassisCommand& m_autoChassisCmd;
+    control::chassis::AutoHolonomicChassisCommand* m_autoChassisCmd;
 
     static constexpr float MAX_PITCH_STEP_PER_UPDATE = 0.03f;
 

@@ -10,14 +10,20 @@ AutoTurretCommand::AutoTurretCommand(Drivers & drivers, TurretSubsystem& turret,
                              tap::control::Command* flywheelsCommand, ///
                              tap::control::Command* agitatorCommand,
                              control::chassis::AutoHolonomicChassisCommand& autoChassisCmd) ///
-    : m_drivers(drivers),
-      m_turret(turret),
+    : AutoTurretCommand(drivers, turret, m_operatorInterface, flywheelsCommand, agitatorCommand, &autoChassisCmd)
+{
+}
+
+AutoTurretCommand::AutoTurretCommand(Drivers & drivers, TurretSubsystem& turret,
+                             ControlOperatorInterface& m_operatorInterface,
+                             tap::control::Command* flywheelsCommand,
+                             tap::control::Command* agitatorCommand,
+                             control::chassis::AutoHolonomicChassisCommand* autoChassisCmd)
+    : m_turret(turret),
       m_operatorInterface(m_operatorInterface),
-      m_flywheelsCommand(flywheelsCommand), ///
-      m_agitatorCommand(agitatorCommand), ///
-      m_autoChassisCmd(autoChassisCmd),
       m_visionCoprocessor(drivers.visionCoprocessor),
       m_logger(drivers.logger),
+      m_drivers(drivers),
       isAutoAim(true),
       m_globalPitch(0.0f), m_globalYaw(0.0f),
       m_pitchCommand(0.0f), m_yawCommand(0.0f),
@@ -31,6 +37,9 @@ AutoTurretCommand::AutoTurretCommand(Drivers & drivers, TurretSubsystem& turret,
       m_targetStartTicks(0),
       m_targetAcquireTicks(0),
       m_scanDirection(1.0f),
+      m_flywheelsCommand(flywheelsCommand),
+      m_agitatorCommand(agitatorCommand),
+      m_autoChassisCmd(autoChassisCmd),
       m_kalmanFilter(kalman_config::KALMAN_A, 
                      kalman_config::KALMAN_C, 
                      kalman_config::KALMAN_Q, 
@@ -61,22 +70,26 @@ void AutoTurretCommand::execute()
                         || currentTarget.zPos != m_lastTarget.zPos) && currentTarget.xPos != 0;
 
 
-    communication::TargetColor enemyColor; 
-
-    auto robotData = m_drivers.refSerial.getRobotData();
-    tap::communication::serial::RefSerialData::RobotId robotID = robotData.robotId;
-    
-    if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
-    {
-        enemyColor = communication::TargetColor::BLUE;
-    }
-    else
-    {
-        enemyColor = communication::TargetColor::RED;
-    }
-    
-    communication::TargetColor detectedColor = currentTarget.color;
-    bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);    
+    // Disabled for non-game testing so turret aims at any plate color.
+    // Note: for competition infantry, use !tap::communication::serial::RefSerialData::isBlueTeam(robotID)
+    // instead of checking only RED_SENTINEL.
+    // communication::TargetColor enemyColor; 
+    //
+    // auto robotData = m_drivers.refSerial.getRobotData();
+    // tap::communication::serial::RefSerialData::RobotId robotID = robotData.robotId;
+    // 
+    // if (robotID == tap::communication::serial::RefSerialData::RobotId::RED_SENTINEL)
+    // {
+    //     enemyColor = communication::TargetColor::BLUE;
+    // }
+    // else
+    // {
+    //     enemyColor = communication::TargetColor::RED;
+    // }
+    // 
+    // communication::TargetColor detectedColor = currentTarget.color;
+    // bool hasValidTarget = hasValidCoordinate && (detectedColor == enemyColor);
+    bool hasValidTarget = hasValidCoordinate;    
 
     // -----------------------------------------
     // Phase 1: State Transitions
@@ -142,9 +155,11 @@ void AutoTurretCommand::execute()
 
             if (m_targetStartTicks >= TARGET_START_SHOOTING_TICKS)
             {
-                auto gameData = m_drivers.refSerial.getGameData();
-                bool aimStart = (m_operatorInterface.isAutoAim() && 
-                    gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME);
+                // Disabled IN_GAME gate for non-game testing
+                // auto gameData = m_drivers.refSerial.getGameData();
+                // bool aimStart = (m_operatorInterface.isAutoAim() && 
+                //     gameData.gameStage == tap::communication::serial::RefSerialData::Rx::GameStage::IN_GAME);
+                bool aimStart = m_operatorInterface.isAutoAim();
 
                 if (aimStart)
                 {
@@ -316,7 +331,7 @@ void AutoTurretCommand::execute()
             
             //m_scanDirection = -1.0f;
 
-            if(m_autoChassisCmd.isDriveLockTurret())
+            if(m_autoChassisCmd == nullptr || m_autoChassisCmd->isDriveLockTurret())
             {
                 m_turret.setYawRps(0.0f);
             }

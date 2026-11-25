@@ -10,7 +10,7 @@ Robot::Robot(Drivers& drivers)
       m_chassis(drivers, m_chassisConfig),
       m_chassisCommand(drivers, m_chassis, m_turret, drivers.controlOperatorInterface, m_chassisCommandConfig),
       m_turret(drivers, m_turretConfig, m_chassisCommandConfig),
-      m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface),
+      m_turretCommand(drivers, m_turret, drivers.controlOperatorInterface, &m_flywheelsCommand, &m_agitatorCommand),
       m_flywheels(drivers, m_flywheelConfig),
       m_flywheelsCommand(m_flywheels, m_flyhweelSpeed),
       m_agitator(drivers, m_agitatorConfig),
@@ -34,6 +34,8 @@ void Robot::initializeSubsystems()
     m_turret.initialize();
     m_flywheels.initialize();
     m_agitator.initialize();
+    m_drivers.visionCoprocessor.setChassisSubsystem(&m_chassis);
+    m_drivers.visionCoprocessor.setTurretSubsystem(&m_turret);
 }
 
 void Robot::registerSubsystems()
